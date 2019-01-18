@@ -7,7 +7,7 @@
 
 namespace crpropa {
 
-Vector3d Ferriere::_HI::CMZTrafo(const Vector3d &position) const {
+Vector3d Ferriere::CMZTrafo(const Vector3d &position) const {
 	// set galactocentric coordinate system with the Sun at (-8.5,0.,0.) instead of (8.5, 0, 0) to be consistand with JF12 implementation
 	double x = -position.x;
 	double y = -position.y;
@@ -25,7 +25,7 @@ Vector3d Ferriere::_HI::CMZTrafo(const Vector3d &position) const {
 	return pos;
 }
 
-Vector3d Ferriere::_HI::DISKTrafo(const Vector3d &position) const {
+Vector3d Ferriere::DISKTrafo(const Vector3d &position) const {
 	// set galactocentric coordinate system with the Sun at (-8.5,0.,0.) instead of (8.5, 0, 0) to be consistand with JF12 implementation
 	double x = -position.x;
 	double y = - position.y;
@@ -56,59 +56,8 @@ Vector3d Ferriere::_HI::DISKTrafo(const Vector3d &position) const {
 	return pos;
 }
 
-Vector3d Ferriere::_H2::CMZTrafo(const Vector3d &position) const {
-	// set galactocentric coordinate system with the Sun at (-8.5,0.,0.) instead of (8.5, 0, 0) to be consistand with JF12 implementation
-	double x = -position.x;
-	double y = -position.y;
-
-	double xC = -50*pc;		//offset
-	double yC = 50*pc;
-	double sinTc = sin(70.*deg);
-	double cosTc = cos(70.*deg);
-
-	Vector3d pos;
-	pos.x = (x - xC)*cosTc + (y - yC)*sinTc;
-	pos.y = -(x - xC)*sinTc + (y - yC)*cosTc;
-	pos.z = position.z;
-
-	return pos;
-}
-
-Vector3d Ferriere::_H2::DISKTrafo(const Vector3d &position) const {
-	// set galactocentric coordinate system with the Sun at (-8.5,0.,0.) instead of (8.5, 0, 0) to be consistand with JF12 implementation
-	double x = -position.x;
-	double y = - position.y;
-	double z = position.z;
-
-	double alphaD = 13.5*deg;  // rotation arround x-axis
-	double sinAd = sin(alphaD);
-	double cosAd = cos(alphaD);
-	double betaD = 20.*deg;  // rotation arround y'-axis
-	double sinBd = sin(betaD);
-	double cosBd = cos(betaD);
-	double TettaD = 48.5*deg;  // rotation arround x"-axis
-	double sinTd = sin(TettaD);
-	double cosTd = cos(TettaD);
-
-	Vector3d pos;
-
-	pos.x = x*cosBd*cosTd - y*(sinAd*sinBd*cosTd -cosAd*sinTd)-z*(cosAd*sinBd*cosTd +sinAd*sinTd);
-
-	pos.y =  -x*cosBd*sinTd;
-	pos.y += y*(sinAd*sinBd*sinTd +cosAd*cosTd);
-	pos.y += z*(cosAd*sinBd*sinTd -sinAd*cosTd);
-
-	pos.z = x*sinBd;
-	pos.z += y*sinAd*cosBd;
-	pos.z += z*cosAd*cosBd;
-
-	return pos;
-}
-
-
-double Ferriere::_HI::get(const Vector3d &position) const {
+double Ferriere::getHIDensity(const Vector3d &position) const {
 	double n = 0;
-	double Rsun = 8500*pc;
 	double R = sqrt(position.x*position.x+position.y*position.y);
 
 	if(R<3*kpc)
@@ -158,9 +107,8 @@ double Ferriere::_HI::get(const Vector3d &position) const {
 	return n;
 }
 
-double Ferriere::_HII::get(const Vector3d &position) const {
+double Ferriere::getHIIDensity(const Vector3d &position) const {
 	double n = 0;
-	double Rsun = 8500*pc;
 	double R = sqrt(position.x*position.x+position.y*position.y);
 
 	if(R< 3*kpc){   // inner
@@ -202,9 +150,8 @@ double Ferriere::_HII::get(const Vector3d &position) const {
 	return n;
 }
 
-double Ferriere::_H2::get(const Vector3d &position) const{
+double Ferriere::getH2Density(const Vector3d &position) const{
 	double n=0;
-	double Rsun = 8500*pc;
 	double R=sqrt(position.x*position.x+position.y*position.y);
 
 	if(R<3*kpc) {
@@ -240,6 +187,90 @@ double Ferriere::_H2::get(const Vector3d &position) const{
 	return n;
 }
 
+double Ferriere::getDensity(const Vector3d &position) const{
+	double n=0;
+	if(isforHI){
+		n += getHIDensity(position);
+	}
+	if(isforHII){
+		n+=getHIIDensity(position);
+	}
+	if(isforH2){
+		n+=getH2Density(position);
+	}
 
-} //namespace
+	// check if any density is activ and give warning if not
+	if(isforHI||isforHII||isforH2 == false){
+		KISS_LOG_WARNING
+			<< "\n called getDensity on deactivated Ferriere \n"
+			<< "returned 0 density\n"
+			<< "please activate \n";
+	}
 
+	return n;
+}
+
+double Ferriere::getNucleonDensity(const Vector3d &position) const{
+	double n=0;
+	if(isforHI){
+		n += getHIDensity(position);
+	}
+	if(isforHII){
+		n+=getHIIDensity(position);
+	}
+	if(isforH2){
+		n+= 2*getH2Density(position);
+	}
+
+	// check if any density is activ and give warning if not
+	if(isforHI||isforHII||isforH2 == false){
+		KISS_LOG_WARNING
+			<< "\n called getDensity on deactivated ConstantDensity \n"
+			<< "returned 0 density\n"
+			<< "please activate\n";
+	}
+
+	return n;
+}
+
+void Ferriere::setIsForHI(bool HI){
+	isforHI = HI;
+}
+
+void Ferriere::setIsForHII(bool HII){
+	isforHII = HII;
+}
+
+void Ferriere::setIsForH2(bool H2){
+	isforH2 = H2;
+}
+
+bool Ferriere::getIsForHI(){
+	return isforHI;
+}
+
+bool Ferriere::getIsForHII(){
+	return isforHII;
+}
+
+bool Ferriere::getIsForH2(){
+	return isforH2;
+}
+
+std::string Ferriere::getDescription() {
+	std::stringstream s;
+	s << "Density modell Ferriere 2007: ";
+	s<< "HI component is ";
+	if(!isforHI)
+		s<< "not ";
+	s<< "activ. HII component is ";
+	if(!isforHII)
+		s<< "not ";
+	s<<"activ. H2 component is ";
+	if(!isforH2)
+		s<<"not ";
+	s<<"activ.";
+	return s.str();
+}
+
+}  // namespace crpropa

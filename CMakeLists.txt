@@ -378,10 +378,9 @@ add_library(crpropa SHARED
 	src/magneticField/ArchimedeanSpiralField.cpp
 	src/advectionField/AdvectionField.cpp
 	src/massDistribution/Nakanishi.cpp
-	src/massDistribution/Massdistribution.cpp
+#	src/massDistribution/Massdistribution.cpp
 	src/massDistribution/Ferriere.cpp
 	src/massDistribution/Cordes.cpp
-	src/massDistribution/ConstantDensity.cpp
 
 	${CRPROPA_EXTRA_SOURCES}
 )
@@ -502,7 +501,7 @@ if(ENABLE_TESTING)
 	target_link_libraries(testDensity crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
 	add_test(testDensity testDensity)
 
-	add_executable(testDINT test/testDINT.cpp)
+#[[	add_executable(testDINT test/testDINT.cpp)
 	target_link_libraries(testDINT crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
 	add_test(testDINT testDINT)
 
@@ -542,7 +541,7 @@ if(ENABLE_TESTING)
 		target_link_libraries(testGalacticMagneticLens crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
 		add_test(testGalacticMagneticLens testGalacticMagneticLens)
 	endif(WITH_GALACTIC_LENSES)
-
+]]
 	# python tests
 	if(ENABLE_PYTHON AND PYTHONLIBS_FOUND)
 		CONFIGURE_FILE(test/testMagneticLensPythonInterface.py.in testMagneticLensPythonInterface.py)

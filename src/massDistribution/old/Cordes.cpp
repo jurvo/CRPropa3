@@ -5,8 +5,7 @@
 
 namespace crpropa {
 
-double Cordes::_HII::get(const Vector3d &position) const
-{
+double Cordes::getHIIDensity(const Vector3d &position) const {
 	double n=0;  // in m^-3
 
 	double z=position.z;
@@ -18,9 +17,27 @@ double Cordes::_HII::get(const Vector3d &position) const
 	return n;
 }
 
+double Cordes::getDensity(const Vector3d &position) const {
+	return Cordes::getHIIDensity(position);
+}
 
-std::string Cordes::getDescription()
-{
+double Cordes::getNucleonDensity(const Vector3d &position) const {
+	return getHIIDensity(position);
+}
+
+bool Cordes::getIsForHI() {
+	return isforHI;
+}
+
+bool Cordes::getIsForHII() {
+	return isforHII;
+}
+
+bool Cordes::getIsForH2() {
+	return isforH2;
+}
+
+std::string Cordes::getDescription() {
 	std::stringstream s;
 	s << "Density Cordes include HII component";
 	return s.str();
