@@ -19,6 +19,8 @@ namespace crpropa {
 class Nakanishi: public DensityDistribution {
 	
 	public:
+	/** @class _HI
+	@brief atomic hydrogen component of the Nakanishi 2003 model */
 	class _HI: public Density
 	{
 		private:
@@ -42,6 +44,9 @@ class Nakanishi: public DensityDistribution {
 		double get(const Vector3d &position) const;
 	}; //_HI 
 	
+	/**
+	@class _H2
+	@brief molecular component of the Nakanishi 2006 model */
 	class _H2: public Density
 	{
 		private:

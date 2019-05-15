@@ -18,6 +18,8 @@ inner:	arxiv:	astro-ph/0702532
 */
 class Ferriere: public DensityDistribution {
 public:
+	/** @class _HI
+	@brief atomic Hydrogen component of the Ferriere model */
 	class _HI : public Density
 	{
 		public:
@@ -43,6 +45,8 @@ public:
 		
 	}; //HI
 	
+	/** @class _HII
+	@brief ionised hydrogen component of the Ferriere model */
 	class _HII : public Density
 	{
 		public:
@@ -58,6 +62,8 @@ public:
 		
 	}; //HII
 	
+	/* @class _H2
+	@brief molecular Hydrogen component of the Ferriere model */
 	class _H2: public Density
 	{
 		public:
