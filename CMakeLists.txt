@@ -378,7 +378,6 @@ add_library(crpropa SHARED
 	src/magneticField/ArchimedeanSpiralField.cpp
 	src/advectionField/AdvectionField.cpp
 	src/massDistribution/Nakanishi.cpp
-#	src/massDistribution/Massdistribution.cpp
 	src/massDistribution/Ferriere.cpp
 	src/massDistribution/Cordes.cpp
 

@@ -544,4 +544,4 @@ class ParticleCollectorIterator {
 %include "crpropa/massDistribution/Nakanishi.h"
 %include "crpropa/massDistribution/Cordes.h"
 %include "crpropa/massDistribution/Ferriere.h"
-//%include "crpropa/massDistribution/Massdistribution.h"
+%include "crpropa/massDistribution/DensityGrid.h"
