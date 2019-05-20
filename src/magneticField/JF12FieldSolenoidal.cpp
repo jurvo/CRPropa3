@@ -181,13 +181,18 @@ Vector3d JF12FieldSolenoidal::getXField(const double& r, const double& z, const 
 				r0 = r * 1. / (1.- 1./ (2. * (zS + rXc * tanThetaX0)) * (zS - z * z / zS));
 
 				// determine correct region (inner/outer)
+				// and compute factor F for solenoidality
 				if (r0 >= r0c){
 					r0 = r + 1. / (2. * tanThetaX0) * (zS - z * z / zS);
-					inner = false;
+					f = 1. + 1/ (2 * r * tanThetaX0/ zS) * (1. - (z / zS) * (z / zS));
+				}
+				else
+				{
+					 f = 1. / ((1. - 1./( 2. + 2. * (rXc * tanThetaX0/ zS)) * (1. - (z / zS) * (z / zS))) * (1. - 1./( 2. + 2. * (rXc * tanThetaX0/ zS)) * (1. - (z / zS) * (z / zS))));
 				}
 
 				// field strength at that position
-				 if (r0 < r0c){
+				if (r0 < r0c){
 					 rp = r0 * rXc / r0c;
 					 double thetaX = atan(zS / (r0 - rp));
 
@@ -200,14 +205,6 @@ Vector3d JF12FieldSolenoidal::getXField(const double& r, const double& z, const 
 					 rp = r0 - zS / tanThetaX0;
 					 br0 =  bX * exp(- rp / rX) * (rp/r0) * cosThetaX0;
 					 bz0 =  bX * exp(- rp / rX) * (rp/r0) * sinThetaX0;
-				 }
-
-				 // compute factor F for solenoidality
-				 if (inner){
-					 f = 1. / ((1. - 1./( 2. + 2. * (rXc * tanThetaX0/ zS)) * (1. - (z / zS) * (z / zS))) * (1. - 1./( 2. + 2. * (rXc * tanThetaX0/ zS)) * (1. - (z / zS) * (z / zS))));
-				 }
-				 else {
-					 f = 1. + 1/ (2 * r * tanThetaX0/ zS) * (1. - (z / zS) * (z / zS));
 				 }
 
 				 double br = z / zS * f * br0;
@@ -269,10 +266,10 @@ double JF12FieldSolenoidal::getHPhiIntegral(const double& r, const double& phi) 
 	// Evaluates the H(phi1) integral for solenoidality for the position (r,phi) which is mapped back to (r1=5kpc,phi1)
 	// along the spiral field line.
 	double H_ret = 0.;
-	int idx = 1;
 
 	if ((r1 < r) && (r < r2)){
 		// find index of the correct spiral arm for (r1,phi1) just like in getSpiralFieldStrengthConstant
+		int idx = 1;
 		double phi1 = phi - log(r/r1) * cotPitch;
 		phi1 = atan2(sin(phi1), cos(phi1));
 		while (phi1 < phi0Arms[idx]){
