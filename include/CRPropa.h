@@ -70,6 +70,7 @@
 #include "crpropa/massDistribution/Cordes.h"
 #include "crpropa/massDistribution/Ferriere.h"
 #include "crpropa/massDistribution/DensityGrid.h"
+#include "crpropa/massDistribution/Pohl.h"
 
 
 // Groups of Modules for Doxygen
