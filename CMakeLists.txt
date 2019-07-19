@@ -386,8 +386,7 @@ add_library(crpropa SHARED
 	src/module/TextOutput.cpp
 	src/module/AdiabaticCooling.cpp
 	src/module/Tools.cpp
-    src/Massdistribution/CMZDensity.cpp
-    src/magneticField/CMZField.cpp
+	src/magneticField/CMZField.cpp
 	src/magneticField/JF12Field.cpp
 	src/magneticField/JF12FieldSolenoidal.cpp
 	src/magneticField/MagneticField.cpp

@@ -1,5 +1,5 @@
 #include "crpropa/module/HadronicInteraction.h"
-#include "crpropa/Massdistribution/CMZDensity.h"
+#include "crpropa/massDistribution/Density.h"
 #include "crpropa/Units.h"
 #include "crpropa/ParticleID.h"
 #include "crpropa/ParticleMass.h"
@@ -34,14 +34,11 @@ void HadronicInteraction::setHaveNeutrinos(bool b) {
 	haveNeutrinos = b;
 }
 
+void HadronicInteraction::setDensity(ref_ptr<Density> density) {
+	density = density;
+}
 
-
-    double HadronicInteraction::getDensity(const Vector3d &position) const {
-        CMZDensity obj;
-        double density=obj.getDensity(position);
-        return density;
-    }
-    Vector3d HadronicInteraction::Position(double height, double radius) const{
+Vector3d HadronicInteraction::Position(double height, double radius) const{
         Random &random = Random::instance();
         int i=0;
         Vector3d pos(0,0,0);
@@ -77,7 +74,7 @@ void HadronicInteraction::setHaveNeutrinos(bool b) {
     
     //Distribution function (energy) for electrons, electron neutrinso and (second) muon neutrinos based on Kelner 2006
     
-    double HadronicInteraction::distribution_e(double energy, double x) const{
+double HadronicInteraction::distribution_e(double energy, double x) const{
         
         double L=log(energy / TeV);
         double Be= 1/(69.5+2.65*L+0.3*pow(L,2.));
@@ -89,7 +86,7 @@ void HadronicInteraction::setHaveNeutrinos(bool b) {
     }
     
     //Number of electrons, electron neutrinos and (second) muons neutrinos produced in a given interaction  based on Kelner 2006
-    double HadronicInteraction::number_e(double energy) const{
+double HadronicInteraction::number_e(double energy) const{
         double x=1/100000.;
         double i=1/100000.;
         double y=0;
@@ -103,7 +100,7 @@ void HadronicInteraction::setHaveNeutrinos(bool b) {
     }
     
     //Distribution function (energy) for (first) muon neutrino based on Kelner 2006
-    double HadronicInteraction::distribution_my1(double energy, double x) const{
+double HadronicInteraction::distribution_my1(double energy, double x) const{
         double L=log(energy / TeV);
         double Bm= 1.75+0.204*L+0.01 * pow(L,2.);
         double betam=1/(1.67+0.111*L+0.0038*pow(L,2.));
@@ -242,12 +239,11 @@ void HadronicInteraction::setHaveNeutrinos(bool b) {
         
         Random &random = Random::instance();
        
-        CMZDensity obj;
-        double density=obj.getDensity(pos);
+        double dens = density->getNucleonDensity(pos);
         //double density=pow(10.,15.);
 
         //Probability of interaction
-        double p_pp=cs_inel*density*step;
+        double p_pp=cs_inel*dens*step;
         double ra = random.rand();
         
         // limit next step to mean free path
