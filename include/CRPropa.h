@@ -6,6 +6,7 @@
 #include "crpropa/Common.h"
 #include "crpropa/Cosmology.h"
 #include "crpropa/EmissionMap.h"
+#include "crpropa/Geometry.h"
 #include "crpropa/Grid.h"
 #include "crpropa/GridTools.h"
 #include "crpropa/GridTurbulence.h"
@@ -60,7 +61,7 @@
 #include "crpropa/magneticField/CMZField.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/magneticField/MagneticFieldGrid.h"
-#include "crpropa/magneticField/PshirkovField.h"
+#include "crpropa/magneticField/PT11Field.h"
 #include "crpropa/magneticField/QuimbyMagneticField.h"
 #include "crpropa/magneticField/ArchimedeanSpiralField.h"
 
