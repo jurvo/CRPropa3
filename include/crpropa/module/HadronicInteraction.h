@@ -26,7 +26,7 @@ public:
     	
     	void setDensity(ref_ptr<Density> density);
     	
-	double getDensity(const Vector3d &position) const;
+	//double getDensity(const Vector3d &position) const;
     	//crpropa::Vector3d MagField(const Vector3d &position) const;
 	void process(Candidate *candidate) const;
 	
@@ -49,8 +49,8 @@ public:
 	//double CrossSection_Kafexhiu(double energy) const;
     	
     	crpropa::Vector3d Position(double height, double radius) const;
-	//~ double counter(Candidate *candidate, double density) const;
-	//~ double counterPion(Candidate *candidate, double density) const;
+	// double counter(Candidate *candidate, double density) const;
+	// double counterPion(Candidate *candidate, double density) const;
 };
 
 } // namespace crpropa

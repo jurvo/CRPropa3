@@ -4,8 +4,7 @@
 #include "crpropa/ParticleID.h"
 #include "crpropa/ParticleMass.h"
 #include "crpropa/Random.h"
-
-
+#include "kiss/logger.h"
 #include <fstream>
 #include <limits>
 #include <cmath>
@@ -216,43 +215,40 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
     //Process Function:
     
     void HadronicInteraction::process(Candidate *candidate) const {
-        
+
         //Get candidate's properties
         double step = candidate->getCurrentStep();
         double energy = candidate->current.getEnergy();
         double id = candidate->current.getId();
         Vector3d pos= candidate->current.getPosition();
-        
+
         //No interaction for secondaries
         if (id != 1000010010){
             return;
         }
-        
-        
-        double cs_inel=0;
- 
-        
+
+	double cs_inel=0;
+
         if (id == 1000010010) {
             cs_inel=CrossSection_Kelner(energy);
         }
-        
-        
+
         Random &random = Random::instance();
-       
-        double dens = density->getNucleonDensity(pos);
-        //double density=pow(10.,15.);
+
+//	  	double dens = density->getNucleonDensity(pos);
+        double dens = pow(10.,15.);	// 1e9 ccm
 
         //Probability of interaction
         double p_pp=cs_inel*dens*step;
         double ra = random.rand();
-        
+
         // limit next step to mean free path
         double limit = 1 / p_pp*0.1;
-        
+
         if (step > limit) {
             candidate->limitNextStep(limit);
         }
-        
+
         //Interaction?
         if (ra > p_pp or energy < 1*GeV){
             return;
@@ -267,49 +263,44 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
         double Eg=0;
         double Etot=0;
         double Econ=0;
-        
+
         double gamma=0;
         double j=0;
 
         // Establish number of secondaries
-        
-            
+
    //Gammas NG
         double FG=number_gamma(energy);
         double NG=std::round(FG);
-        
+
         //First myon neutrino Nmy1
         double Fmy1=number_my1(energy);
         double Nmy1=std::round(Fmy1);
-        
-        
+
         //Electron NE
         double FE=number_e(energy);
         double NE=std::round(FE);
-        
+
         //Electron Neutrino NEN
         double NEN=NE;
-    
-        
+
         //Second Myon Neutrino Nmy2
         double Nmy2=NE;
-    
-        
+
         //Total number of secondaries in the interaction
         double N_tot=NE+NG+Nmy1+NEN+Nmy2;
-        
 
         //Initialize for stopping criteria
         double i=1;
-        double iG=1;
-        double imy1=1;
-        double ie=1;
-        double ien=1;
-        double imy2=1;
+        double iG=1;	//actual gammaray number
+        double imy1=1;	//actual first myon number
+        double ie=1;	//actual electron number
+        double ien=1;	//actual electron-neutrino number
+        double imy2=1;	//actual second myon number
         double test;
         double threshold=0.0001;
         double end=-1;
-        
+
         //Jump to random starting point:
         double sp=random.rand();
         if (sp <= 0.2)
@@ -330,30 +321,31 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
 
             //Check if all gamma rays were created
             if (iG <= NG){
-				if(end==-1)
+		if(end==-1)
                 {
-                //pick gamma ray's energy
-                do{
-                double x=threshold+random.rand()*(1-Eout/energy-threshold);
-                Eout=x*energy;
-                double E=distribution_gamma(energy, x);
-                double Emax=distribution_gamma(energy, threshold);
-                double y=random.rand()*Emax;
-                    
-                    if (y < E and (Etot+Eout)<energy )
-                    {
-                        candidate->addSecondary(22, Eout, pos);
-                        Eg=Eg+Eout;
-                        Etot=Etot+Eout;
-                        i++;
-                        iG++;
-                        if(Etot/energy>=(1-threshold)){
-                            end=i;
-                        }
-                    }
-                    
-                }while(test == iG);
-			}else {
+                	//pick gamma ray's energy
+	                do{
+	                	double x=threshold+random.rand()*(1-Eout/energy-threshold);
+		                Eout=x*energy;
+		                double E=distribution_gamma(energy, x);
+		                double Emax=distribution_gamma(energy, threshold);
+		                double y=random.rand()*Emax;
+
+		                if (y < E and (Etot+Eout)<energy )
+		                {
+		                	candidate->addSecondary(22, Eout, pos);
+		                	Eg=Eg+Eout;
+		                        Etot=Etot+Eout;
+		                        i++;
+		                        iG++;
+		                        if(Etot/energy>=(1-threshold)) {
+		                        	end=i;
+          		   		}
+          			}
+          		}while(test == iG);
+		}
+		else 
+		{
                     Eout=(energy-Etot)/(N_tot-end);
                     candidate->addSecondary(22, Eout, pos);
                     Eg=Eg+Eout;
@@ -361,16 +353,16 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
                     iG++;
                 }
 			
-            }
+            } // end gamma
             label2:
 
             //~ First myon neutrino 14
             test = imy1;
-			
+
             if (imy1 <= Nmy1){
 				if(end==-1){
                 do{
-                
+
                 double x=threshold+random.rand()*(0.427-threshold);
                 Eout=x*energy;
                 double E=distribution_my1(energy, x);
@@ -388,7 +380,7 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
                             end=i;
                         }
                     }
-                    
+
                 }while(test == imy1);
             }else {
                     Eout=(energy-Etot)/(N_tot-end);
@@ -401,9 +393,9 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
 			label3:
             //~ Electron 11
             test = ie;
-			
+
             if (ie <= NE){
-				
+
 				if (end==-1){
                 do{
                 double x=threshold+random.rand()*(1-Eout/energy-threshold);
@@ -411,7 +403,7 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
                 double E=distribution_e(energy, x);
                 double Emax=distribution_e(energy, threshold);
                 double y=random.rand()*Emax;
-                
+
                     if (y < E and (Etot+Eout)<energy )
                     {
                         candidate->addSecondary(11, Eout, pos);
@@ -423,7 +415,7 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
                             end=i;
                         }
                     }
-                    
+
                 }while(test == ie);
             }else {
                     Eout=(energy-Etot)/(N_tot-end);
@@ -433,7 +425,7 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
                     Ee=Ee+Eout;
                 }
 		}
-            
+
             //~ Electron neutrino 12
             label4:
             test=ien;
@@ -446,7 +438,7 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
                 double E=distribution_e(energy, x);
                 double Emax=distribution_e(energy, threshold);
                 double y=random.rand()*Emax;
-                    
+
                     if (y < E and (Etot+Eout)<energy)
                     {
                         candidate->addSecondary(12, Eout, pos);
@@ -458,7 +450,7 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
                             end=i;
                         }
                     }
-                    
+
                 }while(ien==test);
             }else {
                     Eout=(energy-Etot)/(N_tot-end);
@@ -473,48 +465,55 @@ double HadronicInteraction::distribution_my1(double energy, double x) const{
 			label5:
             test=imy2;
             if(imy2 <= Nmy2){
-				if (end==-1){
-                do{
-                    double x=threshold+random.rand()*(1-Eout/energy-threshold);
-                    Eout= x*energy;
-                    double E=distribution_e(energy, x);
-                    double Emax=distribution_e(energy, threshold);
-                    double y=random.rand()*Emax;
+		if (end==-1){
+			do{
+				double x=threshold+random.rand()*(1-Eout/energy-threshold);
+				Eout= x*energy;
+				double E=distribution_e(energy, x);
+				double Emax=distribution_e(energy, threshold);
+				double y=random.rand()*Emax;
 
-                        if (y < E and (Etot+Eout)<energy)
-                        {
-                            candidate->addSecondary(14, Eout, pos);
-                            Emt=Emt+Eout;
-                            Etot=Etot+Eout;
-                            i++;
-                            imy2++;
-                            if(Etot/energy>=(1-threshold)){
-                            end=i;
-                        }
-                        }
-                    
-                }while(imy2==test);
-            }else {
-                    Eout=(energy-Etot)/(N_tot-end);
-                    candidate->addSecondary(14, Eout, pos);
-                    i++;
-                    imy2++;
-                    Emt=Emt+Eout;
-                }
-            }
+				if (y < E and (Etot+Eout)<energy)
+				{
+					candidate->addSecondary(14, Eout, pos);
+					Emt=Emt+Eout;
+					Etot=Etot+Eout;
+					i++;
+					imy2++;
+					if(Etot/energy>=(1-threshold)){
+						end=i;
+					}
+				}
+
+			}while(imy2==test);
+		}else {
+			Eout=(energy-Etot)/(N_tot-end);
+			candidate->addSecondary(14, Eout, pos);
+			i++;
+			imy2++;
+			Emt=Emt+Eout;
+			}
+		}
         }while (i <= N_tot);
-    
+
 		if(end != -1){
 			std::cout<<0<<std::endl;
 		}
-			
-      //Reduce primary's energy
-        candidate->current.setEnergy(energy-(Ene+Emt+Ee+Emo+Eg));
-        
-        return;
-    }
-    
-} //~ namespace CRPropa
 
+	//Reduce primary's energy
+	candidate->current.setEnergy(energy-(Ene+Emt+Ee+Emo+Eg));
+	if(energy-(Ene+Emt+Ee+Emo+Eg) <= 0){
+		KISS_LOG_WARNING
+		<< "\ncurrent Energy of Primary is not higher than 0 \n"
+		<< " Energy is : " << (energy-(Ene+Emt+Ee+Emo+Eg))/GeV << "GeV \n"
+		<< " Position: " << candidate -> current.getPosition()/kpc << "kpc \n"
+		<< " Created secondarys:"<<candidate->secondaries.size() << "\n";
+/*		for (size_t i=0 ; i < candidate->secondaries.size() ; i++){
+			KISS_LOG_WARNING <<"Secondary "<< i<< ": "<< candidate->secondaries[i]->getDescription() << "\n";
+		} */
+		candidate->setActive(false);
+	}
+	return;
+	}
 
-
+} // namespace CRPropa
