@@ -1,56 +1,73 @@
 #ifndef CRPROPA_HADRONICINTERACTION_H
 #define CRPROPA_HADRONICINTERACTION_H
-
+#include "crpropa/massDistribution/Massdistribution.h"
 #include "crpropa/Module.h"
-#include "crpropa/massDistribution/Density.h"
-
-#include <vector>
+#include "crpropa/Vector3.h"
+#include <crpropa/Grid.h>
 
 namespace crpropa {
+/**
+ * \addtogroup EnergyLosses
+ * @{
+ */
 
-
+/**
+ @class HadronicInteraction
+ @brief interactions of nuclei with background nucleons (Hydrogen only).
+ */
 class HadronicInteraction: public Module {
-
-private:
+protected:
+	ref_ptr<Density> massDensity;
+//	ScalarGrid4d spaceTimeGrid;
+//	ScalarGrid spaceGrid;
 	bool haveElectrons;
 	bool havePhotons;
 	bool haveNeutrinos;
-	ref_ptr<Density> density;
-	
+	std::string tag;
+
 public:
-	HadronicInteraction(bool electrons = true, bool photons = true, bool neutrinos = true);
-	
+	HadronicInteraction(
+		ref_ptr<Density> massDensity,
+		bool electrons = false,
+		bool photons = false,
+		bool neutrinos = false,
+		std::string tag = "None");
+
+/*	HadronicInteraction(
+		ref_ptr<Density> massDensity,
+		ScalarGrid4d spaceTimeGrid,
+		bool electrons = false,
+		bool photons = false,
+		bool neutrinos = false,
+		std::string tag = "None");
+
+	HadronicInteraction(
+		ref_ptr<Density> massDensity,
+		ScalarGrid spaceGrid,
+		bool electrons = false,
+		bool photons = false,
+		bool neutrinos = false,
+		std::string = "None");
+*/
+	void setMassDensity(ref_ptr<Density> dens);
 	void setHaveElectrons(bool b);
 	void setHavePhotons(bool b);
 	void setHaveNeutrinos(bool b);
-    	
-    	void setDensity(ref_ptr<Density> density);
-    	
-	//double getDensity(const Vector3d &position) const;
-    	//crpropa::Vector3d MagField(const Vector3d &position) const;
 	void process(Candidate *candidate) const;
-	
-	//double distribution_pi(double energy, double x) const;
 	double distribution_e(double energy, double x) const;
 	double distribution_my1(double energy, double x) const; 
 	double distribution_gamma(double energy, double x) const; 
-	
-	//double number_pi(double energy) const;
-	double number_e(double energy) const;
-	double number_my1(double energy) const;
-	double number_gamma(double energy) const;
-	
+	int numberOfElectrons(double energy) const;
+	int numberOfMuonNeutrinos(double energy) const;
+	int numberOfGammaRays(double energy) const;
+	double CrossSection_Kelner(double energy) const;
+
+	// these functions are not being used in the simulation
 	double distribution_Carceller(double energy, double x, double jcap, double a0, double b0) const;
 	double distribution_Carceller_g(double energy, double x, double jcap, double a0, double b0) const;
-	
 	double CrossSection_Carceller(double energy) const;
-	double CrossSection_Kelner(double energy) const;
 	double CrossSection_Galprop(double energy) const;
-	//double CrossSection_Kafexhiu(double energy) const;
-    	
-    	crpropa::Vector3d Position(double height, double radius) const;
-	// double counter(Candidate *candidate, double density) const;
-	// double counterPion(Candidate *candidate, double density) const;
+    Vector3d getPosition(double height, double radius) const;
 };
 
 } // namespace crpropa
