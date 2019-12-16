@@ -45,6 +45,7 @@
 %ignore operator crpropa::Observer*;
 %ignore operator crpropa::ObserverFeature*;
 %ignore operator crpropa::MagneticField*;
+%ignore operator crpropa::Density*;
 %ignore operator crpropa::AdvectionField*;
 %ignore operator crpropa::ParticleCollector*;
 %ignore crpropa::TextOutput::load;
@@ -319,6 +320,7 @@
 %include "crpropa/magneticField/JF12FieldSolenoidal.h"
 %include "crpropa/magneticField/PT11Field.h"
 %include "crpropa/magneticField/ArchimedeanSpiralField.h"
+%include "crpropa/magneticField/CMZField.h"
 %include "crpropa/module/BreakCondition.h"
 %include "crpropa/module/Boundary.h"
 
@@ -406,6 +408,7 @@
 %include "crpropa/module/TextOutput.h"
 
 %include "crpropa/module/HDF5Output.h"
+%include "crpropa/module/HadronicInteraction.h"
 %include "crpropa/module/OutputShell.h"
 %include "crpropa/module/EMCascade.h"
 %include "crpropa/module/PhotonEleCa.h"
@@ -415,8 +418,8 @@
 %include "crpropa/module/PhotoPionProduction.h"
 %include "crpropa/module/PhotoDisintegration.h"
 %include "crpropa/module/ElasticScattering.h"
-%include "crpropa/module/Redshift.h"
 %include "crpropa/module/RestrictToRegion.h"
+%include "crpropa/module/Redshift.h"
 %include "crpropa/module/EMPairProduction.h"
 %include "crpropa/module/EMDoublePairProduction.h"
 %include "crpropa/module/EMTripletPairProduction.h"
