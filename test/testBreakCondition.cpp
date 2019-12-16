@@ -27,6 +27,33 @@ TEST(MinimumEnergy, test) {
 	EXPECT_TRUE(c.hasProperty("Rejected"));
 }
 
+TEST(MinimumNucleonEnergy, test) {
+	MinimumNucleonEnergy minNucEn(6);
+	Candidate c;
+	c.current.setId(nucleusId(1,1)); // proton
+	
+	c.current.setEnergy(6.1);
+	minNucEn.process(&c);
+	EXPECT_TRUE(c.isActive());
+	
+	c.current.setEnergy(5.9);
+	minNucEn.process(&c);
+	EXPECT_FALSE(c.isActive());
+	EXPECT_TRUE(c.hasProperty("Rejected"));
+
+	c.current.setId(22);	//secondary
+
+	c.current.setEnergy(6.1);
+	c.setActive(true);
+	minNucEn.process(&c);
+	EXPECT_TRUE(c.isActive());
+
+	c.current.setEnergy(5.9);
+	minNucEn.process(&c);
+	EXPECT_TRUE(c.isActive());
+}
+	
+
 TEST(MaximumTrajectoryLength, test) {
 	MaximumTrajectoryLength maxLength(10);
 	Candidate c;

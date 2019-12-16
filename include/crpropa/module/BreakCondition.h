@@ -31,6 +31,26 @@ public:
 };
 
 /**
+ @class MinimumNucleonEnergy
+ @brief Deactivates the nucleon candidate below a minimum energy
+
+ This modules deactivates the nucleon candidate below a given minimum energy.
+ In that case the property ("Deactivated", module::description) is set.
+ All secondaries are passed.
+ */
+class MinimumNucleonEnergy: public AbstractCondition {
+	double minEnergy;
+public:
+	MinimumNucleonEnergy(double minEnergy = 0);
+	void setMinimumEnergy(double energy);
+	double getMinimumEnergy() const;
+	std::string getDescription() const;
+	void process(Candidate *candidate) const;
+};
+
+
+
+/**
  @class MinimumEnergy
  @brief Deactivates the candidate below a minimum energy
 

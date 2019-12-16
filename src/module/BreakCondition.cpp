@@ -94,6 +94,41 @@ std::string MinimumEnergy::getDescription() const {
 }
 
 //*****************************************************************************
+MinimumNucleonEnergy::MinimumNucleonEnergy(double minEnergy) :
+		minEnergy(minEnergy) {
+}
+
+void MinimumNucleonEnergy::setMinimumEnergy(double energy) {
+	minEnergy = energy;
+}
+
+double MinimumNucleonEnergy::getMinimumEnergy() const {
+	return minEnergy;
+}
+
+void MinimumNucleonEnergy::process(Candidate *c) const {
+	if(isNucleus(c -> current.getId()) == false )
+		return;
+	
+	if (c->current.getEnergy() > minEnergy)
+		return;
+	else
+		reject(c);
+}
+
+std::string MinimumNucleonEnergy::getDescription() const {
+	std::stringstream s;
+	s << "Minimum Nucleon energy: " << minEnergy / EeV << " EeV, ";
+	s << "Flag: '" << rejectFlagKey << "' -> '" << rejectFlagValue << "', ";
+	s << "MakeInactive: " << (makeRejectedInactive ? "yes" : "no");
+	if (rejectAction.valid())
+		s << ", Action: " << rejectAction->getDescription();
+	return s.str();
+}
+
+
+
+//*****************************************************************************
 MinimumRigidity::MinimumRigidity(double minRigidity) :
 		minRigidity(minRigidity) {
 }
