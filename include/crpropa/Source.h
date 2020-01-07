@@ -240,7 +240,7 @@ class SourceUniformCylinder: public SourceFeature {
 	double radius;
 public:
 	/** Constructor
-	 @param origin	lower middle of cylinder
+	 @param origin	center of cylinder 
 	 @param height	height of the cylinder
 	 @param radius	radius of the cylinder
 */
