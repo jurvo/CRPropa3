@@ -2,6 +2,7 @@
 #include "crpropa/GridTurbulence.h"
 #include "crpropa/Random.h"
 #include "crpropa/magneticField/MagneticField.h"
+#include <map>
 
 #ifdef CRPROPA_HAVE_FFTW3F
 #include "fftw3.h"
