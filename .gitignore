@@ -21,3 +21,6 @@ cmake/CMakeFiles/
 
 *.png
 *.pyc
+
+include/helapix_base/
+incluse/kiss/
