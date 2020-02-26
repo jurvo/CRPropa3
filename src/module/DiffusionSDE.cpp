@@ -29,9 +29,10 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double toleranc
   	setEpsilon(epsilon);
   	setScale(1.);
   	setAlpha(1./3.);
+  	setUseRadialDependence(false);
 	}
 
-DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
+DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon, bool useRadialDependence) :
   	minStep(0)
 {
 	setMagneticField(magneticField);
@@ -42,6 +43,7 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<Advecti
 	setEpsilon(epsilon);
 	setScale(1.);
 	setAlpha(1./3.);
+	setUseRadialDependence(useRadialDependence);
   	}
 
 void DiffusionSDE::process(Candidate *candidate) const {
@@ -273,10 +275,19 @@ void DiffusionSDE::driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) c
 
 void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const {
 
-    double DifCoeff = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
+    double alpha_ = alpha;
+    if(useRadialDependence) {
+        alpha_ = RadialA*pos.getR() + RadialB;
+        KISS_LOG_WARNING << "\n Take alpha from radial with:" << alpha_ << "\n";
+    }
+    double DifCoeff= scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha_);
     BTen[0] = pow( 2  * DifCoeff, 0.5);
     BTen[4] = pow(2 * epsilon * DifCoeff, 0.5);
     BTen[8] = pow(2 * epsilon * DifCoeff, 0.5);
+    KISS_LOG_WARNING << "DiffusionCoefficient: " << DifCoeff << "\n"
+    << "rigility: " << r << "\n"
+    << "alpha: "    << alpha_ << "\n"
+    << "Radial: "   << useRadialDependence << "\n";
     return;
 
 }
@@ -326,6 +337,26 @@ void DiffusionSDE::setScale(double s) {
 	scale = s;
 }
 
+void DiffusionSDE::setUseRadialDependence(bool use) {
+    useRadialDependence = use;
+    RadialA = 0.035/kpc;  // Parameters from arXiv:1507.07796
+    RadialB = 0.21;
+}
+
+void DiffusionSDE::setUseRadialDependence(bool use, double A, double B) {
+    useRadialDependence = use;
+    RadialA = A;
+    RadialB = B;
+}
+
+void DiffusionSDE::setRadialA(double A) {
+    RadialA = A;
+}
+
+void DiffusionSDE::setRadialB(double B) {
+    RadialB = B;
+}
+
 void DiffusionSDE::setMagneticField(ref_ptr<MagneticField> f) {
 	magneticField = f;
 }
@@ -356,6 +387,18 @@ double DiffusionSDE::getAlpha() const {
 
 double DiffusionSDE::getScale() const {
 	return scale;
+}
+
+bool DiffusionSDE::getUseRadialDependence() const{
+    return useRadialDependence;
+}
+
+double DiffusionSDE::getRadialA() const {
+    return RadialA;
+}
+
+double DiffusionSDE::getRadialB() const {
+    return RadialB;
 }
 
 

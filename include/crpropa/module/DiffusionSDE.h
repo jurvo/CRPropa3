@@ -43,6 +43,9 @@ private:
 	    double epsilon; // ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
 	    double alpha; // power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	    double scale; // scaling factor for the diffusion coefficient D = scale*D_0
+	    bool useRadialDependence;
+	    double RadialA;
+	    double RadialB;
 
 
 public:
@@ -53,10 +56,11 @@ public:
 	@param epsilon		Ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
 	@param alpha 		Power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	@param scale 		Scaling factor for the diffusion coefficient D = scale*D_0
+	@param useRadialDependece   Allow a radial function for the Power law index with \alpha = A*r + B
 */
 	    DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc), double epsilon=0.1);
 
-	    DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc), double epsilon=0.1);
+	    DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc), double epsilon=0.1, bool useRadialDependence=false);
 
 	    void process(crpropa::Candidate *candidate) const;
 
@@ -70,6 +74,11 @@ public:
 	    void setEpsilon(double kappa);
 	    void setAlpha(double alpha);
 	    void setScale(double Scale);
+	    void setUseRadialDependence(bool use, double A, double B);
+        void setUseRadialDependence(bool use);
+        void setRadialA(double A);
+        void setRadialB(double B);
+
 	    void setMagneticField(ref_ptr<crpropa::MagneticField> magneticField);
 	    void setAdvectionField(ref_ptr<crpropa::AdvectionField> advectionField);
 
@@ -79,6 +88,10 @@ public:
 	    double getEpsilon() const;
 	    double getAlpha() const;
 	    double getScale() const;
+	    bool getUseRadialDependence() const;
+	    double getRadialA() const;
+	    double getRadialB() const;
+
 	    std::string getDescription() const;
 
 };
