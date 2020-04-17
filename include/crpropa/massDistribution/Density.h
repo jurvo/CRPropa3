@@ -24,10 +24,16 @@ namespace crpropa {
 			}
 			/** @param position position to get density
 			@return density in parts/m^3 */
-			virtual double get(const Vector3d &position) const
+			virtual double getDensity(const Vector3d &position) const
 			{
 				return 0;
 			}
+			
+			virtual double getNucleonDensity(const Vector3d &position) const
+			{
+				return massNumber(NucleusId)*getDensity(position);
+			}
+
 			/** @return nucleusid of the type of distributed matter*/
 			int getNucleusId() const
 			{ 
@@ -54,34 +60,34 @@ namespace crpropa {
 	 		@return density in parts/m^3, summes all parts up */
 			double getDensity(const Vector3d &position) const
 			{
-				return HI->get(position) + HII->get(position) + H2->get(position);
+				return HI->getDensity(position) + HII->getDensity(position) + H2->getDensity(position);
 			}
 			/** @param position position in galactic coordinates
 			 @return nucleon density in nucleons/m^3, all parts are summed up and H2 is weighted twice */
 			double getNucleonDensity(const Vector3d &position) const
 			{
-				double n = HI->get(position)*massNumber(HI->getNucleusId());
-				n += HII->get(position)*massNumber(HII->getNucleusId());
-				n += H2->get(position)*massNumber(H2->getNucleusId());
+				double n = HI->getNucleonDensity(position);
+				n += HII->getNucleonDensity(position);
+				n += H2->getNucleonDensity(position);
 				return n;
 			}
 			/** @param position position in galactic coordinates
 	 		@return density of atomic hydrogen in parts/m^3 */
 			double getHIDensity(const Vector3d &position) const
 			{
-				return HI->get(position);
+				return HI->getDensity(position);
 			}
 			/** @param position position in galactic coordinates 
 			 @return density of ionised hydrogen in parts/m^3 */
 			double getHIIDensity(const Vector3d &position) const
 			{
-				return HII->get(position);
+				return HII->getDensity(position);
 			}
 			/** @param position position in galactic coordinates 
 			 @return density of molecular hydrogen in parts/m^3 */
 			double getH2Density(const Vector3d &position) const
 			{
-				return H2->get(position);
+				return H2->getDensity(position);
 			}
 	};
 	
