@@ -7,7 +7,7 @@
 namespace crpropa {
 
 Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, double weight) :
-		redshift(z), trajectoryLength(0), weight(1), currentStep(0), nextStep(0), active(true), parent(0) {
+		redshift(z), trajectoryLength(0),time(0), weight(1), currentStep(0), nextStep(0), active(true), parent(0),useTimePropagation(false) {
 	ParticleState state(id, E, pos, dir);
 	source = state;
 	created = state;
@@ -27,7 +27,7 @@ Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, dou
 }
 
 Candidate::Candidate(const ParticleState &state) :
-		source(state), created(state), current(state), previous(state), redshift(0), trajectoryLength(0), currentStep(0), nextStep(0), active(true), parent(0) {
+		source(state), created(state), current(state), previous(state), redshift(0), trajectoryLength(0),time(0), currentStep(0), nextStep(0), active(true), parent(0),useTimePropagation(state.getUseTimePropagation()) {
 
 #if defined(OPENMP_3_1)
 		#pragma omp atomic capture
@@ -57,6 +57,14 @@ double Candidate::getTrajectoryLength() const {
 	return trajectoryLength;
 }
 
+double Candidate::getTime() const {
+	return time;
+}
+
+bool Candidate::getUseTimePropagation() const {
+	return useTimePropagation;
+}
+
 double Candidate::getWeight() const {
 	return weight;
 }
@@ -69,12 +77,29 @@ double Candidate::getNextStep() const {
 	return nextStep;
 }
 
+double Candidate::getCurrentTimeStep() const {
+	return currentTimeStep;
+}
+
+double Candidate::getNextTimeStep() const{
+	return nextTimeStep;
+}
+
 void Candidate::setRedshift(double z) {
 	redshift = z;
 }
 
 void Candidate::setTrajectoryLength(double a) {
 	trajectoryLength = a;
+}
+
+void Candidate::setTime(double t) {
+	time = t;
+}
+
+void Candidate::setUseTimePropagation(bool use) {
+	useTimePropagation = use;
+	current.setUseTimePropagation(use);
 }
 
 void Candidate::setWeight(double w) {
@@ -84,14 +109,28 @@ void Candidate::setWeight(double w) {
 void Candidate::setCurrentStep(double lstep) {
 	currentStep = lstep;
 	trajectoryLength += lstep;
+	time += lstep/c_light;
 }
 
 void Candidate::setNextStep(double step) {
 	nextStep = step;
 }
 
+void Candidate::setCurrentTimeStep(double tstep) {
+	currentTimeStep = tstep;
+	time += tstep;
+}
+
+void Candidate::setNextTimeStep(double t) {
+	nextTimeStep = t;
+}
+
 void Candidate::limitNextStep(double step) {
 	nextStep = std::min(nextStep, step);
+}
+
+void Candidate::limitNextTimeStep(double step) {
+	nextTimeStep = std::min(nextTimeStep, step);
 }
 
 void Candidate::setProperty(const std::string &name, const Variant &value) {
