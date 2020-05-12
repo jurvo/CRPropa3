@@ -94,7 +94,7 @@ void ParticleState::setLorentzFactor(double lf) {
 
 double ParticleState::getBeta() const {
 	if(useTimePropagation ==false) {
-		return 1;
+		return 1; // no velocity lower c_light
 	}
 	double alpha = energy/(pmass*c_squared);
 	if(alpha<=1){

@@ -44,12 +44,11 @@ private:
 	double weight; /**< Weight of the candidate */
 	double redshift; /**< Current simulation time-point in terms of redshift z */
 	double trajectoryLength; /**< Comoving distance [m] the candidate has traveled so far */
-	double currentStep; /**< Size of the currently performed step in [m] comoving units */
-	double nextStep; /**< Proposed size of the next propagation step in [m] comoving units */
+	//double currentStep; /**< Size of the currently performed step in [m] comoving units */
+	//double nextStep; /**< Proposed size of the next propagation step in [m] comoving units */
 	double time; /**< Traveld time of the candidate in [s]. Used for propagation with v<c */
 	double currentTimeStep; /**< Time of currently perfomed step in [s]. Used for propagation with v<c */
 	double nextTimeStep; /**< Proposed time of the next propagation step in [s]. Used for propagation with v<c */
-	bool useTimePropagation;
 
 	static uint64_t nextSerialNumber;
 	uint64_t serialNumber;
@@ -180,6 +179,8 @@ public:
 	 and activate it if inactive, e.g. restart it
 	*/
 	void restart();
+
+
 };
 
 /** @}*/
