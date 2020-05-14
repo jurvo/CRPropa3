@@ -978,6 +978,16 @@ void SourceGenericComposition::setDescription() {
 	description = "Generice source composition" + expression;
 }
 
+// ----------------------------------------------------------------------------
+
+SourceTimePropagation::SourceTimePropagation(bool use){
+	use = use;
+}
+
+void SourceTimePropagation::prepareCandidate(Candidate &candidate) const {
+	candidate.setUseTimePropagation(use);
+}
+
 #endif
 
 } // namespace crpropa
