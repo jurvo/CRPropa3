@@ -55,6 +55,8 @@ void TextOutput::printHeader() const {
 	*out << "#";
 	if (fields.test(TrajectoryLengthColumn))
 		*out << "\tD";
+	if (fields.test(TimeColumn))
+		*out << "\tT";
 	if (fields.test(RedshiftColumn))
 		*out << "\tz";
 	if (fields.test(SerialNumberColumn))
@@ -160,6 +162,10 @@ void TextOutput::process(Candidate *c) const {
 	if (fields.test(TrajectoryLengthColumn))
 		p += std::sprintf(buffer + p, "%8.5E\t",
 				c->getTrajectoryLength() / lengthScale);
+
+	if (fields.test(TimeColumn))
+		p += std::sprintf(buffer + p, "%8.5E\t",
+				c->getTime());
 
 	if (fields.test(RedshiftColumn))
 		p += std::sprintf(buffer + p, "%1.5E\t", c->getRedshift());
