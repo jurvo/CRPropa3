@@ -75,6 +75,8 @@ public:
 
 	/// Get beta = velocity over c
 	double getBeta() const;
+	/// Set velocity
+	void setBeta(double beta);
 
 	/// Velocity: direction times the speed of light in [m/s]
 	Vector3d getVelocity() const;

@@ -15,6 +15,7 @@ namespace crpropa {
 ParticleState::ParticleState(int id, double E, Vector3d pos, Vector3d dir): id(0), energy(0.), position(0.), direction(0.), pmass(0.), charge(0.), useTimePropagation(false)
 {
 	setId(id);
+
 	setEnergy(E);
 	setPosition(pos);
 	setDirection(dir);
@@ -84,12 +85,42 @@ double ParticleState::getCharge() const {
 }
 
 double ParticleState::getLorentzFactor() const {
+	if(useTimePropagation){
+		return 1/std::sqrt(1-getBeta()*getBeta());
+	}
 	return energy / (pmass * c_squared);
 }
 
 void ParticleState::setLorentzFactor(double lf) {
 	lf = std::max(0., lf); // prevent negative Lorentz factors
-	energy = lf * pmass * c_squared;
+	if(useTimePropagation){
+		setBeta(std::sqrt(1-1/lf/lf));
+	}
+	else{
+		energy = lf * pmass * c_squared;
+	}
+}
+
+void ParticleState::setBeta(double beta) {
+	if(useTimePropagation){
+		if(beta==1) {
+			KISS_LOG_WARNING
+				<< "tried to set velocity equal c_light with UseTimePropagation = True\n"
+				<< "to propagate particles with speed of light pleas setUseTimePropagation to False\n";
+				return;
+		}
+		double gamma = 1./std::sqrt(1-beta*beta);
+		energy = pmass*c_squared * std::sqrt(gamma*gamma*beta*beta + 1);
+		
+	}
+	else
+	{
+		KISS_LOG_WARNING
+			<< "tried to change velocity without useTimePropagation\n"
+			<< "velocity is still equal c_light.\n"
+			<< "pleas change useTimePrpagation first.\n";
+	}
+	
 }
 
 double ParticleState::getBeta() const {
@@ -117,6 +148,9 @@ Vector3d ParticleState::getVelocity() const {
 }
 
 Vector3d ParticleState::getMomentum() const {
+	if(useTimePropagation){
+		return std::sqrt(energy*energy/c_squared - pmass*pmass*c_squared)*direction;
+	}
 	return direction * (energy / c_light);
 }
 
