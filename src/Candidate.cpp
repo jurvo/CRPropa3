@@ -92,10 +92,12 @@ void Candidate::setRedshift(double z) {
 
 void Candidate::setTrajectoryLength(double a) {
 	trajectoryLength = a;
+	time = a/(c_light*current.getBeta());
 }
 
 void Candidate::setTime(double t) {
 	time = t;
+	trajectoryLength = t*c_light*current.getBeta();
 }
 
 void Candidate::setUseTimePropagation(bool use) {
