@@ -30,6 +30,15 @@ public:
 	void process(Candidate *candidate) const;
 };
 
+class MaximumTime: public AbstractCondition {
+	double Tmax;
+public:
+	MaximumTime(double time = 0);
+	void setMaximumTime(double time);
+	double getMaximumTime();
+	void process(Candidate *candidate) const;
+};
+
 /**
  @class MinimumEnergy
  @brief Deactivates the candidate below a minimum energy

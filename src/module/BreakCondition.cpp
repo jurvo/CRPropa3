@@ -64,6 +64,31 @@ void MaximumTrajectoryLength::process(Candidate *c) const {
 }
 
 //*****************************************************************************
+MaximumTime::MaximumTime(double time): Tmax(time) {
+}
+
+void MaximumTime::setMaximumTime(double time) {
+	Tmax = time;
+}
+
+double MaximumTime::getMaximumTime() {
+	return Tmax;
+}
+
+void MaximumTime::process(Candidate *c) const {
+	double time = c->getTime();
+	if(time >= Tmax) {
+		reject(c);
+		return;
+	}
+	else
+	{ 
+		c->limitNextTimeStep(Tmax - time);
+	}
+	
+}
+
+//*****************************************************************************
 MinimumEnergy::MinimumEnergy(double minEnergy) :
 		minEnergy(minEnergy) {
 }
