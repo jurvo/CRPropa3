@@ -214,7 +214,7 @@ private:
   std::vector<double> detList;
 public:
   ObserverTimeEvolution();
-  ObserverTimeEvolution(double min, double dist, double numb);
+  ObserverTimeEvolution(double min, double time, double numb);
   void addTime(const double &position);
   const std::vector<double>& getTimes() const;
   DetectionState checkDetection(Candidate *candidate) const;
