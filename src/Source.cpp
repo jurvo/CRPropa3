@@ -977,7 +977,7 @@ void SourceGenericComposition::prepareParticle(ParticleState& particle) const {
 void SourceGenericComposition::setDescription() {
 	description = "Generice source composition" + expression;
 }
-
+#endif
 // ----------------------------------------------------------------------------
 
 SourceTimePropagation::SourceTimePropagation(bool use){
@@ -988,6 +988,5 @@ void SourceTimePropagation::prepareCandidate(Candidate &candidate) const {
 	candidate.setUseTimePropagation(use);
 }
 
-#endif
 
 } // namespace crpropa
