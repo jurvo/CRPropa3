@@ -535,6 +535,7 @@ protected:
 	std::vector<double> cdf;
 
 };
+#endif
 
 class SourceTimePropagation: public SourceFeature{
 private:
@@ -546,7 +547,6 @@ public:
 };
 
 /**  @} */ // end of group SourceFeature
-#endif
 
 }// namespace crpropa
 
