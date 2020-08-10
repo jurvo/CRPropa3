@@ -175,6 +175,17 @@ public:
 };
 
 /**
+ @class ObserverPionVeto
+ @brief Veto for pions
+ */
+class ObserverPionVeto: public ObserverFeature {
+	public:
+	DetectionState checkDetection(Candidate *candidate) const;
+	std::string getDescription() const;
+};
+
+
+/**
  @class ObserverNeutrinoVeto
  @brief Veto for neutrinos
  */

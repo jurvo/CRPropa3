@@ -259,6 +259,17 @@ std::string ObserverInactiveVeto::getDescription() const {
 	return "ObserverInactiveVeto";
 }
 
+// ObserverPionVeto -----------------------------------------------------------
+DetectionState ObserverPionVeto::checkDetection(Candidate *c) const {
+	if(fabs(c->current.getId())==211)
+		return VETO;
+	return NOTHING;
+}
+
+std::string ObserverPionVeto::getDescription() const {
+	return "ObserverPionVeto";
+}
+
 // ObserverNucleusVeto --------------------------------------------------------
 DetectionState ObserverNucleusVeto::checkDetection(Candidate *c) const {
 	if (isNucleus(c->current.getId()))
