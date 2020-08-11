@@ -28,6 +28,7 @@ void HadronicInteraction::setLimit(double lim) {
 }
 
 double HadronicInteraction::spectrumPion(double x, double ePrimary) const {
+	// Kellner+ 2006, eqn. 12
 	const double E0pi = 139.571 * MeV;
 	if (x < E0pi / ePrimary)
 		return 0.;
@@ -46,6 +47,7 @@ double HadronicInteraction::spectrumPion(double x, double ePrimary) const {
 }
 
 double HadronicInteraction::spectrumPhoton(double x, double ePrimary) const {
+	// Kellner+ 2006, eqn. 58
 	const double L = std::log(ePrimary / TeV);
 	const double B = 1.30 + 0.14 * L + 0.011 * L * L;
 	const double beta = 1. / (1.79 + 0.11 * L + 0.008 * L * L);
@@ -60,6 +62,7 @@ double HadronicInteraction::spectrumPhoton(double x, double ePrimary) const {
 }
 
 double HadronicInteraction::xSectionKelner06(double ePrimary) const {
+	// Kellner+ 2006, eqn. 73
 	const double L = std::log(ePrimary / TeV);
 	const double A = 1 - std::pow(1.22 * 1e-3 * TeV / ePrimary, 4);
 	return (34.3 + 1.88 * L + 0.25 * L * L) * A * A * 1e-31;
