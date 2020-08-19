@@ -399,6 +399,7 @@ add_library(crpropa SHARED
 	src/magneticField/PT11Field.cpp
     src/magneticField/TF17Field.cpp
 	src/magneticField/ArchimedeanSpiralField.cpp
+	src/magneticField/CMZFieldRevision.cpp
 	src/advectionField/AdvectionField.cpp
 	src/massDistribution/Nakanishi.cpp
 	src/massDistribution/Massdistribution.cpp
@@ -504,6 +505,9 @@ endif(DOXYGEN_FOUND)
 
 if(ENABLE_TESTING)
 	enable_testing()
+	
+	#if(FALSE) # fake comment
+	
 	add_executable(testCore test/testCore.cpp)
 	target_link_libraries(testCore  crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
 	add_test(testCore testCore)
@@ -568,9 +572,11 @@ if(ENABLE_TESTING)
 		target_link_libraries(testGalacticMagneticLens crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
 		add_test(testGalacticMagneticLens testGalacticMagneticLens)
 	endif(WITH_GALACTIC_LENSES)
+	#endif() # end of FAKE COMMENT
 
 	# python tests
 	if(ENABLE_PYTHON AND PYTHONLIBS_FOUND)
+		#if(FALSE) # fake comment
 		CONFIGURE_FILE(test/testMagneticLensPythonInterface.py.in testMagneticLensPythonInterface.py)
 		if(numpyIncludePath AND WITH_GALACTIC_LENSES)
 			add_test(testMagneticLensPythonInterface ${PYTHON_EXECUTABLE} testMagneticLensPythonInterface.py)
@@ -578,12 +584,15 @@ if(ENABLE_TESTING)
 
 		CONFIGURE_FILE(test/testSimulationExecution.py.in testSimulationExecution.py)
 		add_test(testSimulationExecution ${PYTHON_EXECUTABLE} testSimulationExecution.py)
+		#endif() # end of fake comment
 
 		CONFIGURE_FILE(test/testDiffusionSDE.py.in testDiffusionSDE.py)
 		add_test(testDiffusionSDE ${PYTHON_EXECUTABLE} testDiffusionSDE.py)
 
+		#if(FALSE) # fake COMMENT
 		CONFIGURE_FILE(test/testPythonExtension.py.in testPythonExtension.py)
 		add_test(testPythonExtension ${PYTHON_EXECUTABLE} testPythonExtension.py)
+		#endif() # end of fake Comment
 	endif(ENABLE_PYTHON AND PYTHONLIBS_FOUND)
 
 endif(ENABLE_TESTING)

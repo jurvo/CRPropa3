@@ -66,6 +66,7 @@
 #include "crpropa/magneticField/TF17Field.h"
 #include "crpropa/magneticField/QuimbyMagneticField.h"
 #include "crpropa/magneticField/ArchimedeanSpiralField.h"
+#include "crpropa/magneticField/CMZFieldRevision.h"
 
 #include "crpropa/advectionField/AdvectionField.h"
 
