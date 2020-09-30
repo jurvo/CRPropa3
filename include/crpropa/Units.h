@@ -99,7 +99,7 @@ static const double PeV = petaelectronvolt;
 static const double EeV = exaelectronvolt;
 
 static const double barn = 1E-28 * meter * meter;
-
+static const double mb = milli*barn;
 // astronomical distances
 static const double au = 149597870700 * meter;
 static const double ly = 365.25 * 24 * 3600 * second * c_light;
