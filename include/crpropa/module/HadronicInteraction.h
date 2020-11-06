@@ -25,7 +25,7 @@ protected:
 	double const W_NDH[7] = {44.0, 45.0, 47.0, 42.0, 40.0, 45.0, 40.0};
 	double const mProton = nuclearMass(1,1);
 	double const mPion = 0.135 * GeV/c_squared;
-  	 double const c1[9] = { 0.152322227732,0.807220022742,
+  	double const c1[9] = { 0.152322227732,0.807220022742,
       	2.005135155619,3.783473973331,6.204956777877,
       	9.372985251688,13.466236911092,18.833597788992,
       	26.374071890927};
@@ -34,8 +34,8 @@ protected:
 		0.305249767093e-3,0.659212302608e-5,0.411076933035e-7,
 		0.329087403035e-10};
 
-	int flag_Function; // 0: Kellner, 1: Kamae, 2: Dermer, 3: Kamae+Kellner, 4: Dermer+Kellner, 5: Dermer+Kamae+Kellner
-
+	int flag_Function=0; // 0: Kellner, 1: Kamae, 2: Dermer, 3: Kamae+Kellner, 4: Dermer+Kellner, 5: Dermer+Kamae+Kellner
+	double EnergySplit = 100*GeV;
 public:
 	HadronicInteraction(
 		ref_ptr<Density> density,
@@ -47,6 +47,9 @@ public:
 
 	void setFlagFunction(int flag){
 		flag_Function = flag;
+	}
+	void setEnergySplit(double Energy){
+		EnergySplit = Energy;
 	}
 
 	// general functions

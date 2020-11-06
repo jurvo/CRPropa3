@@ -71,8 +71,8 @@ double HadronicInteraction::KellnerXSection(double ePrimary) const {
 
 // ---------------------------------- Kamae 2006 ------------------------------------------------------------------------
 double HadronicInteraction::KamaeXSection(double ePrimary) const {
-	KISS_LOG_WARNING << "Kamae 2006 does not provide a x-Section \n"
-		<< "use Kellner x-Section instead\n";
+	//KISS_LOG_WARNING << "Kamae 2006 does not provide a x-Section \n"
+	//	<< "use Kellner x-Section instead\n";
 	return KellnerXSection(ePrimary);
 }
 
@@ -685,7 +685,7 @@ double HadronicInteraction::xSection(double ePrimary) const {
 		return DermerXSection(ePrimary);
 		break;
 	case 3:
-		if(ePrimary < 100*GeV) {
+		if(ePrimary < EnergySplit) {
 			return KamaeXSection(ePrimary);
 		}
 		else{
@@ -693,7 +693,7 @@ double HadronicInteraction::xSection(double ePrimary) const {
 		}
 		break;
 	case 4:
-		if(ePrimary < 100*GeV) {
+		if(ePrimary < EnergySplit) {
 			return DermerXSection(ePrimary);
 		}
 		else{
@@ -704,18 +704,18 @@ double HadronicInteraction::xSection(double ePrimary) const {
 		if(ePrimary < 20*GeV) {
 			return DermerXSection(ePrimary);
 		}
-		if(ePrimary < 100*GeV) {
+		if(ePrimary < EnergySplit) {
 			return KamaeXSection(ePrimary);
 		}
-		else
+		else{
 			return KellnerXSection(ePrimary);
 		}
 		break;
-	
 	default:
 		KISS_LOG_WARNING << "flag for Funiction not understood \nreturn 0";
-		return 0
+		return 0;
 		break;
+	}
 }
 
 double HadronicInteraction::spectrumPion(double x, double ePrimary) const {
@@ -735,7 +735,7 @@ double HadronicInteraction::spectrumPhoton(double x, double ePrimary) const {
 		return DermerSpectrumPhoton(x*ePrimary, ePrimary);
 		break;
 	case 3:
-		if(ePrimary < 100*GeV) {
+		if(ePrimary < EnergySplit) {
 			return KamaeSpectrumPhoton(x*ePrimary, ePrimary);
 		}
 		else{
@@ -743,7 +743,7 @@ double HadronicInteraction::spectrumPhoton(double x, double ePrimary) const {
 		}
 		break;
 	case 4:
-		if(ePrimary < 100*GeV) {
+		if(ePrimary < EnergySplit) {
 			return DermerSpectrumPhoton(x*ePrimary, ePrimary);
 		}
 		else{
@@ -754,17 +754,16 @@ double HadronicInteraction::spectrumPhoton(double x, double ePrimary) const {
 		if(ePrimary < 20*GeV) {
 			return DermerSpectrumPhoton(x*ePrimary, ePrimary);
 		}
-		if(ePrimary < 100*GeV) {
+		if(ePrimary < EnergySplit) {
 			return KamaeSpectrumPhoton(x*ePrimary, ePrimary);
 		}
-		else
+		else {
 			return KellnerSpectrumPhoton(x,ePrimary);
 		}
 		break;
-	
 	default:
 		KISS_LOG_WARNING << "flag for Funiction not understood \nreturn 0";
-		return 0
+		return 0;
 		break;
 	}
 	
