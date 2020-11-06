@@ -62,7 +62,7 @@ public:
 
 	    void tryStep(const Vector3d &Pos, Vector3d &POut, Vector3d &PosErr, double z, double propStep ) const;
 	    void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) const;
-	    void calculateBTensor(double rig, double BTen[], Vector3d pos, Vector3d dir, double z) const;
+	    void calculateBTensor(double rig, double BTen[], Vector3d pos, Vector3d dir, double z, double turbulence) const;
 
 	    void setMinimumStep(double minStep);
 	    void setMaximumStep(double maxStep);
@@ -79,6 +79,8 @@ public:
 	    double getEpsilon() const;
 	    double getAlpha() const;
 	    double getScale() const;
+		double getAlphaPara(double turbulence) const;
+		double getAlphaPerp(double turbulence) const;
 	    std::string getDescription() const;
 
 };

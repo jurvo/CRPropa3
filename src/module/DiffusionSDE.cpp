@@ -75,10 +75,23 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	double z = candidate->getRedshift();
 	double rig = current.getEnergy() / current.getCharge();
 
+	// try to calculate turbulence level 
+	double turb = 0;
+	try
+	{
+		Vector3d Turbulent = magneticField -> getTurbulentField(PosIn);
+		Vector3d Regular = magneticField -> getRegularField(PosIn);
+		turb = Turbulent.getR()/Regular.getR();
+	}
+	catch(const std::exception& e)
+	{
+		KISS_LOG_ERROR << e.what() << '\n';
+	}
+	
 
     // Calculate the Diffusion tensor
 	double BTensor[] = {0., 0., 0., 0., 0., 0., 0., 0., 0.};
-	calculateBTensor(rig, BTensor, PosIn, DirIn, z);
+	calculateBTensor(rig, BTensor, PosIn, DirIn, z, turb);
 
 
     // Generate random numbers
@@ -271,12 +284,13 @@ void DiffusionSDE::driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) c
 	return;
 }
 
-void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const {
+void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z, double turb) const {
 
-    double DifCoeff = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
-    BTen[0] = pow( 2  * DifCoeff, 0.5);
-    BTen[4] = pow(2 * epsilon * DifCoeff, 0.5);
-    BTen[8] = pow(2 * epsilon * DifCoeff, 0.5);
+    double DifCoeffPara = scale * 6.1e24 * pow((std::abs(r) / 4.0e9),getAlphaPara(turb));
+	double DiffCoeffPerp = epsilon*scale*6.1e24*pow((std::abs(r)/4.0e9),getAlphaPerp(turb));
+    BTen[0] = pow( 2  * DifCoeffPara, 0.5);
+    BTen[4] = pow(2 * DiffCoeffPerp, 0.5);
+    BTen[8] = pow(2 * DiffCoeffPerp, 0.5);
     return;
 
 }
@@ -358,7 +372,13 @@ double DiffusionSDE::getScale() const {
 	return scale;
 }
 
+double DiffusionSDE::getAlphaPara(double turb) const {
+	return alpha;
+}
 
+double DiffusionSDE::getAlphaPerp(double turb) const {
+	return alpha;
+}
 
 std::string DiffusionSDE::getDescription() const {
 	std::stringstream s;
