@@ -284,13 +284,21 @@ Vector3d CMZField::ICField(const Vector3d& pos) const {//Field in intercloud med
     double a2=2.*158.*pc;// Radius of A
     double a1=2.*35.*pc;
     double eta=0.85;
-    double B1=1e-5;
-    b.y+=ByPol(x,y,z,B1,a1,a2,eta);
-    b.x+=BxPol(x,y,z,B1,a1,a2,eta);
-    b.z+=BzPol(x,y,z,B1,a1,a2,eta);
-    b.x=b.x*1.e-4;
-    b.y=b.y*1.e-4;
-    b.z=b.z*1.e-4;
+    double B1=1e-5*gauss;
+    double B2 = B1/eta;
+
+    double r = sqrt(x*x+y*y);
+    double phi = atan2(y,x);
+    double sPhi = sin(phi);
+    double cPhi = cos(phi);
+    double a = 4*log(2)/a1/a1;
+    double L = a2/log(2)/2.;
+    double r1 = 1/(1+a*z*z);
+    double Br =2*a*r*pow(r1,3)*z*B2*exp(-r/L*r1);
+
+    b.y += sPhi*Br;
+    b.x += cPhi*Br;
+    b.z += r1*r1 * B2 * exp(-r/L *r1);
     return b;
 }                                                         
     //  
@@ -421,7 +429,7 @@ Vector3d CMZField::RadioArc(const Vector3d& pos) const {//Field in the non-therm
 }
 
 Vector3d CMZField::getField(const Vector3d& pos) const{
-    Vector3d A(0.);
+    /*Vector3d A(0.);
     Vector3d B(0.);
     Vector3d C(0.);
     if (-130.*pc<pos.y<16.*pc and -30.*pc<pos.z<72.*pc and -10.*pc<pos.x<10*pc)
@@ -435,7 +443,7 @@ Vector3d CMZField::getField(const Vector3d& pos) const{
     if (-90.*pc<pos.y<180.*pc and -80.*pc<pos.z<80.*pc and -30.*pc<pos.x<30.*pc)
     {
         C=MCField(pos);
-    }
+    }*/
     return ICField(pos);
     //return A+B+C+ICField(pos);
     //return MCField(pos)+RadioArc(pos)+NTFField(pos)+ICField(pos);
