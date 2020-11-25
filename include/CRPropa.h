@@ -72,7 +72,6 @@
 #include "crpropa/magneticField/turbulentField/PlaneWaveTurbulence.h"
 #include "crpropa/magneticField/turbulentField/SimpleGridTurbulence.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
-#include "crpropa/magneticField/CMZFieldRevision.h"
 #include "crpropa/magneticField/RealisticJF12.h"
 
 #include "crpropa/advectionField/AdvectionField.h"

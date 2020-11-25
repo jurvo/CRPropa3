@@ -3,7 +3,7 @@
 
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/magneticField/JF12FieldSolenoidal.h"
-#include "crpropa/magneticField/CMZFieldRevision.h"
+#include "crpropa/magneticField/CMZField.h"
 #include "kiss/logger.h"
 
 namespace crpropa {
