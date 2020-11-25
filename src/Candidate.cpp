@@ -7,12 +7,13 @@
 namespace crpropa {
 
 Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, double weight) :
-		redshift(z), trajectoryLength(0), weight(1), currentStep(0), nextStep(0), active(true), parent(0) {
+		redshift(z), trajectoryLength(0),time(0), weight(1), currentTimeStep(0), nextTimeStep(0), active(true), parent(0) {
 	ParticleState state(id, E, pos, dir);
 	source = state;
 	created = state;
 	previous = state;
 	current = state;
+	current.setUseTimePropagation(false);
 
 #if defined(OPENMP_3_1)
 		#pragma omp atomic capture
@@ -27,8 +28,8 @@ Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, dou
 }
 
 Candidate::Candidate(const ParticleState &state) :
-		source(state), created(state), current(state), previous(state), redshift(0), trajectoryLength(0), currentStep(0), nextStep(0), active(true), parent(0) {
-
+		source(state), created(state), current(state), previous(state), redshift(0), trajectoryLength(0),time(0), currentTimeStep(0), nextTimeStep(0), active(true), parent(0) {
+		current.setUseTimePropagation(false);
 #if defined(OPENMP_3_1)
 		#pragma omp atomic capture
 		{serialNumber = nextSerialNumber++;}
@@ -57,16 +58,32 @@ double Candidate::getTrajectoryLength() const {
 	return trajectoryLength;
 }
 
+double Candidate::getTime() const {
+	return time;
+}
+
+bool Candidate::getUseTimePropagation() const {
+	return current.getUseTimePropagation();
+}
+
 double Candidate::getWeight() const {
 	return weight;
 }
 
 double Candidate::getCurrentStep() const {
-	return currentStep;
+	return currentTimeStep*current.getBeta()*c_light;
 }
 
 double Candidate::getNextStep() const {
-	return nextStep;
+	return nextTimeStep*current.getBeta()*c_light;
+}
+
+double Candidate::getCurrentTimeStep() const {
+	return currentTimeStep;
+}
+
+double Candidate::getNextTimeStep() const{
+	return nextTimeStep;
 }
 
 void Candidate::setRedshift(double z) {
@@ -75,6 +92,16 @@ void Candidate::setRedshift(double z) {
 
 void Candidate::setTrajectoryLength(double a) {
 	trajectoryLength = a;
+	time = a/(c_light*current.getBeta());
+}
+
+void Candidate::setTime(double t) {
+	time = t;
+	trajectoryLength = t*c_light*current.getBeta();
+}
+
+void Candidate::setUseTimePropagation(bool use) {
+	current.setUseTimePropagation(use);
 }
 
 void Candidate::setWeight(double w) {
@@ -82,16 +109,31 @@ void Candidate::setWeight(double w) {
 }
 
 void Candidate::setCurrentStep(double lstep) {
-	currentStep = lstep;
 	trajectoryLength += lstep;
+	currentTimeStep = lstep/(current.getBeta()*c_light);
+	time += currentTimeStep;
 }
 
 void Candidate::setNextStep(double step) {
-	nextStep = step;
+	//nextStep = step;
+	nextTimeStep = step/(current.getBeta()*c_light);
+}
+
+void Candidate::setCurrentTimeStep(double tstep) {
+	time += tstep;
+	trajectoryLength += current.getBeta()*c_light*tstep;
+}
+
+void Candidate::setNextTimeStep(double t) {
+	nextTimeStep = t;
 }
 
 void Candidate::limitNextStep(double step) {
-	nextStep = std::min(nextStep, step);
+	nextTimeStep = std::min(nextTimeStep, step/(current.getBeta()*c_light));
+}
+
+void Candidate::limitNextTimeStep(double step) {
+	nextTimeStep = std::min(nextTimeStep, step);
 }
 
 void Candidate::setProperty(const std::string &name, const Variant &value) {
@@ -180,8 +222,8 @@ ref_ptr<Candidate> Candidate::clone(bool recursive) const {
 	cloned->redshift = redshift;
 	cloned->weight = weight;
 	cloned->trajectoryLength = trajectoryLength;
-	cloned->currentStep = currentStep;
-	cloned->nextStep = nextStep;
+	cloned->currentTimeStep = currentTimeStep;
+	cloned->nextTimeStep = nextTimeStep;
 	if (recursive) {
 		cloned->secondaries.reserve(secondaries.size());
 		for (size_t i = 0; i < secondaries.size(); i++) {

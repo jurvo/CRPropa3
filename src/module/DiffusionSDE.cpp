@@ -16,6 +16,20 @@ const double b[] = { 37. / 378., 0, 250. / 621., 125. / 594., 0., 512.
 const double bs[] = { 2825. / 27648., 0., 18575. / 48384., 13525.
 		/ 55296., 277. / 14336., 1. / 4. };
 
+// turbulence dependend values for the diffusion coefficient
+const std::vector<double> bB = {0.067, 0.108, 0.174, 0.28, 0.452, 0.727, 1.172, 1.887, 3.022, 3.834, 4.865, 6.172, 7.832};
+
+const std::vector<double> kappa_para_0 = {7.62027106e+32, 2.48212330e+32, 8.33535627e+31, 2.96949725e+31,
+ 1.14828611e+31, 5.08992373e+30, 2.66923660e+30, 1.73875117e+30,
+ 1.35040055e+30, 1.25957468e+30, 1.17795162e+30, 1.11661816e+30,
+ 1.08112229e+30};
+const std::vector<double> gamma_para = {0.5669, 0.587, 0.6465, 0.7075, 0.7523, 0.7977, 0.8703, 0.9377, 0.9703, 0.9805, 0.9662, 0.9577, 0.9349};
+
+const std::vector<double> kappa_perp_0 = {2.05687400e+27, 3.76269310e+27, 7.09804916e+27, 1.44494461e+28,
+ 3.28214232e+28, 7.67791668e+28, 1.73937204e+29, 3.63945258e+29,
+ 6.27195917e+29, 7.56419514e+29, 8.54756784e+29, 9.25339363e+29,
+ 9.65696170e+29};
+const std::vector<double> gamma_perp = {0.326, 0.367, 0.396, 0.4469, 0.4278, 0.4754, 0.5702, 0.7451, 0.9039, 0.9447, 0.9625, 0.9644, 0.9464};
 
 
 DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double tolerance,
@@ -75,10 +89,23 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	double z = candidate->getRedshift();
 	double rig = current.getEnergy() / current.getCharge();
 
+	// try to calculate turbulence level 
+	double turb = 0;
+	try
+	{
+		Vector3d Turbulent = magneticField -> getTurbulentField(PosIn);
+		Vector3d Regular = magneticField -> getRegularField(PosIn);
+		turb = Turbulent.getR()/Regular.getR();
+	}
+	catch(const std::exception& e)
+	{
+		KISS_LOG_ERROR << e.what() << '\n';
+	}
+	
 
     // Calculate the Diffusion tensor
 	double BTensor[] = {0., 0., 0., 0., 0., 0., 0., 0., 0.};
-	calculateBTensor(rig, BTensor, PosIn, DirIn, z);
+	calculateBTensor(rig, BTensor, PosIn, DirIn, z, turb);
 
 
     // Generate random numbers
@@ -271,12 +298,25 @@ void DiffusionSDE::driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) c
 	return;
 }
 
-void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const {
+void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z, double turb) const {
+	double DiffCoeffPara;
+	double DiffCoeffPerp;
+	if(turb>0){
+		// calc reduced rigidity 
+		double B = magneticField->getField(pos).getR();
+		double rho = r/B/c_light/lc;
+		
+		DiffCoeffPara = interpolate(turb,bB,kappa_para_0)*cm*cm * pow(rho/(5/(2*M_PI)),getAlphaPara(turb));
+		DiffCoeffPerp = interpolate(turb, bB, kappa_perp_0)*cm*cm*pow(rho/(5/(2*M_PI)),getAlphaPerp(turb));
+	}
+	else{
+		DiffCoeffPara = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
+		DiffCoeffPerp = epsilon*DiffCoeffPara;
 
-    double DifCoeff = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
-    BTen[0] = pow( 2  * DifCoeff, 0.5);
-    BTen[4] = pow(2 * epsilon * DifCoeff, 0.5);
-    BTen[8] = pow(2 * epsilon * DifCoeff, 0.5);
+	}
+    BTen[0] = pow(2 * DiffCoeffPara, 0.5);
+    BTen[4] = pow(2 * DiffCoeffPerp, 0.5);
+    BTen[8] = pow(2 * DiffCoeffPerp, 0.5);
     return;
 
 }
@@ -358,7 +398,21 @@ double DiffusionSDE::getScale() const {
 	return scale;
 }
 
+double DiffusionSDE::getAlphaPara(double turb) const {
+	return interpolate(turb, bB,gamma_para);
+}
 
+double DiffusionSDE::getAlphaPerp(double turb) const {
+	return interpolate(turb, bB, gamma_perp);
+}
+
+double DiffusionSDE::getKappaPara(double rho, double turb) const {
+	return interpolate(turb,bB,kappa_para_0)*cm*cm * pow(rho/(5/(2*M_PI)),getAlphaPara(turb));
+}
+
+double DiffusionSDE::getKappaPerp(double rho, double turb) const {
+	return interpolate(turb, bB, kappa_perp_0)*cm*cm*pow(rho/(5/(2*M_PI)),getAlphaPerp(turb));
+}
 
 std::string DiffusionSDE::getDescription() const {
 	std::stringstream s;

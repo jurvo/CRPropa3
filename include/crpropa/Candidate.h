@@ -44,8 +44,11 @@ private:
 	double weight; /**< Weight of the candidate */
 	double redshift; /**< Current simulation time-point in terms of redshift z */
 	double trajectoryLength; /**< Comoving distance [m] the candidate has traveled so far */
-	double currentStep; /**< Size of the currently performed step in [m] comoving units */
-	double nextStep; /**< Proposed size of the next propagation step in [m] comoving units */
+	//double currentStep; /**< Size of the currently performed step in [m] comoving units */
+	//double nextStep; /**< Proposed size of the next propagation step in [m] comoving units */
+	double time; /**< Traveld time of the candidate in [s]. Used for propagation with v<c */
+	double currentTimeStep; /**< Time of currently perfomed step in [s]. Used for propagation with v<c */
+	double nextTimeStep; /**< Proposed time of the next propagation step in [s]. Used for propagation with v<c */
 
 	static uint64_t nextSerialNumber;
 	uint64_t serialNumber;
@@ -75,6 +78,12 @@ public:
 	void setRedshift(double z);
 	double getRedshift() const;
 
+	void setTime(double t);
+	double getTime() const;
+
+	void setUseTimePropagation(bool use);
+	bool getUseTimePropagation() const;
+
 	/**
 	 Sets weight of each candidate.
 	 Weights are calculated for each tracked secondary.
@@ -97,9 +106,28 @@ public:
 	double getNextStep() const;
 
 	/**
+	 Sets the current time step and increases the time accordingly.
+	 Only the propagation module should use this.
+	 */
+	void setCurrentTimeStep(double t);
+	double getCurrentTimeStep() const;
+
+	/**
+	 Set the proposed next time step.
+	 Only tho propagation module should use this.
+	 */
+	void setNextTimeStep(double t);
+	double getNextTimeStep() const;
+
+	/**
 	 Make a bid for the next step size: the lowest wins.
 	 */
 	void limitNextStep(double step);
+
+	/**
+	 Make a bid for the next time step: the lowest wins.
+	 */
+	void limitNextTimeStep(double step);
 
 	void setProperty(const std::string &name, const Variant &value);
 	const Variant &getProperty(const std::string &name) const;
@@ -151,6 +179,8 @@ public:
 	 and activate it if inactive, e.g. restart it
 	*/
 	void restart();
+
+
 };
 
 /** @}*/

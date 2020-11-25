@@ -536,9 +536,18 @@ protected:
 	std::vector<double> cdf;
 
 };
+#endif
+
+class SourceTimePropagation: public SourceFeature{
+private:
+	bool use;
+
+public:
+	SourceTimePropagation(bool use);
+	void prepareCandidate(Candidate &candidate) const;
+};
 
 /**  @} */ // end of group SourceFeature
-#endif
 
 }// namespace crpropa
 

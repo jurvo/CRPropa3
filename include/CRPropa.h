@@ -36,6 +36,7 @@
 #include "crpropa/module/EMTripletPairProduction.h"
 #include "crpropa/module/ElasticScattering.h"
 #include "crpropa/module/ElectronPairProduction.h"
+#include "crpropa/module/HadronicInteraction.h"
 #include "crpropa/module/HDF5Output.h"
 #include "crpropa/module/NuclearDecay.h"
 #include "crpropa/module/Observer.h"
@@ -45,6 +46,8 @@
 #include "crpropa/module/PhotoPionProduction.h"
 #include "crpropa/module/PhotonEleCa.h"
 #include "crpropa/module/PhotonOutput1D.h"
+#include "crpropa/module/PionDecay.h"
+#include "crpropa/module/PropagationCK.h"
 #include "crpropa/module/PropagationBP.h"
 #include "crpropa/module/PropagationCK.h"
 #include "crpropa/module/Redshift.h"
@@ -68,6 +71,8 @@
 #include "crpropa/magneticField/turbulentField/PlaneWaveTurbulence.h"
 #include "crpropa/magneticField/turbulentField/SimpleGridTurbulence.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
+#include "crpropa/magneticField/CMZFieldRevision.h"
+#include "crpropa/magneticField/RealisticJF12.h"
 
 #include "crpropa/advectionField/AdvectionField.h"
 

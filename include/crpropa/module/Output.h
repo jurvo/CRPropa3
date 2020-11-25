@@ -35,6 +35,7 @@ protected:
 public:
 	enum OutputColumn {
 		TrajectoryLengthColumn,
+		TimeColumn,
 		ColumnDensityColumn,
 		RedshiftColumn,
 		CurrentIdColumn,

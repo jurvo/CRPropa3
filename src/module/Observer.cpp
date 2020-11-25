@@ -259,6 +259,17 @@ std::string ObserverInactiveVeto::getDescription() const {
 	return "ObserverInactiveVeto";
 }
 
+// ObserverPionVeto -----------------------------------------------------------
+DetectionState ObserverPionVeto::checkDetection(Candidate *c) const {
+	if(fabs(c->current.getId())==211)
+		return VETO;
+	return NOTHING;
+}
+
+std::string ObserverPionVeto::getDescription() const {
+	return "ObserverPionVeto";
+}
+
 // ObserverNucleusVeto --------------------------------------------------------
 DetectionState ObserverNucleusVeto::checkDetection(Candidate *c) const {
 	if (isNucleus(c->current.getId()))
@@ -323,9 +334,9 @@ std::string ObserverParticleIdVeto::getDescription() const {
 // ObserverTimeEvolution --------------------------------------------------------
 ObserverTimeEvolution::ObserverTimeEvolution() {}
 
-ObserverTimeEvolution::ObserverTimeEvolution(double min, double dist, double numb) {
+ObserverTimeEvolution::ObserverTimeEvolution(double min, double time, double numb) {
   for (size_t i = 0; i < numb; i++) {
-    addTime(min + i * dist);
+    addTime(min + i * time);
   }
 }
 
@@ -333,7 +344,7 @@ ObserverTimeEvolution::ObserverTimeEvolution(double min, double dist, double num
 DetectionState ObserverTimeEvolution::checkDetection(Candidate *c) const {
 
 	if (detList.size()) {
-		double length = c->getTrajectoryLength();
+		double time = c->getTime();
 		size_t index;
 		const std::string DI = "DetectionIndex";
 		std::string value;
@@ -351,19 +362,19 @@ DetectionState ObserverTimeEvolution::checkDetection(Candidate *c) const {
 			return NOTHING;
 		}
 
-		// Calculate the distance to next detection
-		double distance = length - detList[index];
+		// Calculate the time left to next detection
+		double timeLeft = time - detList[index];
 
 		// Limit next Step and detect candidate
 		// Increase the index by one in case of detection
-		if (distance < 0.) {
-			c->limitNextStep(-distance);
+		if (timeLeft < 0.) {
+			c->limitNextTimeStep(-timeLeft);
 			return NOTHING;
 		}
 		else {
 
 			if (index < detList.size()-1) {
-				c->limitNextStep(detList[index+1]-length);
+				c->limitNextTimeStep(detList[index+1]-time);
 			}
 			c->setProperty(DI, Variant::fromUInt64(index+1));
 

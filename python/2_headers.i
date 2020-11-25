@@ -421,6 +421,8 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %include "crpropa/magneticField/turbulentField/SimpleGridTurbulence.h"
 %include "crpropa/magneticField/turbulentField/HelicalGridTurbulence.h"
 %include "crpropa/magneticField/turbulentField/PlaneWaveTurbulence.h"
+%include "crpropa/magneticField/CMZFieldRevision.h"
+%include "crpropa/magneticField/RealisticJF12.h"
 %include "crpropa/module/BreakCondition.h"
 %include "crpropa/module/Boundary.h"
 
@@ -506,7 +508,7 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %include "crpropa/module/Output.h"
 %include "crpropa/module/DiffusionSDE.h"
 %include "crpropa/module/TextOutput.h"
-
+%include "crpropa/module/HadronicInteraction.h"
 %include "crpropa/module/HDF5Output.h"
 %include "crpropa/module/OutputShell.h"
 %include "crpropa/module/EMCascade.h"
@@ -516,6 +518,7 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %include "crpropa/module/ElectronPairProduction.h"
 %include "crpropa/module/PhotoPionProduction.h"
 %include "crpropa/module/PhotoDisintegration.h"
+%include "crpropa/module/PionDecay.h"
 %include "crpropa/module/ElasticScattering.h"
 %include "crpropa/module/Redshift.h"
 %include "crpropa/module/RestrictToRegion.h"

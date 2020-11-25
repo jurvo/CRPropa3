@@ -238,19 +238,19 @@ TEST(ObserverFeature, TimeEvolution) {
   obs.setFlag("Detected", "Detected");
   obs.add(new ObserverTimeEvolution(5, 5, 2));
   Candidate c;
-  c.setNextStep(10);
-  c.setTrajectoryLength(3);
+  c.setNextTimeStep(10);
+  c.setTime(3);
   
   // no detection, limit next step
   obs.process(&c);
   EXPECT_TRUE(c.isActive());
 
   // limit step
-  EXPECT_DOUBLE_EQ(2, c.getNextStep());
+  EXPECT_DOUBLE_EQ(2, c.getNextTimeStep());
   
   // detection one
-  c.setCurrentStep(0.1);
-  c.setTrajectoryLength(5);
+  c.setCurrentTimeStep(0.1);
+  c.setTime(5);
   obs.process(&c);
   EXPECT_TRUE(c.isActive());
   EXPECT_TRUE(c.hasProperty("Detected"));
@@ -260,8 +260,8 @@ TEST(ObserverFeature, TimeEvolution) {
   EXPECT_FALSE(c.hasProperty("Detected"));
 
   // detection two
-  c.setCurrentStep(0.1);
-  c.setTrajectoryLength(10.05);
+  c.setCurrentTimeStep(0.1);
+  c.setTime(10.05);
   obs.process(&c);
   EXPECT_TRUE(c.isActive());
   EXPECT_TRUE(c.hasProperty("Detected"));

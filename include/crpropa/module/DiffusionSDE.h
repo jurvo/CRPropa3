@@ -13,6 +13,7 @@
 #include "crpropa/advectionField/AdvectionField.h"
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
+#include "crpropa/Common.h"
 
 #include "kiss/logger.h"
 
@@ -43,6 +44,7 @@ private:
 	    double epsilon; // ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
 	    double alpha; // power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	    double scale; // scaling factor for the diffusion coefficient D = scale*D_0
+		double lc = 54*pc; // coherence length of the turbulence of the magnetic field
 
 
 public:
@@ -62,7 +64,7 @@ public:
 
 	    void tryStep(const Vector3d &Pos, Vector3d &POut, Vector3d &PosErr, double z, double propStep ) const;
 	    void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) const;
-	    void calculateBTensor(double rig, double BTen[], Vector3d pos, Vector3d dir, double z) const;
+	    void calculateBTensor(double rig, double BTen[], Vector3d pos, Vector3d dir, double z, double turbulence) const;
 
 	    void setMinimumStep(double minStep);
 	    void setMaximumStep(double maxStep);
@@ -79,6 +81,12 @@ public:
 	    double getEpsilon() const;
 	    double getAlpha() const;
 	    double getScale() const;
+		double getAlphaPara(double turbulence) const;
+		double getAlphaPerp(double turbulence) const;
+
+		double getKappaPara(double rho, double turb) const;
+		double getKappaPerp(double rho, double turb) const;
+
 	    std::string getDescription() const;
 
 };

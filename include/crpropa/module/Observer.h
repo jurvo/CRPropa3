@@ -175,6 +175,17 @@ public:
 };
 
 /**
+ @class ObserverPionVeto
+ @brief Veto for pions
+ */
+class ObserverPionVeto: public ObserverFeature {
+	public:
+	DetectionState checkDetection(Candidate *candidate) const;
+	std::string getDescription() const;
+};
+
+
+/**
  @class ObserverNeutrinoVeto
  @brief Veto for neutrinos
  */
@@ -227,7 +238,7 @@ private:
   std::vector<double> detList;
 public:
   ObserverTimeEvolution();
-  ObserverTimeEvolution(double min, double dist, double numb);
+  ObserverTimeEvolution(double min, double time, double numb);
   void addTime(const double &position);
   const std::vector<double>& getTimes() const;
   DetectionState checkDetection(Candidate *candidate) const;

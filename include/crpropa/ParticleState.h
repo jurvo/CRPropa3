@@ -27,6 +27,7 @@ private:
 	Vector3d direction; ///< unit vector of velocity or momentum
 	double pmass; ///< particle rest mass
 	double charge; ///< particle charge
+	bool useTimePropagation;
 
 public:
 	ParticleState(int id = 0, double energy = 0,
@@ -55,6 +56,9 @@ public:
 	/// Get particle ID
 	int getId() const;
 
+	void setUseTimePropagation(bool use);
+	bool getUseTimePropagation() const;
+
 	std::string getDescription() const;
 
 	// ======== Helper methods ========
@@ -68,6 +72,11 @@ public:
 	void setLorentzFactor(double gamma);
 	/// Get Lorentz factor
 	double getLorentzFactor() const;
+
+	/// Get beta = velocity over c
+	double getBeta() const;
+	/// Set velocity
+	void setBeta(double beta);
 
 	/// Velocity: direction times the speed of light in [m/s]
 	Vector3d getVelocity() const;

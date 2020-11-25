@@ -380,6 +380,7 @@ add_library(crpropa SHARED
   src/module/EMTripletPairProduction.cpp
   src/module/ElasticScattering.cpp
   src/module/ElectronPairProduction.cpp
+  src/module/HadronicInteraction.cpp
   src/module/HDF5Output.cpp
   src/module/NuclearDecay.cpp
   src/module/Observer.cpp
@@ -390,6 +391,7 @@ add_library(crpropa SHARED
   src/module/PhotoPionProduction.cpp
   src/module/PhotonEleCa.cpp
   src/module/PhotonOutput1D.cpp
+	src/module/PionDecay.cpp
   src/module/PropagationBP.cpp
   src/module/PropagationCK.cpp
   src/module/Redshift.cpp
@@ -417,6 +419,8 @@ add_library(crpropa SHARED
   src/massDistribution/Nakanishi.cpp
 
   ${CRPROPA_EXTRA_SOURCES}
+
+
 )
 target_link_libraries(crpropa ${CRPROPA_EXTRA_LIBRARIES})
 
