@@ -425,4 +425,22 @@ std::string ObserverSurface::getDescription() const {
 	return ss.str();
 };
 
+// ObserverInsideSurface --------------------------------------------------------
+
+ObserverInsideSurface::ObserverInsideSurface(Surface* _surface) : surface(_surface) { };
+
+DetectionState ObserverInsideSurface::checkDetection(Candidate *candidate) const
+{
+	double distance = surface-> distance(candidate->current.getPosition());
+	if(distance<0)
+		return DETECTED;
+	else
+		return VETO;
+};
+
+std::string ObserverInsideSurface::getDescription() const {
+	std::stringstream ss;
+	ss << "ObserverInsideSurface: << " << surface->getDescription();
+	return ss.str();
+};
 } // namespace crpropa

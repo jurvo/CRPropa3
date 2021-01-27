@@ -743,6 +743,30 @@ TEST(Geometry, ParaxialBox)
 	EXPECT_NEAR(8., b.distance(Vector3d(-8., 0., 0.)), 1E-10);
 }
 
+TEST(Geometry, Cylinder)
+{
+	Cylinder c(Vector3d(0.),1.,2.);
+	EXPECT_TRUE(c.distance(Vector3d(0.5, 0.5,0.7))<0);
+	EXPECT_TRUE(c.distance(Vector3d(0.5,0.5,-0.3))<0);
+	EXPECT_TRUE(c.distance(Vector3d(2,0,0))>0);
+	EXPECT_TRUE(c.distance(Vector3d(0.5,0,3))>0);
+	EXPECT_TRUE(c.distance(Vector3d(0.5,0,-3))>0);
+	EXPECT_TRUE(c.distance(Vector3d(3,0,3))>0);
+	EXPECT_TRUE(c.distance(Vector3d(-5,0,-5))>0);
+}
+
+TEST(Geometry, HollowCylinder)
+{
+	HollowCylinder h(Vector3d(0.), 1,2,1);
+	EXPECT_TRUE(h.distance(Vector3d(0.))>0);
+	EXPECT_TRUE(h.distance(Vector3d(0,0,2))>0);
+	EXPECT_TRUE(h.distance(Vector3d(1.5, 0, 0.4))<0);
+	EXPECT_TRUE(h.distance(Vector3d(0,1.5,-0.4))<0);
+	EXPECT_TRUE(h.distance(Vector3d(1.2, 1.2, 3))>0);
+	EXPECT_TRUE(h.distance(Vector3d(-1.4, -1.1, -5))>0);
+	EXPECT_TRUE(h.distance(Vector3d(3,0,0.2))>0);
+	EXPECT_TRUE(h.distance(Vector3d(-5,0,-5))>0);
+}
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

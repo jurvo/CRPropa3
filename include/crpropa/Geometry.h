@@ -89,6 +89,38 @@ class ParaxialBox: public Surface
 		virtual std::string getDescription() const;
 };
 
+/**
+ * @class Cylinder
+ * @brief A cylinder with a circle with radius R in xy-plane and height h. 
+ * @param h: height of cylinder. Upper and lower corner are mid.z +/- 0.5h.
+*/
+class Cylinder: public Surface
+{
+	private:
+		Vector3d mid;
+		double R, h;
+	public: 
+		Cylinder(const Vector3d& _mid, const double _R, const double _h);
+		virtual double distance(const Vector3d &point) const;
+		virtual Vector3d normal(const Vector3d& point) const;
+		virtual std::string getDescription() const;		
+};
+/**
+ * @class HollowCylinder
+ * @brief defines a hollow cylinder with a circle in xy-plane
+ */
+class HollowCylinder: public Surface
+{
+	private:
+		Vector3d mid;
+		double Rmin, Rmax, h;
+	public:
+		HollowCylinder(const Vector3d& _mid, const double Rmin, const double Rmax, const double h);
+		virtual double distance(const Vector3d &point) const;
+		virtual Vector3d normal(const Vector3d& point) const;
+		virtual std::string getDescription() const;
+};
+
 
 /** @}*/
 } // namespace crpropa

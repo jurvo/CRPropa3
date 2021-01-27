@@ -84,6 +84,20 @@ class ObserverSurface: public ObserverFeature {
 };
 
 /**
+ @class ObserverInsideSurface
+ @brief Detects all particles inside a surface and gives a VETO for all patricles outside.
+ */
+class ObserverInsideSurface: public ObserverFeature {
+	private:
+		ref_ptr<Surface> surface;
+
+	public:
+		ObserverInsideSurface(Surface* _surface);
+		DetectionState checkDetection(Candidate *candidate) const;
+		std::string getDescription() const;
+};
+
+/**
  @class ObserverSmallSphere
  @brief Detects particles upon entering a sphere
  */
