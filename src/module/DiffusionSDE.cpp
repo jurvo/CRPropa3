@@ -301,7 +301,7 @@ void DiffusionSDE::driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) c
 void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z, double turb) const {
 	double DiffCoeffPara;
 	double DiffCoeffPerp;
-	if(turb>0){
+	if(useTurbulenceDependence && (turb>0)){
 		// calc reduced rigidity 
 		double B = magneticField->getField(pos).getR();
 		double rho = r/B/c_light/lc;
@@ -321,6 +321,9 @@ void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vecto
 
 }
 
+void DiffusionSDE::setUseTurbulenceDependence(bool use) {
+	useTurbulenceDependence = use;
+}
 
 void DiffusionSDE::setMinimumStep(double min) {
 	if (min < 0)
@@ -372,6 +375,10 @@ void DiffusionSDE::setMagneticField(ref_ptr<MagneticField> f) {
 
 void DiffusionSDE::setAdvectionField(ref_ptr<AdvectionField> f) {
 	advectionField = f;
+}
+
+bool DiffusionSDE::getUseTurbulenceDependence() const {
+	return useTurbulenceDependence;
 }
 
 double DiffusionSDE::getMinimumStep() const {

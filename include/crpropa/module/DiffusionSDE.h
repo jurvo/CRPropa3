@@ -45,6 +45,7 @@ private:
 	    double alpha; // power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	    double scale; // scaling factor for the diffusion coefficient D = scale*D_0
 		double lc = 54*pc; // coherence length of the turbulence of the magnetic field
+		bool useTurbulenceDependence = false;
 
 
 public:
@@ -66,6 +67,7 @@ public:
 	    void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) const;
 	    void calculateBTensor(double rig, double BTen[], Vector3d pos, Vector3d dir, double z, double turbulence) const;
 
+		void setUseTurbulenceDependence(bool use);
 	    void setMinimumStep(double minStep);
 	    void setMaximumStep(double maxStep);
 	    void setTolerance(double tolerance);
@@ -75,6 +77,7 @@ public:
 	    void setMagneticField(ref_ptr<crpropa::MagneticField> magneticField);
 	    void setAdvectionField(ref_ptr<crpropa::AdvectionField> advectionField);
 
+		bool getUseTurbulenceDependence() const;
 	    double getMinimumStep() const;
 	    double getMaximumStep() const;
 	    double getTolerance() const;
