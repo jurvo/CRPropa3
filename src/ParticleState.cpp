@@ -124,7 +124,7 @@ void ParticleState::setBeta(double beta) {
 }
 
 double ParticleState::getBeta() const {
-	if(useTimePropagation ==false) {
+	if((useTimePropagation ==false) || (id==22)){
 		return 1; // no velocity lower c_light
 	}
 	double alpha = energy/(pmass*c_squared);
