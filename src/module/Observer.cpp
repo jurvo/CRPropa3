@@ -346,7 +346,6 @@ DetectionState ObserverTimeEvolution::checkDetection(Candidate *c) const {
 	if (detList.size()) {
 		double time = c->getTime();
 		size_t index;
-		const std::string DI = "DetectionIndex";
 		std::string value;
 
 		// Load the last detection index
@@ -396,12 +395,20 @@ const std::vector<double>& ObserverTimeEvolution::getTimes() const {
 
 std::string ObserverTimeEvolution::getDescription() const {
 	std::stringstream s;
-	s << "List of Detection lengths in kpc";
+	s << "OberverTimeEvolution: \n It use Property " << DI << "\n";
+	s << "List of Detection lengths in kpc/c";
 	for (size_t i = 0; i < detList.size(); i++)
-	  s << "  - " << detList[i] / kpc;
+	  s << "  - " << detList[i] / kpc*c_light;
 	return s.str();
 }
 
+void ObserverTimeEvolution::setDI(const std::string s){
+	DI = s;
+}
+
+std::string ObserverTimeEvolution::getDI() const {
+	return DI;
+}
 // ObserverSurface--------------------------------------------------------------
 ObserverSurface::ObserverSurface(Surface* _surface) : surface(_surface) { };
 

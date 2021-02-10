@@ -250,6 +250,7 @@ public:
 class ObserverTimeEvolution: public ObserverFeature {
 private:
   std::vector<double> detList;
+  std::string DI = "DetectionIndex";
 public:
   ObserverTimeEvolution();
   ObserverTimeEvolution(double min, double time, double numb);
@@ -257,6 +258,8 @@ public:
   const std::vector<double>& getTimes() const;
   DetectionState checkDetection(Candidate *candidate) const;
   std::string getDescription() const;
+  void setDI(const std::string s);
+  std::string getDI() const;
 };
 /** @} */
 
