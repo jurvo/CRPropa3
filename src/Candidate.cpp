@@ -1,6 +1,7 @@
 #include "crpropa/Candidate.h"
 #include "crpropa/ParticleID.h"
 #include "crpropa/Units.h"
+#include "kiss/logger.h"
 
 #include <stdexcept>
 
@@ -116,7 +117,15 @@ void Candidate::setCurrentStep(double lstep) {
 
 void Candidate::setNextStep(double step) {
 	//nextStep = step;
-	nextTimeStep = step/(current.getBeta()*c_light);
+	double nStep = step/(current.getBeta()*c_light);
+	if(nStep != nStep){
+		KISS_LOG_WARNING << "Detected nextTimeStep with inf\n" 
+		<< "set candidate inactive\n";
+		active = false;
+		return;
+	}
+	nextTimeStep=nStep;
+
 }
 
 void Candidate::setCurrentTimeStep(double tstep) {
