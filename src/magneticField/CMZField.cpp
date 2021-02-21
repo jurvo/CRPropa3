@@ -123,7 +123,7 @@ void CMZField::setUseICField(bool use) {
 void CMZField::setUseNTFField(bool use) {
     useNTFField = use;
 }
-void CMZField::setUseRaidoArc(bool use) {
+void CMZField::setUseRadioArc(bool use) {
     useRadioArc = use;
 }
 
