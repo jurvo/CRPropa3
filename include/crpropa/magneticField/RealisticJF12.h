@@ -21,7 +21,9 @@ public:
     RealisticJF12Field(){
         JF12 = new JF12FieldSolenoidal(3 * kpc, 0.5*kpc);
         JF12 -> deactivateOuterTransition();
-        JF12 -> randomTurbulent(0);
+	    #ifdef CRPROPA_HAVE_FFTW3
+            JF12 -> randomTurbulent(0);
+        #endif
         JF12 -> randomStriated(0);
         CMZ = new CMZField();
     };
@@ -52,6 +54,21 @@ public:
     double getReduction() const {
         return reduction;
     };
+
+    double getTurbulenceOverRegular(const Vector3d pos) const {
+        Vector3d Field = JF12->getRegularField(pos);
+        Field += CMZ->getField(pos);
+        double b = JF12 -> getTurbulentStrength(pos);
+        return b/Field.getR()/reduction;
+    }
+
+    double getTurbulence(const Vector3d pos) const {
+	double B = JF12->getRegularField(pos).getR();
+    B += CMZ->getField(pos).getR();
+	double b = JF12->getTurbulentStrength(pos)/reduction;
+    B += b;
+	return b/B;
+    }
 
 }; // class RealisticJF12Field
 
