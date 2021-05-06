@@ -364,6 +364,10 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %template(MagneticFieldRefPtr) crpropa::ref_ptr<crpropa::MagneticField>;
 %include "crpropa/magneticField/MagneticField.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::RealisticJF12Field>;
+%template(RealisticJF12RefPtr) crpropa::ref_ptr<crpropa::RealisticJF12Field>;
+%include "crpropa/magneticField/RealisticJF12.h"
+
 %implicitconv crpropa::ref_ptr<crpropa::PhotonField>;
 %template(PhotonFieldRefPtr) crpropa::ref_ptr<crpropa::PhotonField>;
 
