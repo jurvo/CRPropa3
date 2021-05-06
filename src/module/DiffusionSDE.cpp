@@ -1,6 +1,7 @@
 #include "crpropa/module/DiffusionSDE.h"
 
 
+
 using namespace crpropa;
 
 // Defining Cash-Karp coefficients
@@ -23,13 +24,13 @@ const std::vector<double> kappa_para_0 = {7.62027106e+32, 2.48212330e+32, 8.3353
  1.14828611e+31, 5.08992373e+30, 2.66923660e+30, 1.73875117e+30,
  1.35040055e+30, 1.25957468e+30, 1.17795162e+30, 1.11661816e+30,
  1.08112229e+30};
-const std::vector<double> gamma_para = {0.5669, 0.587, 0.6465, 0.7075, 0.7523, 0.7977, 0.8703, 0.9377, 0.9703, 0.9805, 0.9662, 0.9577, 0.9349};
+const std::vector<double> gamma_para = {0.563, 0.585, 0.649, 0.689, 0.73, 0.768, 0.829, 0.888, 0.913, 0.923, 0.911}; // Daten Stand: 19/02/2021
 
 const std::vector<double> kappa_perp_0 = {2.05687400e+27, 3.76269310e+27, 7.09804916e+27, 1.44494461e+28,
  3.28214232e+28, 7.67791668e+28, 1.73937204e+29, 3.63945258e+29,
  6.27195917e+29, 7.56419514e+29, 8.54756784e+29, 9.25339363e+29,
  9.65696170e+29};
-const std::vector<double> gamma_perp = {0.326, 0.367, 0.396, 0.4469, 0.4278, 0.4754, 0.5702, 0.7451, 0.9039, 0.9447, 0.9625, 0.9644, 0.9464};
+const std::vector<double> gamma_perp = {0.343, 0.378, 0.418, 0.444, 0.445, 0.481, 0.586, 0.756, 0.901, 0.926, 0.932}; // Daten Stand 19/02/2021
 
 
 DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double tolerance,
@@ -88,24 +89,11 @@ void DiffusionSDE::process(Candidate *candidate) const {
 
 	double z = candidate->getRedshift();
 	double rig = current.getEnergy() / current.getCharge();
-
-	// try to calculate turbulence level 
-	double turb = 0;
-	try
-	{
-		Vector3d Turbulent = magneticField -> getTurbulentField(PosIn);
-		Vector3d Regular = magneticField -> getRegularField(PosIn);
-		turb = Turbulent.getR()/Regular.getR();
-	}
-	catch(const std::exception& e)
-	{
-		KISS_LOG_ERROR << e.what() << '\n';
-	}
 	
 
     // Calculate the Diffusion tensor
 	double BTensor[] = {0., 0., 0., 0., 0., 0., 0., 0., 0.};
-	calculateBTensor(rig, BTensor, PosIn, DirIn, z, turb);
+	calculateBTensor(rig, BTensor, PosIn, DirIn, z);
 
 
     // Generate random numbers
@@ -298,16 +286,24 @@ void DiffusionSDE::driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) c
 	return;
 }
 
-void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z, double turb) const {
+void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const {
 	double DiffCoeffPara;
 	double DiffCoeffPerp;
-	if(useTurbulenceDependence && (turb>0)){
-		// calc reduced rigidity 
-		double B = magneticField->getField(pos).getR();
-		double rho = r/B/c_light/lc;
-		
-		DiffCoeffPara = interpolate(turb,bB,kappa_para_0)*cm*cm * pow(rho/(5/(2*M_PI)),getAlphaPara(turb));
-		DiffCoeffPerp = interpolate(turb, bB, kappa_perp_0)*cm*cm*pow(rho/(5/(2*M_PI)),getAlphaPerp(turb));
+	if(useTurbulenceDependence){
+		// try to calculate turbulence level 
+		try
+		{
+			double turb = realisticField -> getTurbulence(pos);
+			double B = realisticField -> getRegularField(pos).getR();
+			double rho = std::abs(r)/c_light/B/lc;
+			DiffCoeffPara = 6.1e24 *pow(turb/eta0,-2)*pow(rho/rho0, getAlphaPara(turb));
+			DiffCoeffPerp = 6.1e24*pow(turb*eta0,0)*pow(rho/rho0, getAlphaPerp(turb));
+
+		}
+		catch(const std::exception& e)
+		{
+			KISS_LOG_ERROR << e.what() << '\n';
+		}
 	}
 	else{
 		DiffCoeffPara = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
@@ -319,6 +315,14 @@ void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vecto
     BTen[8] = pow(2 * DiffCoeffPerp, 0.5);
     return;
 
+}
+
+void DiffusionSDE::setRealisticField(ref_ptr<crpropa::RealisticJF12Field> field) {
+	realisticField = field;
+	useTurbulenceDependence = true;
+	eta0 = field->getTurbulence(Vector3d(-8.5*kpc, 0., 0.));
+	double B0 = field -> getRegularField(Vector3d(-8.5*kpc,0.,0.)).getR();
+	rho0 = 4*giga*volt/c_light/B0 /lc;
 }
 
 void DiffusionSDE::setUseTurbulenceDependence(bool use) {
@@ -423,6 +427,7 @@ double DiffusionSDE::getKappaPerp(double rho, double turb) const {
 
 std::string DiffusionSDE::getDescription() const {
 	std::stringstream s;
+	s << "Diffusion SDE Model with following specification: \n";
 	s << "minStep: " << minStep / kpc  << " kpc, ";
 	s << "maxStep: " << maxStep / kpc  << " kpc, ";
 	s << "tolerance: " << tolerance << "\n";

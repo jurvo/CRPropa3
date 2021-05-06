@@ -10,6 +10,7 @@
 
 #include "crpropa/Module.h"
 #include "crpropa/magneticField/MagneticField.h"
+#include "crpropa/magneticField/RealisticJF12.h"
 #include "crpropa/advectionField/AdvectionField.h"
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
@@ -37,6 +38,7 @@ class DiffusionSDE : public Module{
 
 private:
 	    ref_ptr<MagneticField> magneticField;
+		ref_ptr<RealisticJF12Field> realisticField; // used for information about local tubulence
 	    ref_ptr<AdvectionField> advectionField;
 	    double minStep; // minStep/c_light is the minimum integration timestep
 	    double maxStep; // maxStep/c_light is the maximum integration timestep
@@ -44,8 +46,10 @@ private:
 	    double epsilon; // ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
 	    double alpha; // power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	    double scale; // scaling factor for the diffusion coefficient D = scale*D_0
-		double lc = 54*pc; // coherence length of the turbulence of the magnetic field
 		bool useTurbulenceDependence = false;
+		double eta0; // reference tubulencelevel at earth
+		double rho0; // reduced rigility for R = 4*GV
+		double lc = 60*pc; // coheration length for the Milky Way
 
 
 public:
@@ -65,7 +69,7 @@ public:
 
 	    void tryStep(const Vector3d &Pos, Vector3d &POut, Vector3d &PosErr, double z, double propStep ) const;
 	    void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) const;
-	    void calculateBTensor(double rig, double BTen[], Vector3d pos, Vector3d dir, double z, double turbulence) const;
+	    void calculateBTensor(double rig, double BTen[], Vector3d pos, Vector3d dir, double z) const;
 
 		void setUseTurbulenceDependence(bool use);
 	    void setMinimumStep(double minStep);
@@ -76,6 +80,7 @@ public:
 	    void setScale(double Scale);
 	    void setMagneticField(ref_ptr<crpropa::MagneticField> magneticField);
 	    void setAdvectionField(ref_ptr<crpropa::AdvectionField> advectionField);
+		void setRealisticField(ref_ptr<crpropa::RealisticJF12Field> realisticField);
 
 		bool getUseTurbulenceDependence() const;
 	    double getMinimumStep() const;
