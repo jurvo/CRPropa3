@@ -410,11 +410,13 @@ double DiffusionSDE::getScale() const {
 }
 
 double DiffusionSDE::getAlphaPara(double turb) const {
-	return interpolate(turb, bB,gamma_para);
+	//return interpolate(turb, bB,gamma_para);
+	return 1./3.;
 }
 
 double DiffusionSDE::getAlphaPerp(double turb) const {
-	return interpolate(turb, bB, gamma_perp);
+	//return interpolate(turb, bB, gamma_perp);
+	return 1./3.;
 }
 
 double DiffusionSDE::getKappaPara(double rho, double turb) const {
