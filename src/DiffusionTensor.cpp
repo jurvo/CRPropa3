@@ -153,7 +153,7 @@ double QLTRigidity::calculateLamorRadius(ParticleState &state) const {
     return state.getMomentum().getR()/std::abs(state.getCharge())/fieldStrength;
 }
 
-QLTRigidity::QLTRigidity(ref_ptr<MagneticField> magField, ref_ptr<TurbulentField> turbField, double kappa0, double alphaPara, double aPerp)
+QLTRigidity::QLTRigidity(ref_ptr<MagneticField> magField, ref_ptr<TurbulentField> turbField, double kappa0, double alphaPara, double alphaPerp)
     : backgroundField(magField), kappa0(kappa0), alphaPara(alphaPara), alphaPerp(alphaPerp){
         setTurbulentField(turbField);
     }
@@ -189,15 +189,15 @@ void QLTRigidity::normToPosition(const Vector3d &pos){
     Vector3d b = turbulentField -> getField(pos);
     Vector3d B = backgroundField -> getField(pos);
     normEta = b.getR()/B.getR();
-    normB = (b+B).getR();
+    normRho = 4e9*volt/B.getR()/c_light/correlationLength;
 }
 
 void QLTRigidity::setNormEta(double eta){
     normEta = eta;
 }
 
-void QLTRigidity::setNormB(double B){
-    normB = B;
+void QLTRigidity::setNormRho(double rho){
+    normRho = rho;
 }
 
 ref_ptr<MagneticField> QLTRigidity::getMagneticField(){
@@ -224,10 +224,35 @@ double QLTRigidity::getNormEta() const{
     return normEta;
 }
 
-double QLTRigidity::getNormB() const{
-    return normB;
+double QLTRigidity::getNormRho() const{
+    return normRho;
 }
 
 Vector3d QLTRigidity::getNormPos() const{
     return normPos;
+}
+
+double QLTRigidity::getKappaParallel(Candidate *cand) const{
+    Vector3d pos = cand->current.getPosition();
+
+    // reduced rigidty
+    double rho = calculateLamorRadius(cand->current)/correlationLength; 
+    double eta = turbulentField->getField(pos).getR()/backgroundField->getField(pos).getR();
+
+    return kappa0* pow(eta/normEta, -2) * pow(rho/normRho, getAlphaPara());
+}
+
+double QLTRigidity::getKappaPerpendicular(Candidate *cand) const{
+    auto state = cand -> current;
+    Vector3d pos = state.getPosition();
+
+    // reduced rigidty    
+    double rho = calculateLamorRadius(state)/correlationLength; 
+    double eta = turbulentField->getField(pos).getR()/backgroundField->getField(pos).getR();
+
+    return kappa0* pow(eta*normEta, 2) * pow(rho/normRho, getAlphaPerp());
+}
+
+double QLTRigidity::getKappaPerpendicular2(Candidate *cand) const{
+    return getKappaPerpendicular(cand);
 }

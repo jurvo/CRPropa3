@@ -60,8 +60,9 @@ TEST(testQLTTurbulence, testQLTTurbulence){
     // turbulent field
     double b = 1;
     unsigned int seed = 42; // random number
-    SimpleGridTurbulence* turbulentField = new SimpleGridTurbulence(SimpleTurbulenceSpectrum(b, 10*pc, 100*pc), GridProperties(Vector3d(0.), 256, 5*pc),seed);
-
+    auto spectrum = SimpleTurbulenceSpectrum(b, 30*pc, 90*pc);
+    auto gp = GridProperties(Vector3d(0.), 10, 10*pc);
+    auto turbulentField = new SimpleGridTurbulence(spectrum, gp, seed);
     // diffusion tensor
     QLTTurbulent* Tens = new QLTTurbulent(background, turbulentField);
  
@@ -111,4 +112,66 @@ TEST(testQLTTurbulence, testQLTTurbulence){
     EXPECT_DOUBLE_EQ(Tens ->getAlphaPerp(), 0.5);
     Tens ->setNormTurbulence(0.01);
     EXPECT_DOUBLE_EQ(Tens ->getNormTurbulence(), 0.01);
+}
+
+TEST(testQLTRigidity, testQLTRigidity){
+    // background field
+    double B = 10;  // field strenght
+    UniformMagneticField* background = new UniformMagneticField(Vector3d(B, 0, 0));
+
+    // turbulent field
+    double b = 1;
+    unsigned int seed = 42; // random number
+    auto spectrum = SimpleTurbulenceSpectrum(b, 30*pc, 90*pc);
+    auto gp = GridProperties(Vector3d(0.), 10, 10*pc);
+    auto turbulentField = new SimpleGridTurbulence(spectrum, gp, seed);
+
+    QLTRigidity* Tens = new QLTRigidity(background, turbulentField);
+
+    // candidate for testparticle
+    Vector3d pos1(0.);
+    Vector3d posEarth(-8.5*kpc, 0., 0.);
+    int id = 1000010010; // protons
+    Candidate cand(id, 4*GeV, pos1);
+
+    // check default values
+    EXPECT_DOUBLE_EQ(Tens -> getKappa0(), 6.1e24);
+    EXPECT_DOUBLE_EQ(Tens -> getAlphaPara(), 1./3.);
+    EXPECT_DOUBLE_EQ(Tens -> getAlphaPerp(), 1./3.);
+    double normEta = turbulentField -> getField(posEarth).getR()/B;
+    EXPECT_DOUBLE_EQ(Tens -> getNormEta(), normEta);
+    double normRho = 4e9*volt / B / c_light / turbulentField-> getCorrelationLength();
+    EXPECT_DOUBLE_EQ(Tens -> getNormRho(), normRho);
+
+    //EXPECT_DOUBLE_EQ(Tens -> getKappaParallel(&cand), 6.1e24);
+    //EXPECT_DOUBLE_EQ(Tens -> getKappaPerpendicular(&cand), pow(normEta,4)*6.1e24);
+    //EXPECT_DOUBLE_EQ(Tens -> getKappaPerpendicular2(&cand), pow(normEta,4)*6.1e24);
+
+    // energy scaling 
+    double kPara = Tens -> getKappaParallel(&cand);
+    double kPerp = Tens -> getKappaPerpendicular(&cand);
+    cand.current.setEnergy(4*PeV); // 1e6 in energy -> 1e2 for kappa (scales with E^1/3)
+    EXPECT_DOUBLE_EQ(Tens -> getKappaParallel(&cand), 100*kPara);
+    EXPECT_DOUBLE_EQ(Tens -> getKappaPerpendicular(&cand), 100*kPerp);
+
+    // test set function
+    Tens -> setKappa0(100);
+    EXPECT_DOUBLE_EQ(Tens -> getKappa0(), 100);
+    Tens -> setAlphaPara(0.2);
+    EXPECT_DOUBLE_EQ(Tens -> getAlphaPara(), 0.2);
+    Tens -> setAlphaPerp(0.4);
+    EXPECT_DOUBLE_EQ(Tens -> getAlphaPerp(), 0.4);
+    Tens -> setAlpha(0.5);
+    EXPECT_DOUBLE_EQ(Tens -> getAlphaPara(), 0.5);
+    EXPECT_DOUBLE_EQ(Tens -> getAlphaPerp(), 0.5);
+    Tens -> setNormEta(0.2);
+    EXPECT_DOUBLE_EQ(Tens -> getNormEta(), 0.2);
+    Tens -> setNormRho(0.8);
+    EXPECT_DOUBLE_EQ(Tens -> getNormRho(), 0.8);
+    Vector3d normPos(1,5,8);
+    Tens -> normToPosition(normPos);
+    Vector3d tensNormPos = Tens -> getNormPos();
+    EXPECT_DOUBLE_EQ(tensNormPos.x, normPos.x);
+    EXPECT_DOUBLE_EQ(tensNormPos.y, normPos.y);
+    EXPECT_DOUBLE_EQ(tensNormPos.z, normPos.z);
 }

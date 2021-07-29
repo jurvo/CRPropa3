@@ -100,15 +100,19 @@ class QLTRigidity: public DiffusionTensor{
         bool hasTurbulentField;
         double kappa0;
         double normEta;
-        double normB; 
+        double normRho; 
         double alphaPara;
         double alphaPerp;
-        double correlationLength = 59.96077*pc;
+        double correlationLength;
         Vector3d normPos; // position where the diffusion coefficent is normed. default at earth Vector3d(-8.5*kpc, 0, 0)
         double calculateLamorRadius(ParticleState &state) const;
 
     public:
-        QLTRigidity(ref_ptr<MagneticField> magField, ref_ptr<TurbulentField> turbField, double kappa0=6.1e24, double alphaPara=(1./3.), double alpaPerp=(1./3.));
+        QLTRigidity(ref_ptr<MagneticField> magField, ref_ptr<TurbulentField> turbField, double kappa0=6.1e24, double alphaPara=(1./3.), double alphaPerp=(1./3.));
+        
+        double getKappaParallel(Candidate *cand) const;
+        double getKappaPerpendicular(Candidate *cand) const;
+        double getKappaPerpendicular2(Candidate *cand) const;
 
         void setMagneticField(ref_ptr<MagneticField> field);
         void setTurbulentField(ref_ptr<TurbulentField> field);
@@ -116,9 +120,9 @@ class QLTRigidity: public DiffusionTensor{
         void setAlphaPara(double aPara);
         void setAlphaPerp(double aPerp);
         void setAlpha(double alpha);
-        void normToPosition(const Vector3d &pos= Vector3d(-8.5*kpc, 0., 0.));
+        void normToPosition(const Vector3d &pos);
         void setNormEta(double eta);
-        void setNormB(double B);
+        void setNormRho(double rho);
 
         ref_ptr<MagneticField> getMagneticField();
         ref_ptr<TurbulentField> getTurbulentField();
@@ -126,7 +130,7 @@ class QLTRigidity: public DiffusionTensor{
         double getAlphaPara() const;
         double getAlphaPerp() const;
         double getNormEta() const;
-        double getNormB() const;
+        double getNormRho() const;
         Vector3d getNormPos() const;
 };
 
