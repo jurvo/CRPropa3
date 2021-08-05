@@ -3,6 +3,8 @@
 #include "kiss/logger.h"
 #include "crpropa/Common.h"
 
+#include <sstream>
+#include <fstream>
 
 using namespace crpropa;
 
@@ -13,13 +15,16 @@ void DiffusionTensor::setDescription(const std::string &d) {
 
 */
 
+inline double calculateLamorRadius(ParticleState &state, ref_ptr<MagneticField> backgroundField) {
+    double fieldStrength;
+    Vector3d pos = state.getPosition();
+    fieldStrength = backgroundField->getField(pos).getR();
+    return state.getMomentum().getR()/std::abs(state.getCharge())/fieldStrength;
+}
 
 // QLTDiffusion ------------------------------------------------------------------
-QLTDiffusion::QLTDiffusion(double eps , double kap, double alp ){
-    epsilon = eps;
-    kappa0 = kap;
-    alpha = alp;
-}
+QLTDiffusion::QLTDiffusion(double epsilon , double kappa0, double alpha, double normRig ): 
+    epsilon(epsilon), kappa0(kappa0), alpha(alpha), normRig(normRig) {}
 
 void QLTDiffusion::setEpsilon(double eps){
     epsilon = eps;
@@ -29,6 +34,9 @@ void QLTDiffusion::setKappa0(double kap){
 }
 void QLTDiffusion::setAlpha(double alph){
     alpha = alph;
+}
+void QLTDiffusion::setNormRig(double rig){
+    normRig = rig;
 }
 
 double QLTDiffusion::getAlpha() const{
@@ -40,61 +48,47 @@ double QLTDiffusion::getKappa0() const{
 double QLTDiffusion::getEpsilon() const{
     return epsilon;
 }
-
-double QLTDiffusion::getKappaParallel(Candidate *cand){
-    double rig = cand-> current.getRigidity();
-    return kappa0*pow(std::abs(rig)/(4.0e9*volt),alpha);
+double QLTDiffusion::getNormRig() const{
+    return normRig;
 }
 
-double QLTDiffusion::getKappaPerpendicular(Candidate *cand){
-    double rig = cand-> current.getRigidity();
-    return epsilon*kappa0*pow(std::abs(rig)/(4.0e9*volt),alpha);
-}
+Vector3d QLTDiffusion::getDiffusionKoefficent(Candidate *cand) const{
+    double rig = cand -> current.getRigidity();
 
-double QLTDiffusion::getKappaPerpendicular2(Candidate *cand){
-    return getKappaPerpendicular(cand); 
+    Vector3d tens(1, epsilon, epsilon);
+    tens *= kappa0 * pow(std::abs(rig)/normRig, alpha);
+    return tens;
 }
 
 std::string QLTDiffusion::getDescription() const{
     std::stringstream s;
     s << "Diffusion tensor for quasi-linear-theory (QLT)  with: \n"
     << "epsilon: \t" << epsilon <<"\n"
-    << "kappa0: \t"<< kappa0 << "m2/s \n"
-    << "alpha: \t" << alpha << "\n";
+    << "kappa0: \t"<< kappa0 << " m^2/s \n"
+    << "alpha:  \t" << alpha << "\n"
+    << "normRig: \t" << normRig << "\n";
     return s.str();
 }
 
 // QLTTurbulent ------------------------------------------------------------------
 
-QLTTurbulent::QLTTurbulent(ref_ptr<MagneticField> background, ref_ptr<TurbulentField> turbulent, double kap, double aPara, double aPerp){
-    backgroundField = background;
-    turbulentField = turbulent;
-    kappa0 = kap;
-    alphaPara = aPara;
-    alphaPerp = aPerp;
+QLTTurbulent::QLTTurbulent(ref_ptr<MagneticField> backgroundField, ref_ptr<TurbulentField> turbulentField, double kappa0, double alphaPara, double alphaPerp, double normRig):
+    backgroundField(backgroundField), turbulentField(turbulentField), kappa0(kappa0), alphaPara(alphaPara), alphaPerp(alphaPerp), normRig(normRig) {
     normToEarthPosition(); 
 }
 
-double QLTTurbulent::getKappaParallel(Candidate *cand) const {
-	ParticleState &current = cand->current;
-    double rig = current.getRigidity();
-    Vector3d pos = current.getPosition();
-    double eta = turbulentField->getField(pos).getR() / backgroundField -> getField(pos).getR();
-    double k = kappa0 * pow_integer<2>(normTurbulence/eta) * pow(rig/(4e9*volt), alphaPara);
-    return k;
-}
+Vector3d QLTTurbulent::getDiffusionKoefficent(Candidate *cand) const    {
+    double rig = cand -> current.getRigidity();
+    Vector3d pos = cand -> current.getPosition();
+    double b = turbulentField -> getField(pos).getR();
+    double B = backgroundField -> getField(pos).getR();
+    double eta = b/std::sqrt(b*b + B*B);
+    Vector3d tens(kappa0);
+    tens.x *= pow_integer<2>(normTurbulence/eta)*pow(rig/normRig, alphaPara);
+    tens.y *= pow_integer<2>(normTurbulence*eta)*pow(rig/normRig, alphaPerp);
+    tens.z = tens.y;
 
-double QLTTurbulent::getKappaPerpendicular(Candidate *cand) const{
-	ParticleState &current = cand->current;
-    double rig = current.getRigidity();
-    Vector3d pos = current.getPosition();
-    double eta = turbulentField->getField(pos).getR() / backgroundField -> getField(pos).getR();
-    double k = kappa0 * pow_integer<2>(normTurbulence*eta)* pow(rig/(4e9*volt), alphaPerp);
-    return k;
-}
-
-double QLTTurbulent::getKappaPerpendicular2(Candidate *cand) const{
-    return getKappaPerpendicular(cand);
+    return tens;
 }
 
 double QLTTurbulent::getKappa0() const{
@@ -108,6 +102,9 @@ double QLTTurbulent::getAlphaPerp() const{
 }
 double QLTTurbulent::getNormTurbulence() const{
     return normTurbulence;
+}
+double QLTTurbulent::getNormRigidity() const{
+    return normRig;
 }
 
 void QLTTurbulent::setKappa0(double kap){
@@ -126,6 +123,9 @@ void QLTTurbulent::setAlpha(double a){
 void QLTTurbulent::setNormTurbulence(double eta){
     normTurbulence = eta;
 }
+void QLTTurbulent::setNormRigidity(double rig){
+    normRig = rig;
+}
 
 void QLTTurbulent::normToEarthPosition(Vector3d posEarth){
     double b = turbulentField -> getField(posEarth).getR();
@@ -135,23 +135,17 @@ void QLTTurbulent::normToEarthPosition(Vector3d posEarth){
 
 std::string QLTTurbulent::getDescription() const{
     std::stringstream ss;
-    ss << "Diffusion Tensor for the quasi-linear-theory (QLT) with turbulence dependence \n \n"
-    << "Energyscaling with spectral index:\n"
-    << "alpha parallel \t" << alphaPara << "\n"
-    << "alpha perpendicular \t" << alphaPerp << "\n \n"
-    << "norming the turbulence at value: \t" << normTurbulence << "\n"
-    << "norming the diffusion coefficent to: \t" << kappa0 << "m2/s \n"; 
+    ss  << "Diffusion Tensor for the quasi-linear-theory (QLT) with turbulence dependence \n \n"
+        << "Energyscaling with spectral index:\n"
+        << "alpha parallel \t" << alphaPara << "\n"
+        << "alpha perpendicular \t" << alphaPerp << "\n \n"
+        << "norming the turbulence at value: \t" << normTurbulence << "\n"
+        << "and at rigidity: \t" << normRig <<" volt \n"
+        << "norming the diffusion coefficent to: \t" << kappa0 << " m2/s \n"; 
     return ss.str();
 }
 
 // QLTRigidity ------------------------------------------------------------------
-
-double QLTRigidity::calculateLamorRadius(ParticleState &state) const {
-    double fieldStrength;
-    Vector3d pos = state.getPosition();
-    fieldStrength = (backgroundField->getField(pos) + turbulentField ->getField(pos)).getR();
-    return state.getMomentum().getR()/std::abs(state.getCharge())/fieldStrength;
-}
 
 QLTRigidity::QLTRigidity(ref_ptr<MagneticField> magField, ref_ptr<TurbulentField> turbField, double kappa0, double alphaPara, double alphaPerp)
     : backgroundField(magField), kappa0(kappa0), alphaPara(alphaPara), alphaPerp(alphaPerp){
@@ -232,27 +226,17 @@ Vector3d QLTRigidity::getNormPos() const{
     return normPos;
 }
 
-double QLTRigidity::getKappaParallel(Candidate *cand) const{
-    Vector3d pos = cand->current.getPosition();
+Vector3d QLTRigidity::getDiffusionKoefficent(Candidate *cand) const {
+    Vector3d pos = cand -> current.getPosition();
+    double rho = calculateLamorRadius(cand -> current, backgroundField)/correlationLength;
+    double b = turbulentField -> getField(pos).getR();
+    double B = backgroundField -> getField(pos).getR();
+    double eta = b/std::sqrt(b*b + B*B);
+    
+    Vector3d tens(kappa0);
+    tens.x *= pow_integer<2>(normEta/eta)*pow(rho/normRho, getAlphaPara());  // parallel component
+    tens.y *= pow_integer<2>(normEta*eta)*pow(rho/normRho, getAlphaPerp());  // perpendicular component
+    tens.z = tens.y; // perpendicular components are degenerated
 
-    // reduced rigidty
-    double rho = calculateLamorRadius(cand->current)/correlationLength; 
-    double eta = turbulentField->getField(pos).getR()/backgroundField->getField(pos).getR();
-
-    return kappa0* pow(eta/normEta, -2) * pow(rho/normRho, getAlphaPara());
-}
-
-double QLTRigidity::getKappaPerpendicular(Candidate *cand) const{
-    auto state = cand -> current;
-    Vector3d pos = state.getPosition();
-
-    // reduced rigidty    
-    double rho = calculateLamorRadius(state)/correlationLength; 
-    double eta = turbulentField->getField(pos).getR()/backgroundField->getField(pos).getR();
-
-    return kappa0* pow(eta*normEta, 2) * pow(rho/normRho, getAlphaPerp());
-}
-
-double QLTRigidity::getKappaPerpendicular2(Candidate *cand) const{
-    return getKappaPerpendicular(cand);
+    return tens;
 }

@@ -5,6 +5,7 @@
 #include "crpropa/Referenced.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
+#include "crpropa/magneticField/JF12Field.h"
 
 #include <string>
 #include <cmath>
@@ -21,17 +22,26 @@ class DiffusionTensor: public Referenced {
     public:
         virtual ~DiffusionTensor(){
         }
-	//void setDescription(const std::string &description);
-    virtual double getKappaParallel(Candidate *cand){
-        return 0;
-    };
-    virtual double getKappaPerpendicular(Candidate *cand){
-        return 0;
-    };
-    virtual double getKappaPerpendicular2(Candidate *cand){
-        return 0;
-    };
-    //std::string getDescription() const;
+
+        // diagonal entries of the diffusion tensor in the frame of the local magnetic fieldline. x direction is parallel to the fieldline, y and z are perpendicular
+        virtual Vector3d getDiffusionKoefficent(Candidate *cand) const {
+            return Vector3d(0.);
+        };
+
+        /*virtual double getKappaParallel(Candidate *cand){
+            return 0;
+        };
+        
+        virtual double getKappaPerpendicular(Candidate *cand){
+            return 0;
+        };
+        
+        virtual double getKappaPerpendicular2(Candidate *cand){
+            return getKappaPerpendicular(cand);
+        };*/
+        virtual std::string getDescription() const{
+            return "diffusion tensor";
+        };
 };
 
 /**
@@ -41,24 +51,26 @@ class DiffusionTensor: public Referenced {
 class QLTDiffusion: public DiffusionTensor {
     private:
         double epsilon; // ratio between perpendicular and parallel diffusion coefficent
-        double kappa0;  // norm value for the diffusioncoefficent at rigidity 4 GV
+        double kappa0;  // norm value for the diffusioncoefficent at given rigidity
         double alpha;   // spectral index of the diffusion coefficent
+        double normRig; // rigidity to norm the diffusionCoefficent
 
     public:
-        QLTDiffusion(double epsilon = 0.1 , double kappa0 = 6.1e24, double alpha = (1./3.) );
+        QLTDiffusion(double epsilon = 0.1 , double kappa0 = 6.1e24, double alpha = (1./3.), double normRig = 4e9*volt);
         
-        double getKappaParallel(Candidate *cand);
-        double getKappaPerpendicular(Candidate *cand);
-        double getKappaPerpendicular2(Candidate *cand);
+        Vector3d getDiffusionKoefficent(Candidate *cand) const;
 
         void setEpsilon(double epsilon);
         void setKappa0(double kappa0);
         void setAlpha(double alpha);
+        void setNormRig(double rig);
         //void setDescription();
 
         double getEpsilon() const;
         double getAlpha() const;
         double getKappa0() const;
+        double getNormRig() const;
+
 	    std::string getDescription() const;
 };
 
@@ -66,28 +78,29 @@ class QLTTurbulent: public DiffusionTensor{
     private:
 	    ref_ptr<MagneticField> backgroundField;
         ref_ptr<TurbulentField> turbulentField;
-        double kappa0;      // value to norm the diffusioncoefficent at a rigidity of 4 GV
+        double kappa0;      // value to norm the diffusioncoefficent at a given rigidity
         double alphaPara;   // spectral index for the parallel component
         double alphaPerp;   // spectral index for the perpendicular component
         double normTurbulence;  // value to norm the turbulence (probably at earth)
+        double normRig;     // rigidity to norm the diffusioncoefficent
 
     public:
-        QLTTurbulent(ref_ptr<MagneticField> background, ref_ptr<TurbulentField> turbulent, double kappa0 = 6.1e24, double alphaPara=(1./3.), double alphaPerp=(1./3.));
+        QLTTurbulent(ref_ptr<MagneticField> background, ref_ptr<TurbulentField> turbulent, double kappa0 = 6.1e24, double alphaPara=(1./3.), double alphaPerp=(1./3.), double normRig=4.0e9);
 
-        double getKappaParallel(Candidate *cand) const;
-        double getKappaPerpendicular(Candidate *cand) const;
-        double getKappaPerpendicular2(Candidate *cand) const;
+        Vector3d getDiffusionKoefficent(Candidate *cand) const;
 
         double getKappa0() const;
         double getAlphaPara() const;
         double getAlphaPerp() const;
         double getNormTurbulence() const;
+        double getNormRigidity() const;
 
         void setKappa0(double kappa0);
         void setAlphaPara(double alpha);
         void setAlphaPerp(double alpha);
         void setAlpha(double alpha);
         void setNormTurbulence(double eta);
+        void setNormRigidity(double rig);
         void normToEarthPosition(Vector3d posEarth = Vector3d(-8.5*kpc, 0., 0.));
 
         std::string getDescription() const;
@@ -97,22 +110,20 @@ class QLTRigidity: public DiffusionTensor{
     private:
         ref_ptr<MagneticField> backgroundField;
         ref_ptr<TurbulentField> turbulentField;
-        bool hasTurbulentField;
+
         double kappa0;
         double normEta;
-        double normRho; 
+        double normRho; // reduced rigidity to norm
         double alphaPara;
         double alphaPerp;
         double correlationLength;
         Vector3d normPos; // position where the diffusion coefficent is normed. default at earth Vector3d(-8.5*kpc, 0, 0)
-        double calculateLamorRadius(ParticleState &state) const;
+        //double calculateLamorRadius(ParticleState &state) const;
 
     public:
         QLTRigidity(ref_ptr<MagneticField> magField, ref_ptr<TurbulentField> turbField, double kappa0=6.1e24, double alphaPara=(1./3.), double alphaPerp=(1./3.));
         
-        double getKappaParallel(Candidate *cand) const;
-        double getKappaPerpendicular(Candidate *cand) const;
-        double getKappaPerpendicular2(Candidate *cand) const;
+        Vector3d getDiffusionKoefficent(Candidate *cand) const;
 
         void setMagneticField(ref_ptr<MagneticField> field);
         void setTurbulentField(ref_ptr<TurbulentField> field);

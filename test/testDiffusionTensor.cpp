@@ -2,6 +2,7 @@
 #include "crpropa/magneticField/turbulentField/SimpleGridTurbulence.h"
 #include "crpropa/magneticField/MagneticFieldGrid.h"
 #include "crpropa/Grid.h"
+#include "crpropa/Common.h"
 
 #include "gtest/gtest.h"
 
@@ -33,23 +34,25 @@ TEST(testQLTDiffusion, TestForEnergyScaling){
     double energy = 4*GeV;
     Candidate cand(id, energy);
     double norm = Tens-> getKappa0();
-    EXPECT_DOUBLE_EQ(Tens-> getKappaParallel(&cand), norm);
-    EXPECT_DOUBLE_EQ(Tens-> getKappaPerpendicular(&cand), 0.1*norm); // with epsilon = 0.1 as default
-    EXPECT_DOUBLE_EQ(Tens-> getKappaPerpendicular2(&cand), 0.1*norm);
+    Vector3d values = Tens -> getDiffusionKoefficent(&cand);
+    EXPECT_DOUBLE_EQ(values.x, norm);
+    EXPECT_DOUBLE_EQ(values.y, 0.1*norm); // with epsilon = 0.1 as default
+    EXPECT_DOUBLE_EQ(values.z, 0.1*norm);
 
     // checking for another energy
-    energy = 15*GeV;
+    energy = 4*PeV;
     cand.current.setEnergy(energy);
-    EXPECT_NEAR(Tens-> getKappaParallel(&cand), 9.47706e24, 1e19);
-    EXPECT_NEAR(Tens-> getKappaPerpendicular(&cand), 9.47706e23, 1e18);
-    EXPECT_NEAR(Tens-> getKappaPerpendicular2(&cand), 9.47706e23, 1e18);
+    Vector3d values2 = Tens -> getDiffusionKoefficent(&cand);
+    EXPECT_DOUBLE_EQ(values2.x, 100*norm);
+    EXPECT_DOUBLE_EQ(values2.y, 10*norm);
 
     // checking energy far away from norming
     energy = 15*PeV;
     cand.current.setEnergy(energy);
-    EXPECT_NEAR(Tens-> getKappaParallel(&cand), 9.47706e26, 1e21);
-    EXPECT_NEAR(Tens-> getKappaPerpendicular(&cand),  9.47706e25, 1e20);
-    EXPECT_NEAR(Tens-> getKappaPerpendicular2(&cand),  9.47706e25, 1e20);
+    Vector3d value3 = Tens -> getDiffusionKoefficent(&cand); 
+    EXPECT_NEAR(value3.x, 9.47706e26, 1e21);
+    EXPECT_NEAR(value3.y,  9.47706e25, 1e20);
+    EXPECT_NEAR(value3.z,  9.47706e25, 1e20);
 }
 
 TEST(testQLTTurbulence, testQLTTurbulence){
@@ -68,7 +71,8 @@ TEST(testQLTTurbulence, testQLTTurbulence){
  
     // check position for turbulence scaling
     Vector3d pos1(-1*kpc, 0., -20*pc);
-    double locTurb = turbulentField -> getField(pos1).getR() / B;
+    double locb = turbulentField -> getField(pos1).getR();
+    double locTurb = locb/std::sqrt(locb*locb+B*B);
     double normTurb = turbulentField->getField(Vector3d(-8.5*kpc, 0., 0.)).getR()/B; // norm Value for the turbulence at earth
 
     // check default values
@@ -76,6 +80,7 @@ TEST(testQLTTurbulence, testQLTTurbulence){
     EXPECT_DOUBLE_EQ(Tens ->getAlphaPara(), 1./3.);
     EXPECT_DOUBLE_EQ(Tens ->getAlphaPerp(), 1./3.);
     EXPECT_DOUBLE_EQ(Tens ->getNormTurbulence(), normTurb);
+    EXPECT_DOUBLE_EQ(Tens ->getNormRigidity(), 4e9);
     
     normTurb = turbulentField->getField(Vector3d(0.)).getR()/B;
     Tens ->normToEarthPosition(Vector3d(0.));
@@ -88,17 +93,27 @@ TEST(testQLTTurbulence, testQLTTurbulence){
     cand.current.setPosition(pos1);
 
     // check values
-    double kappaPara = 6.1e24 * pow(locTurb/normTurb, -2);
-    double kappaPerp = 6.1e24 * pow(locTurb*normTurb, 2);
-    EXPECT_DOUBLE_EQ(Tens -> getKappaParallel(&cand), kappaPara);
-    EXPECT_DOUBLE_EQ(Tens -> getKappaPerpendicular(&cand), kappaPerp);
-    EXPECT_DOUBLE_EQ(Tens -> getKappaPerpendicular2(&cand), kappaPerp);
+    
+    double kappaPara = 6.1e24*pow_integer<2>(normTurb/locTurb);
+    double kappaPerp = 6.1e24*pow_integer<2>(locTurb*normTurb);
+
+    EXPECT_DOUBLE_EQ(kappaPara, 6.1e24*pow(locTurb/normTurb, -2));
+    
+    //double kappaPara = 6.1e24 * pow(locTurb/normTurb, -2);
+    //double kappaPerp = 6.1e24 * pow(locTurb*normTurb, 2);
+    Vector3d value = Tens -> getDiffusionKoefficent(&cand);
+    EXPECT_DOUBLE_EQ(cand.current.getRigidity(), 4e9);
+    EXPECT_DOUBLE_EQ(cand.current.getRigidity()/4e9, 1.);
+    EXPECT_DOUBLE_EQ(value.x, kappaPara);
+    EXPECT_DOUBLE_EQ(value.y, kappaPerp);
+    EXPECT_DOUBLE_EQ(value.z, kappaPerp);
 
     // check energy scaling
     cand.current.setEnergy(4*PeV);  
-    EXPECT_DOUBLE_EQ(Tens -> getKappaParallel(&cand), 100*kappaPara);
-    EXPECT_DOUBLE_EQ(Tens -> getKappaPerpendicular(&cand), 100*kappaPerp);
-    EXPECT_DOUBLE_EQ(Tens -> getKappaPerpendicular2(&cand), 100*kappaPerp);
+    value = Tens -> getDiffusionKoefficent(&cand);
+    EXPECT_DOUBLE_EQ(value.x, 100*kappaPara);
+    EXPECT_DOUBLE_EQ(value.y, 100*kappaPerp);
+    EXPECT_DOUBLE_EQ(value.z, 100*kappaPerp);
 
     // check set function
     Tens ->setKappa0(1e15);
@@ -148,11 +163,12 @@ TEST(testQLTRigidity, testQLTRigidity){
     //EXPECT_DOUBLE_EQ(Tens -> getKappaPerpendicular2(&cand), pow(normEta,4)*6.1e24);
 
     // energy scaling 
-    double kPara = Tens -> getKappaParallel(&cand);
-    double kPerp = Tens -> getKappaPerpendicular(&cand);
+    Vector3d lowE = Tens -> getDiffusionKoefficent(&cand);
     cand.current.setEnergy(4*PeV); // 1e6 in energy -> 1e2 for kappa (scales with E^1/3)
-    EXPECT_DOUBLE_EQ(Tens -> getKappaParallel(&cand), 100*kPara);
-    EXPECT_DOUBLE_EQ(Tens -> getKappaPerpendicular(&cand), 100*kPerp);
+    Vector3d highE = Tens -> getDiffusionKoefficent(&cand); 
+    EXPECT_DOUBLE_EQ(highE.x, lowE.x * 100);
+    EXPECT_DOUBLE_EQ(highE.y, 100*lowE.y);
+    EXPECT_DOUBLE_EQ(highE.z, 100*lowE.z);
 
     // test set function
     Tens -> setKappa0(100);

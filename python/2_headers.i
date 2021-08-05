@@ -408,6 +408,13 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %template(DensityRefPtr) crpropa::ref_ptr<crpropa::Density>;
 %include "crpropa/massDistribution/Density.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::TurbulentField>;
+%template(TurbbulentFieldRefPtr) crpropa::ref_ptr<crpropa::TurbulentField>;
+
+
+%implicitconv crpropa::ref_ptr<crpropa::JF12Field>;
+%template(JF12FieldRefPtr) crpropa::ref_ptr<crpropa::JF12Field>;
+
 %implicitconv crpropa::ref_ptr<crpropa::DiffusionTensor>;
 %template(DiffusionTensorRefPtr) crpropa::ref_ptr<crpropa::DiffusionTensor>;
 %include "crpropa/DiffusionTensor.h"

@@ -39,6 +39,7 @@ private:
 	    ref_ptr<MagneticField> magneticField;
 	    ref_ptr<AdvectionField> advectionField;
 		ref_ptr<DiffusionTensor> diffusionTensor;
+		
 	    double minStep; // minStep/c_light is the minimum integration timestep
 	    double maxStep; // maxStep/c_light is the maximum integration timestep
 	    double tolerance; // tolerance is criterion for step adjustment. Step adjustment takes place when the tangential vector of the magnetic field line is calculated.

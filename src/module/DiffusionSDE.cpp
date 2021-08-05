@@ -30,7 +30,6 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double toleranc
   	setScale(1.);
   	setAlpha(1./3.);
 	diffusionTensor = new QLTDiffusion(epsilon);
-	//setDiffusionTensor(DiffTensor);
 	}
 
 DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
@@ -45,7 +44,6 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<Advecti
 	setScale(1.);
 	setAlpha(1./3.);
 	diffusionTensor = new QLTDiffusion(epsilon);
-	//setDiffusionTensor(DiffTensor);
   	}
 
 void DiffusionSDE::process(Candidate *candidate) const {
@@ -80,12 +78,9 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	double rig = current.getEnergy() / current.getCharge();
 
 	double BTensor[] = {0., 0., 0., 0., 0., 0., 0., 0., 0.};
-	double DifCoeffPara = diffusionTensor -> getKappaParallel(candidate);
-	double DifCoeffPerp = diffusionTensor -> getKappaPerpendicular(candidate);
-	double DifCoeffPerp2 = diffusionTensor-> getKappaPerpendicular2(candidate);
-	BTensor[0] = pow(2 * DifCoeffPara, 0.5);
-    BTensor[4] = pow(2 * DifCoeffPerp, 0.5);
-    BTensor[8] = pow(2 * DifCoeffPerp2, 0.5);
+
+	Vector3d diffCoeff = diffusionTensor -> getDiffusionKoefficent(candidate);
+
 
     // Generate random numbers
 	double eta[] = {0., 0., 0.};
