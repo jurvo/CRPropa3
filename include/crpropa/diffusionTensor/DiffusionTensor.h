@@ -3,12 +3,9 @@
 
 #include "crpropa/Candidate.h"
 #include "crpropa/Referenced.h"
-#include "crpropa/magneticField/MagneticField.h"
-#include "crpropa/magneticField/turbulentField/TurbulentField.h"
-#include "crpropa/magneticField/JF12Field.h"
 
 #include <string>
-#include <cmath>
+
 
 namespace crpropa{
 
@@ -17,8 +14,6 @@ namespace crpropa{
  @brief Abstract base class for diffusion tensors
 */
 class DiffusionTensor: public Referenced {
-    private:
-        std::string description;
     public:
         virtual ~DiffusionTensor(){
         }
@@ -28,17 +23,6 @@ class DiffusionTensor: public Referenced {
             return Vector3d(0.);
         };
 
-        /*virtual double getKappaParallel(Candidate *cand){
-            return 0;
-        };
-        
-        virtual double getKappaPerpendicular(Candidate *cand){
-            return 0;
-        };
-        
-        virtual double getKappaPerpendicular2(Candidate *cand){
-            return getKappaPerpendicular(cand);
-        };*/
         virtual std::string getDescription() const{
             return "diffusion tensor";
         };

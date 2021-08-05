@@ -81,6 +81,9 @@ void DiffusionSDE::process(Candidate *candidate) const {
 
 	Vector3d diffCoeff = diffusionTensor -> getDiffusionKoefficent(candidate);
 
+	BTensor[0] = pow(2 * diffCoeff.x, 0.5); // parallel component
+    BTensor[4] = pow(2 * diffCoeff.y, 0.5);
+    BTensor[8] = pow(2 * diffCoeff.z, 0.5);
 
     // Generate random numbers
 	double eta[] = {0., 0., 0.};
@@ -362,8 +365,6 @@ double DiffusionSDE::getAlpha() const {
 double DiffusionSDE::getScale() const {
 	return scale;
 }
-
-
 
 std::string DiffusionSDE::getDescription() const {
 	std::stringstream s;

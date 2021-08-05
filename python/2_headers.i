@@ -701,7 +701,7 @@ class ParticleCollectorIterator {
 %include "crpropa/massDistribution/ConstantDensity.h"
 
 %include "crpropa/diffusionTensor/QuasiLinearDiffusion.h"
-
+%include "crpropa/diffusionTensor/TurbulentDiffusion.h"
 
 %template(StepLengthModifierRefPtr) crpropa::ref_ptr<crpropa::StepLengthModifier>;
 %feature("director") crpropa::StepLengthModifier;

@@ -2,6 +2,9 @@
 #define CRPROPA_QUASILINEARDIFFUSION_H
 
 #include "crpropa/diffusionTensor/DiffusionTensor.h"
+#include "crpropa/magneticField/MagneticField.h"
+#include "crpropa/magneticField/turbulentField/TurbulentField.h"
+#include "crpropa/Units.h"
 
 namespace crpropa{
 

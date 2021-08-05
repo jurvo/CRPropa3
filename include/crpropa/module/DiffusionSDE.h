@@ -88,8 +88,6 @@ public:
 	    double getEpsilon() const;
 	    double getAlpha() const;
 	    double getScale() const;
-		ref_ptr<crpropa::DiffusionTensor> getDiffusionTensor();
-		//ref_ptr<crpropa::MagneticField> getMagneticField();
 
 	    std::string getDescription() const;
 
