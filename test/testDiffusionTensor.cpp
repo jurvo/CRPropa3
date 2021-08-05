@@ -1,4 +1,4 @@
-#include "crpropa/DiffusionTensor.h"
+#include "crpropa/diffusionTensor/QuasiLinearDiffusion.h"
 #include "crpropa/magneticField/turbulentField/SimpleGridTurbulence.h"
 #include "crpropa/magneticField/MagneticFieldGrid.h"
 #include "crpropa/Grid.h"

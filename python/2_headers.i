@@ -417,7 +417,7 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 
 %implicitconv crpropa::ref_ptr<crpropa::DiffusionTensor>;
 %template(DiffusionTensorRefPtr) crpropa::ref_ptr<crpropa::DiffusionTensor>;
-%include "crpropa/DiffusionTensor.h"
+%include "crpropa/diffusionTensor/DiffusionTensor.h"
 
 %include "crpropa/Grid.h"
 %include "crpropa/GridTools.h"
@@ -700,7 +700,7 @@ class ParticleCollectorIterator {
 %include "crpropa/massDistribution/Massdistribution.h"
 %include "crpropa/massDistribution/ConstantDensity.h"
 
-
+%include "crpropa/diffusionTensor/QuasiLinearDiffusion.h"
 
 
 %template(StepLengthModifierRefPtr) crpropa::ref_ptr<crpropa::StepLengthModifier>;

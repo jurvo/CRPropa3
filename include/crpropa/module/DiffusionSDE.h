@@ -13,7 +13,8 @@
 #include "crpropa/advectionField/AdvectionField.h"
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
-#include "crpropa/DiffusionTensor.h"
+#include "crpropa/diffusionTensor/DiffusionTensor.h"
+#include "crpropa/diffusionTensor/QuasiLinearDiffusion.h"
 
 #include "kiss/logger.h"
 
@@ -39,7 +40,7 @@ private:
 	    ref_ptr<MagneticField> magneticField;
 	    ref_ptr<AdvectionField> advectionField;
 		ref_ptr<DiffusionTensor> diffusionTensor;
-		
+
 	    double minStep; // minStep/c_light is the minimum integration timestep
 	    double maxStep; // maxStep/c_light is the maximum integration timestep
 	    double tolerance; // tolerance is criterion for step adjustment. Step adjustment takes place when the tangential vector of the magnetic field line is calculated.
@@ -87,6 +88,9 @@ public:
 	    double getEpsilon() const;
 	    double getAlpha() const;
 	    double getScale() const;
+		ref_ptr<crpropa::DiffusionTensor> getDiffusionTensor();
+		//ref_ptr<crpropa::MagneticField> getMagneticField();
+
 	    std::string getDescription() const;
 
 };

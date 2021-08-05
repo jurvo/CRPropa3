@@ -364,7 +364,6 @@ add_library(crpropa SHARED
   src/Clock.cpp
   src/Common.cpp
   src/Cosmology.cpp
-  src/DiffusionTensor.cpp
   src/EmissionMap.cpp
   src/Geometry.cpp
   src/GridTools.cpp
@@ -427,6 +426,7 @@ add_library(crpropa SHARED
   src/massDistribution/Ferriere.cpp
   src/massDistribution/Massdistribution.cpp
   src/massDistribution/Nakanishi.cpp
+  src/diffusionTensor/QuasiLinearDiffusion.cpp
 
   ${CRPROPA_EXTRA_SOURCES}
 )
