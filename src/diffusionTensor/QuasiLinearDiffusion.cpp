@@ -76,7 +76,8 @@ Vector3d QLTTurbulent::getDiffusionKoefficent(Candidate *cand) const    {
     Vector3d pos = cand -> current.getPosition();
     double b = turbulentField -> getField(pos).getR();
     double B = backgroundField -> getField(pos).getR();
-    double eta = b/std::sqrt(b*b + B*B);
+    // double eta = b/std::sqrt(b*b + B*B);  // new approach by Julien
+    double eta = b/B; // std approach (e.g. Partrick)
     Vector3d tens(kappa0);
     tens.x *= pow_integer<2>(normTurbulence/eta)*pow(rig/normRig, alphaPara);
     tens.y *= pow_integer<2>(normTurbulence*eta)*pow(rig/normRig, alphaPerp);
