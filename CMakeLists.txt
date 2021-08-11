@@ -428,6 +428,7 @@ add_library(crpropa SHARED
   src/massDistribution/Nakanishi.cpp
   src/diffusionTensor/QuasiLinearDiffusion.cpp
   src/diffusionTensor/TurbulentDiffusion.cpp
+  src/diffusionTensor/BohmDiffusion.cpp
 
   ${CRPROPA_EXTRA_SOURCES}
 )

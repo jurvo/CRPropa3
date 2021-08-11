@@ -12,7 +12,7 @@
 namespace crpropa {
 
 class TurbulentDiffusion: public DiffusionTensor{
-    private:
+    protected:
         // results by P.Reichherzer (MNRAS)
         std::vector<double> turbulence;
         std::vector<double> alphaPara;
@@ -41,9 +41,11 @@ class TurbulentDiffusion: public DiffusionTensor{
         void loadData(std::string filename);
         void normToPosition(Vector3d &pos);
 
-        double getAlphaPara(Vector3d &pos);
-        double getAlphaPerp(Vector3d &pos);
-        double getTurbulence(Vector3d &pos);
+        Vector3d getDiffusionKoefficent(Candidate *cand) const;
+
+        double getAlphaPara(Vector3d &pos) const;
+        double getAlphaPerp(Vector3d &pos) const;
+        double getTurbulence(Vector3d &pos) const;
 
         double getKappaParallel(Candidate *cand);
         double getKappaPerpendicular(Candidate *cand);
@@ -63,6 +65,12 @@ class TurbulentDiffusion: public DiffusionTensor{
         void setKappa0(double kappa);
 
         void printData();
+};
+
+
+class TurbulentCSR: public TurbulentDiffusion{
+    public:
+        Vector3d getDiffusionKoefficent(Candidate *cand) const;
 };
 
 

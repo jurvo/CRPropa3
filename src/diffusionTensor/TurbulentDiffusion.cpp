@@ -8,11 +8,10 @@
 
 using namespace crpropa;
 
-inline double calculateLamorRadius(ParticleState &state, ref_ptr<MagneticField> backgroundField) {
+inline double calculateLamorRadius(ParticleState &state, double BField) {
     double fieldStrength;
     Vector3d pos = state.getPosition();
-    fieldStrength = backgroundField->getField(pos).getR();
-    return state.getMomentum().getR()/std::abs(state.getCharge())/fieldStrength;
+    return state.getMomentum().getR()/std::abs(state.getCharge())/BField;
 }
 
 TurbulentDiffusion::TurbulentDiffusion(ref_ptr<MagneticField> backgroundField, ref_ptr<TurbulentField> turbulentField, bool useNormValue):
@@ -90,7 +89,7 @@ void TurbulentDiffusion::normToPosition(Vector3d &pos){
     normRho = 4e9*volt/B/c_light/correlationLength;
 }
 
-double TurbulentDiffusion::getTurbulence(Vector3d &pos){
+double TurbulentDiffusion::getTurbulence(Vector3d &pos) const{
     double b, B;
     if(useFullModel){
         b = JF12 -> getTurbulentStrength(pos);
@@ -103,23 +102,51 @@ double TurbulentDiffusion::getTurbulence(Vector3d &pos){
     return b/std::sqrt(B*B+b*b);
 }
 
-double TurbulentDiffusion::getAlphaPara(Vector3d &pos){
+double TurbulentDiffusion::getAlphaPara(Vector3d &pos) const {
     double a = interpolate(getTurbulence(pos), turbulence, alphaPara);
     return a;
 }
 
-double TurbulentDiffusion::getAlphaPerp(Vector3d &pos){
+double TurbulentDiffusion::getAlphaPerp(Vector3d &pos) const {
     return interpolate(getTurbulence(pos), turbulence, alphaPerp);
 }
+
+Vector3d TurbulentDiffusion::getDiffusionKoefficent(Candidate *cand) const{
+    Vector3d pos = cand -> current.getPosition();
+    double rho;
+    if(useFullModel) {
+        rho = calculateLamorRadius(cand -> current, JF12->getField(pos).getR())/correlationLength;
+    }
+    else{
+        rho = calculateLamorRadius(cand -> current, (turbulentField->getField(pos) + backgroundField->getField(pos)).getR())/correlationLength;
+    }
+    const double eta = getTurbulence(pos);
+    Vector3d tens(0.);
+    if(useNormValue){
+        tens.x = kappa0*pow_integer<2>(normTurbulence/eta)*pow(rho/normRho, getAlphaPara(pos));
+        tens.y = kappa0*pow_integer<2>(normTurbulence*eta)*pow(rho/normRho, getAlphaPerp(pos));
+    }
+    else{
+        double k0Par = interpolate(eta, turbulence, kappaPara);
+        double k0Per = interpolate(eta, turbulence, kappaPerp);
+        double logR = log(rho);
+        tens.x = pow(10, k0Par + getAlphaPara(pos)*logR);
+        tens.y = pow(10, k0Per + getAlphaPerp(pos)*logR);
+    }
+    tens.z = tens.y; // perpendicluar components are degenerated
+
+    return tens;
+}
+
 
 double TurbulentDiffusion::getKappaParallel(Candidate *cand){
     Vector3d pos = cand -> current.getPosition();
     double rho;
     if(useFullModel){
-        rho = calculateLamorRadius(cand->current, JF12)/correlationLength;
+        rho = calculateLamorRadius(cand->current, JF12 -> getField(pos).getR())/correlationLength;
     }
     else{
-        rho = calculateLamorRadius(cand->current, backgroundField)/correlationLength;
+        rho = calculateLamorRadius(cand->current, (backgroundField -> getField(pos)+ turbulentField -> getField(pos)).getR())/correlationLength;
     }
     double eta = getTurbulence(pos);
     double kPar= 0;
@@ -140,10 +167,10 @@ double TurbulentDiffusion::getKappaPerpendicular(Candidate *cand){
     Vector3d pos = cand -> current.getPosition();
     double rho;
     if(useFullModel){
-        rho = calculateLamorRadius(cand->current, JF12)/correlationLength;
+        rho = calculateLamorRadius(cand->current, JF12 -> getField(pos).getR())/correlationLength;
     }
     else{
-        rho = calculateLamorRadius(cand->current, backgroundField)/correlationLength;
+        rho = calculateLamorRadius(cand->current, (backgroundField -> getField(pos) + turbulentField -> getField(pos)).getR())/correlationLength;
     }
     double eta = getTurbulence(pos);
     double kPer;
@@ -227,4 +254,30 @@ void TurbulentDiffusion::printData() {
         << "kPar: \t" << kappaPara[i] << " \n"
         << "kPer: \t" << kappaPerp[i] << " \n \n";
     }
+}
+
+// TurbulentCSR -------------------------------------------------------
+Vector3d TurbulentCSR::getDiffusionKoefficent(Candidate *cand) const{
+    Vector3d pos = cand -> current . getPosition();
+    double rho;
+    if(useFullModel) {
+        rho = calculateLamorRadius(cand -> current, JF12->getField(pos).getR())/correlationLength;
+    }
+    else{
+        rho = calculateLamorRadius(cand -> current, (turbulentField->getField(pos) + backgroundField->getField(pos)).getR())/correlationLength;
+    }
+    double eta = getTurbulence(pos);
+    double kPar;
+
+    if(useNormValue){
+        kPar =  kappa0*pow_integer<2>(normTurbulence/eta)*pow(rho/normRho, getAlphaPara(pos));
+    }
+    else{
+        double logR = log(rho);
+        double k0Par = interpolate(eta, turbulence, kappaPara);
+        kPar = pow(10, k0Par + getAlphaPara(pos)*logR);
+    }
+    double rG = rho*correlationLength;
+    double kPer = kPar/(1 + pow_integer<2>(3*kPar/c_light/rG));
+    return Vector3d(kPar, kPer, kPer);
 }
