@@ -68,16 +68,30 @@ std::string QLTDiffusion::getDescription() const{
 
 QLTTurbulent::QLTTurbulent(ref_ptr<MagneticField> backgroundField, ref_ptr<TurbulentField> turbulentField, double kappa0, double alphaPara, double alphaPerp, double normRig):
     backgroundField(backgroundField), turbulentField(turbulentField), kappa0(kappa0), alphaPara(alphaPara), alphaPerp(alphaPerp), normRig(normRig) {
+    useFullModel = false;
     normToEarthPosition(); 
+}
+
+QLTTurbulent::QLTTurbulent(ref_ptr<RealisticJF12Field> fullField, double kappa0, double alphaPara, double alphaPerp, double normRig):
+    fullField(fullField), kappa0(kappa0), alphaPara(alphaPara), alphaPerp(alphaPerp), normRig(normRig) {
+        useFullModel = true;
+        normToEarthPosition();
 }
 
 Vector3d QLTTurbulent::getDiffusionKoefficent(Candidate *cand) const    {
     double rig = cand -> current.getRigidity();
     Vector3d pos = cand -> current.getPosition();
-    double b = turbulentField -> getField(pos).getR();
-    double B = backgroundField -> getField(pos).getR();
-    // double eta = b/std::sqrt(b*b + B*B);  // new approach by Julien
-    double eta = b/B; // std approach (e.g. Partrick)
+    double eta;
+    if(useFullModel){
+        eta = fullField -> getTurbulenceOverRegular(pos);
+    }
+    else{
+        double b = turbulentField -> getField(pos).getR();
+        double B = backgroundField -> getField(pos).getR();
+        // double eta = b/std::sqrt(b*b + B*B);  // new approach by Julien
+        eta = b/B; // std approach (e.g. Partrick)
+    }
+
     Vector3d tens(kappa0);
     tens.x *= pow_integer<2>(normTurbulence/eta)*pow(rig/normRig, alphaPara);
     tens.y *= pow_integer<2>(normTurbulence*eta)*pow(rig/normRig, alphaPerp);
@@ -123,9 +137,15 @@ void QLTTurbulent::setNormRigidity(double rig){
 }
 
 void QLTTurbulent::normToEarthPosition(Vector3d posEarth){
-    double b = turbulentField -> getField(posEarth).getR();
-    double B = backgroundField ->getField(posEarth).getR();
-    setNormTurbulence(b/B);
+    if(useFullModel){
+        double b = turbulentField -> getField(posEarth).getR();
+        double B = backgroundField ->getField(posEarth).getR();
+        setNormTurbulence(b/B); 
+    }
+    else{
+        setNormTurbulence(fullField -> getTurbulenceOverRegular(posEarth));
+    }
+
 }
 
 std::string QLTTurbulent::getDescription() const{

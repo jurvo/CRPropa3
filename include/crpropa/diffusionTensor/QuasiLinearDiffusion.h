@@ -4,6 +4,7 @@
 #include "crpropa/diffusionTensor/DiffusionTensor.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
+#include "crpropa/magneticField/RealisticJF12.h"
 #include "crpropa/Units.h"
 
 namespace crpropa{
@@ -18,6 +19,7 @@ class QLTDiffusion: public DiffusionTensor {
         double kappa0;  // norm value for the diffusioncoefficent at given rigidity
         double alpha;   // spectral index of the diffusion coefficent
         double normRig; // rigidity to norm the diffusionCoefficent
+        bool useFullModel;
 
     public:
         QLTDiffusion(double epsilon = 0.1 , double kappa0 = 6.1e24, double alpha = (1./3.), double normRig = 4e9*volt);
@@ -42,6 +44,7 @@ class QLTTurbulent: public DiffusionTensor{
     private:
 	    ref_ptr<MagneticField> backgroundField;
         ref_ptr<TurbulentField> turbulentField;
+        ref_ptr<RealisticJF12Field> fullField;
         double kappa0;      // value to norm the diffusioncoefficent at a given rigidity
         double alphaPara;   // spectral index for the parallel component
         double alphaPerp;   // spectral index for the perpendicular component
@@ -50,6 +53,7 @@ class QLTTurbulent: public DiffusionTensor{
 
     public:
         QLTTurbulent(ref_ptr<MagneticField> background, ref_ptr<TurbulentField> turbulent, double kappa0 = 6.1e24, double alphaPara=(1./3.), double alphaPerp=(1./3.), double normRig=4.0e9);
+        QLTTurbulent(ref_ptr<RealisticJF12Field> fullField, double kappa0 = 6.1e24, double alphaPara = (1./3.), double alphaPerp = (1./3.), double normRig = 4e9);
 
         Vector3d getDiffusionKoefficent(Candidate *cand) const;
 
