@@ -72,7 +72,8 @@ TEST(testQLTTurbulence, testQLTTurbulence){
     // check position for turbulence scaling
     Vector3d pos1(-1*kpc, 0., -20*pc);
     double locb = turbulentField -> getField(pos1).getR();
-    double locTurb = locb/std::sqrt(locb*locb+B*B);
+    //double locTurb = locb/std::sqrt(locb*locb+B*B); // new turbulence definition
+    double locTurb = locb/B; // std turbulence definition
     double normTurb = turbulentField->getField(Vector3d(-8.5*kpc, 0., 0.)).getR()/B; // norm Value for the turbulence at earth
 
     // check default values
