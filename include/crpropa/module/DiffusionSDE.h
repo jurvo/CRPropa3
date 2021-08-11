@@ -50,7 +50,6 @@ private:
 	    double epsilon; // ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
 	    double alpha; // power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	    double scale; // scaling factor for the diffusion coefficient D = scale*D_0
-		bool useTurbulenceDependence = false;
 		double eta0; // reference tubulencelevel at earth
 		double rho0; // reduced rigility for R = 4*GV
 		double lc = 60*pc; // coheration length for the Milky Way
@@ -77,28 +76,25 @@ public:
 
 	    void tryStep(const Vector3d &Pos, Vector3d &POut, Vector3d &PosErr, double z, double propStep ) const;
 	    void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) const;
-	    void calculateBTensor(double rig, double BTen[], Vector3d pos, Vector3d dir, double z) const;
 
-		void setUseTurbulenceDependence(bool use);
 	    void setMinimumStep(double minStep);
 	    void setMaximumStep(double maxStep);
 	    void setTolerance(double tolerance);
-	    void setEpsilon(double kappa);
-	    void setAlpha(double alpha);
-	    void setScale(double Scale);
+	    void setEpsilon(double kappa); // outdated
+	    void setAlpha(double alpha); // outdated
+	    void setScale(double Scale); // outdated
 	    void setMagneticField(ref_ptr<crpropa::MagneticField> magneticField);
 	    void setAdvectionField(ref_ptr<crpropa::AdvectionField> advectionField);
 		void setDiffusionTensor(ref_ptr<crpropa::DiffusionTensor> diffusionTensor);
 
-		bool getUseTurbulenceDependence() const;
-	    double getMinimumStep() const;
+		double getMinimumStep() const;
 	    double getMaximumStep() const;
 	    double getTolerance() const;
-	    double getEpsilon() const;
-	    double getAlpha() const;
-	    double getScale() const;
+	    double getEpsilon() const; // outdated
+	    double getAlpha() const; // outdated
+	    double getScale() const; // outdated
 
-	    std::string getDescription() const;
+	    std::string getDescription() const; // need to be updated
 
 };
 /** @}*/

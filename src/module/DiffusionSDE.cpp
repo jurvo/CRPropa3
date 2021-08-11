@@ -292,49 +292,6 @@ void DiffusionSDE::driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) c
 	return;
 }
 
-void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const {
-	double DiffCoeffPara;
-	double DiffCoeffPerp;
-	if(useTurbulenceDependence){
-		// try to calculate turbulence level 
-		try
-		{
-			double turb = realisticField -> getTurbulence(pos);
-			double B = realisticField -> getRegularField(pos).getR();
-			double rho = std::abs(r)/c_light/B/lc;
-			DiffCoeffPara = 6.1e24 *pow(turb/eta0,-2)*pow(rho/rho0, getAlphaPara(turb));
-			DiffCoeffPerp = 6.1e24*pow(turb*eta0,0)*pow(rho/rho0, getAlphaPerp(turb));
-
-		}
-		catch(const std::exception& e)
-		{
-			KISS_LOG_ERROR << e.what() << '\n';
-		}
-	}
-	else{
-		DiffCoeffPara = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
-		DiffCoeffPerp = epsilon*DiffCoeffPara;
-
-	}
-    BTen[0] = pow(2 * DiffCoeffPara, 0.5);
-    BTen[4] = pow(2 * DiffCoeffPerp, 0.5);
-    BTen[8] = pow(2 * DiffCoeffPerp, 0.5);
-    return;
-
-}
-
-void DiffusionSDE::setRealisticField(ref_ptr<crpropa::RealisticJF12Field> field) {
-	realisticField = field;
-	useTurbulenceDependence = true;
-	eta0 = field->getTurbulence(Vector3d(-8.5*kpc, 0., 0.));
-	double B0 = field -> getRegularField(Vector3d(-8.5*kpc,0.,0.)).getR();
-	rho0 = 4*giga*volt/c_light/B0 /lc;
-}
-
-void DiffusionSDE::setUseTurbulenceDependence(bool use) {
-	useTurbulenceDependence = use;
-}
-
 void DiffusionSDE::setMinimumStep(double min) {
 	if (min < 0)
 		throw std::runtime_error("DiffusionSDE: minStep < 0 ");
