@@ -1,7 +1,7 @@
 #ifndef CRPROPA_BOHMDIFFUSION_H
 #define CRPROPA_BOHMDIFFUSION_H
 
-#include "crpropa/diffusionTensor/DiffusioNTensor.h"
+#include "crpropa/diffusionTensor/DiffusionTensor.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
 #include "crpropa/Units.h"
 
