@@ -428,6 +428,9 @@ add_library(crpropa SHARED
   src/massDistribution/Ferriere.cpp
   src/massDistribution/Massdistribution.cpp
   src/massDistribution/Nakanishi.cpp
+  src/diffusionTensor/QuasiLinearDiffusion.cpp
+  src/diffusionTensor/TurbulentDiffusion.cpp
+  src/diffusionTensor/BohmDiffusion.cpp
 
   ${CRPROPA_EXTRA_SOURCES}
 
@@ -614,6 +617,10 @@ if(ENABLE_TESTING)
   add_executable(testAdvectionField test/testAdvectionField.cpp)
   target_link_libraries(testAdvectionField crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testAdvectionField testAdvectionField)
+
+  add_executable(testDiffusionTensor test/testDiffusionTensor.cpp)
+  target_link_libraries(testDiffusionTensor crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
+  add_test(testDiffusionTensor testDiffusionTensor)
 
   add_executable(testDensity test/testDensity.cpp)
   target_link_libraries(testDensity crpropa gtest gtest_main pthread ${COVERAGE_LIBS})

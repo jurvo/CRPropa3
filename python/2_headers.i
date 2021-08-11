@@ -51,6 +51,7 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %ignore operator crpropa::AdvectionField*;
 %ignore operator crpropa::ParticleCollector*;
 %ignore operator crpropa::Density*;
+%ignore operator crpropa::DiffusionTensor*;
 %ignore operator crpropa::CylindricalProjectionMap*;
 %ignore operator crpropa::EmissionMap*;
 %ignore operator crpropa::Grid< crpropa::Vector3< float > >*;
@@ -411,6 +412,17 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %template(DensityRefPtr) crpropa::ref_ptr<crpropa::Density>;
 %include "crpropa/massDistribution/Density.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::TurbulentField>;
+%template(TurbbulentFieldRefPtr) crpropa::ref_ptr<crpropa::TurbulentField>;
+
+
+%implicitconv crpropa::ref_ptr<crpropa::JF12Field>;
+%template(JF12FieldRefPtr) crpropa::ref_ptr<crpropa::JF12Field>;
+
+%implicitconv crpropa::ref_ptr<crpropa::DiffusionTensor>;
+%template(DiffusionTensorRefPtr) crpropa::ref_ptr<crpropa::DiffusionTensor>;
+%include "crpropa/diffusionTensor/DiffusionTensor.h"
+
 %include "crpropa/Grid.h"
 %include "crpropa/GridTools.h"
 
@@ -694,8 +706,9 @@ class ParticleCollectorIterator {
 %include "crpropa/massDistribution/Massdistribution.h"
 %include "crpropa/massDistribution/ConstantDensity.h"
 
-
-
+%include "crpropa/diffusionTensor/QuasiLinearDiffusion.h"
+%include "crpropa/diffusionTensor/TurbulentDiffusion.h"
+%include "crpropa/diffusionTensor/BohmDiffusion.h"
 
 %template(StepLengthModifierRefPtr) crpropa::ref_ptr<crpropa::StepLengthModifier>;
 %feature("director") crpropa::StepLengthModifier;

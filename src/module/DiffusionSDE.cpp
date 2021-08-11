@@ -44,6 +44,7 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double toleranc
   	setEpsilon(epsilon);
   	setScale(1.);
   	setAlpha(1./3.);
+	diffusionTensor = new QLTDiffusion(epsilon);
 	}
 
 DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
@@ -57,6 +58,7 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<Advecti
 	setEpsilon(epsilon);
 	setScale(1.);
 	setAlpha(1./3.);
+	diffusionTensor = new QLTDiffusion(epsilon);
   	}
 
 void DiffusionSDE::process(Candidate *candidate) const {
@@ -93,8 +95,12 @@ void DiffusionSDE::process(Candidate *candidate) const {
 
     // Calculate the Diffusion tensor
 	double BTensor[] = {0., 0., 0., 0., 0., 0., 0., 0., 0.};
-	calculateBTensor(rig, BTensor, PosIn, DirIn, z);
 
+	Vector3d diffCoeff = diffusionTensor -> getDiffusionKoefficent(candidate);
+
+	BTensor[0] = pow(2 * diffCoeff.x, 0.5); // parallel component
+    BTensor[4] = pow(2 * diffCoeff.y, 0.5);
+    BTensor[8] = pow(2 * diffCoeff.z, 0.5);
 
     // Generate random numbers
 	double eta[] = {0., 0., 0.};
@@ -381,8 +387,8 @@ void DiffusionSDE::setAdvectionField(ref_ptr<AdvectionField> f) {
 	advectionField = f;
 }
 
-bool DiffusionSDE::getUseTurbulenceDependence() const {
-	return useTurbulenceDependence;
+void DiffusionSDE::setDiffusionTensor(ref_ptr<DiffusionTensor> t) {
+	diffusionTensor = t;
 }
 
 double DiffusionSDE::getMinimumStep() const {
@@ -407,24 +413,6 @@ double DiffusionSDE::getAlpha() const {
 
 double DiffusionSDE::getScale() const {
 	return scale;
-}
-
-double DiffusionSDE::getAlphaPara(double turb) const {
-	//return interpolate(turb, bB,gamma_para);
-	return 1./3.;
-}
-
-double DiffusionSDE::getAlphaPerp(double turb) const {
-	//return interpolate(turb, bB, gamma_perp);
-	return 1./3.;
-}
-
-double DiffusionSDE::getKappaPara(double rho, double turb) const {
-	return interpolate(turb,bB,kappa_para_0)*cm*cm * pow(rho/(5/(2*M_PI)),getAlphaPara(turb));
-}
-
-double DiffusionSDE::getKappaPerp(double rho, double turb) const {
-	return interpolate(turb, bB, kappa_perp_0)*cm*cm*pow(rho/(5/(2*M_PI)),getAlphaPerp(turb));
 }
 
 std::string DiffusionSDE::getDescription() const {
