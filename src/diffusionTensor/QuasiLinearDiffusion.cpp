@@ -74,8 +74,8 @@ QLTTurbulent::QLTTurbulent(ref_ptr<MagneticField> backgroundField, ref_ptr<Turbu
 
 QLTTurbulent::QLTTurbulent(ref_ptr<RealisticJF12Field> fullField, double kappa0, double alphaPara, double alphaPerp, double normRig):
     fullField(fullField), kappa0(kappa0), alphaPara(alphaPara), alphaPerp(alphaPerp), normRig(normRig) {
-        useFullModel = true;
-        normToEarthPosition();
+    useFullModel = true;
+    normToEarthPosition();
 }
 
 Vector3d QLTTurbulent::getDiffusionKoefficent(Candidate *cand) const    {
@@ -138,12 +138,12 @@ void QLTTurbulent::setNormRigidity(double rig){
 
 void QLTTurbulent::normToEarthPosition(Vector3d posEarth){
     if(useFullModel){
+        setNormTurbulence(fullField -> getTurbulenceOverRegular(posEarth));
+    }
+    else{
         double b = turbulentField -> getField(posEarth).getR();
         double B = backgroundField ->getField(posEarth).getR();
         setNormTurbulence(b/B); 
-    }
-    else{
-        setNormTurbulence(fullField -> getTurbulenceOverRegular(posEarth));
     }
 
 }

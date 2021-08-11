@@ -19,7 +19,6 @@ class QLTDiffusion: public DiffusionTensor {
         double kappa0;  // norm value for the diffusioncoefficent at given rigidity
         double alpha;   // spectral index of the diffusion coefficent
         double normRig; // rigidity to norm the diffusionCoefficent
-        bool useFullModel;
 
     public:
         QLTDiffusion(double epsilon = 0.1 , double kappa0 = 6.1e24, double alpha = (1./3.), double normRig = 4e9*volt);
@@ -50,6 +49,7 @@ class QLTTurbulent: public DiffusionTensor{
         double alphaPerp;   // spectral index for the perpendicular component
         double normTurbulence;  // value to norm the turbulence (probably at earth)
         double normRig;     // rigidity to norm the diffusioncoefficent
+        bool useFullModel;
 
     public:
         QLTTurbulent(ref_ptr<MagneticField> background, ref_ptr<TurbulentField> turbulent, double kappa0 = 6.1e24, double alphaPara=(1./3.), double alphaPerp=(1./3.), double normRig=4.0e9);
