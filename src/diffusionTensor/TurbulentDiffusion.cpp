@@ -25,7 +25,7 @@ TurbulentDiffusion::TurbulentDiffusion(ref_ptr<MagneticField> backgroundField, r
         }    
 }
 
-TurbulentDiffusion::TurbulentDiffusion(ref_ptr<JF12Field> JF12, bool useNormValue):
+TurbulentDiffusion::TurbulentDiffusion(ref_ptr<RealisticJF12Field> JF12, bool useNormValue):
     JF12(JF12), useNormValue(useNormValue){
         useFullModel = true;
         loadData(getDataPath("TurbulenceData.txt"));
@@ -59,7 +59,8 @@ void TurbulentDiffusion::loadData(std::string filename){
             infile >> aPer >> err;
             infile >> kPer >> err;
 
-            turbulence.push_back(eta/std::sqrt(1+eta*eta)); // neue Turbulenzvariante   
+            turbulence.push_back(eta);
+            //turbulence.push_back(eta/std::sqrt(1+eta*eta)); // neue Turbulenzvariante   
             alphaPara.push_back(aPar);
             alphaPerp.push_back(aPer);
             kappaPara.push_back(kPar);
@@ -78,28 +79,30 @@ void TurbulentDiffusion::normToPosition(Vector3d &pos){
 
     double b, B;
     if(useFullModel){
-        b = JF12 -> getTurbulentStrength(pos);
-        B = JF12 -> getRegularField(pos).getR();
+        normTurbulence = JF12 -> getTurbulenceOverRegular(pos);
+        B = JF12->getRegularField(pos).getR();
     }
     else{
         b = turbulentField -> getField(pos).getR();
         B = backgroundField -> getField(pos).getR();
+        normTurbulence = b/B;
     }
-    normTurbulence = b/std::sqrt(B*B+b*b);
+    // normTurbulence = b/std::sqrt(B*B+b*b); // new version for turbulence definition
     normRho = 4e9*volt/B/c_light/correlationLength;
 }
 
 double TurbulentDiffusion::getTurbulence(Vector3d &pos) const{
-    double b, B;
+    double b, B, eta;
     if(useFullModel){
-        b = JF12 -> getTurbulentStrength(pos);
-        B = JF12 -> getRegularField(pos).getR();
+        eta = JF12 -> getTurbulenceOverRegular(pos);
     }
     else{
         b = turbulentField -> getField(pos).getR();
         B = backgroundField -> getField(pos).getR();
+        eta = b/B;
+        eta = b/std::sqrt(b*b+B*B);
     }
-    return b/std::sqrt(B*B+b*b);
+    return eta;
 }
 
 double TurbulentDiffusion::getAlphaPara(Vector3d &pos) const {
@@ -167,7 +170,7 @@ double TurbulentDiffusion::getKappaPerpendicular(Candidate *cand){
     Vector3d pos = cand -> current.getPosition();
     double rho;
     if(useFullModel){
-        rho = calculateLamorRadius(cand->current, JF12 -> getField(pos).getR())/correlationLength;
+        rho = calculateLamorRadius(cand->current, JF12 -> getTotalField(pos).getR())/correlationLength;
     }
     else{
         rho = calculateLamorRadius(cand->current, (backgroundField -> getField(pos) + turbulentField -> getField(pos)).getR())/correlationLength;

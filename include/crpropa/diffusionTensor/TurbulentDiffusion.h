@@ -5,6 +5,7 @@
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
 #include "crpropa/magneticField/JF12Field.h"
+#include "crpropa/magneticField/RealisticJF12.h"
 
 #include <cmath>
 #include <string>
@@ -32,11 +33,11 @@ class TurbulentDiffusion: public DiffusionTensor{
         ref_ptr<MagneticField> backgroundField;
         ref_ptr<TurbulentField> turbulentField;
         bool useFullModel; // if true all turbulence values are calculated by JF12 field
-        ref_ptr<JF12Field> JF12;
+        ref_ptr<RealisticJF12Field> JF12;
 
     public:
         TurbulentDiffusion(ref_ptr<MagneticField> background, ref_ptr<TurbulentField> turbulent, bool useNormValue=false);
-        TurbulentDiffusion(ref_ptr<JF12Field> JF12, bool useNormValue=false);
+        TurbulentDiffusion(ref_ptr<RealisticJF12Field> JF12, bool useNormValue=false);
 
         void loadData(std::string filename);
         void normToPosition(Vector3d &pos);
