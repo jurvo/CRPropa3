@@ -271,7 +271,7 @@ std::string TurbulentDiffusion::getDescription() const{
     else{
         ss << "interpolated for the local turbulence level\n";
     }
-    return ss.to_str();
+    return ss.str();
 }
 
 
