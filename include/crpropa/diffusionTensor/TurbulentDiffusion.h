@@ -66,6 +66,8 @@ class TurbulentDiffusion: public DiffusionTensor{
         void setKappa0(double kappa);
 
         void printData();
+
+        std::string getDescription() const;
 };
 
 

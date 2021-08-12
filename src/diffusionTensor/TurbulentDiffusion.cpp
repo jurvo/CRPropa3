@@ -259,6 +259,22 @@ void TurbulentDiffusion::printData() {
     }
 }
 
+std::string TurbulentDiffusion::getDescription() const{
+    std::stringstream ss;
+    ss << "Using diffusion tensor TurbulentDiffusion \n"
+    << "spectral indizies of the diffusiontensor are interpolated after the results by Reichherzer et al (2021)\n"
+    << "the norming koefficient k0 is ";
+    if(useNormValue){
+        ss <<  "normed to " << kappa0 << " m^2/s at the position " << normPosition/kpc << " kpc \n";
+        ss << "and norming the turbulence to " << normTurbulence << " and reduced rigidity to "<< normRho << "\n";
+    }
+    else{
+        ss << "interpolated for the local turbulence level\n";
+    }
+    return ss.to_str();
+}
+
+
 // TurbulentCSR -------------------------------------------------------
 Vector3d TurbulentCSR::getDiffusionKoefficent(Candidate *cand) const{
     Vector3d pos = cand -> current . getPosition();
