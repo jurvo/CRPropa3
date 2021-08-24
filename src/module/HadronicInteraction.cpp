@@ -14,9 +14,10 @@
 namespace crpropa {
 
 
-HadronicInteraction::HadronicInteraction(ref_ptr<Density> massDensity, double limit) {
+HadronicInteraction::HadronicInteraction(ref_ptr<Density> massDensity, double limit, int flag) {
 	this->massDensity = massDensity;
 	this->limit = limit;
+	this->flag_Function = flag;
 	setDescription("HadronicInteraction");
 }
 

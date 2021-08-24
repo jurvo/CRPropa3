@@ -39,7 +39,7 @@ protected:
 public:
 	HadronicInteraction(
 		ref_ptr<Density> density,
-		double limit = 0.1);
+		double limit = 0.1, int flag = 0);
 	void setMassDensity(ref_ptr<Density> density);
 	void setLimit(double limit);
 	void process(Candidate *candidate) const;
