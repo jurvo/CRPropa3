@@ -12,6 +12,8 @@
 #include "crpropa/module/EMDoublePairProduction.h"
 #include "crpropa/module/EMTripletPairProduction.h"
 #include "crpropa/module/EMInverseComptonScattering.h"
+#include "crpropa/module/Bremsstrahlung.h"
+#include "crpropa/massDistribution/ConstantDensity.h"
 #include "gtest/gtest.h"
 
 #include <fstream>
@@ -947,6 +949,37 @@ TEST(EMInverseComptonScattering, secondaries) {
 			EXPECT_NEAR(Ep, Etot, 1e-9); 
 		}
 	}
+}
+
+// Bremsstrahlung -------------------------------------------------------------
+TEST(Bremsstrahlung, getSetFunctions){
+	ref_ptr<Density> dens = new ConstantDensity(1,0,1);
+	Bremsstrahlung interaction(dens, 0.01);
+
+	// check default values
+	EXPECT_DOUBLE_EQ(interaction.getLimit(), 0.01);
+	EXPECT_FALSE(interaction.getHavePhotons());
+
+	// check set functions
+	interaction.setHavePhotons(true);
+	EXPECT_TRUE(interaction.getHavePhotons());
+
+	interaction.setLimit(0.1);
+	EXPECT_DOUBLE_EQ(interaction.getLimit(), 0.1);
+
+	interaction.setSecondaryThreshold(5*eV);
+	EXPECT_DOUBLE_EQ(interaction.getSecondaryThreshold(), 5*eV);
+}
+
+TEST(Bremsstrahlung, energyLoss){
+	ref_ptr<Density> dens = new ConstantDensity(1e8, 0, 0);
+	Bremsstrahlung brems(dens);
+	double E0 = 10*GeV;
+	Candidate cand(11, E0);
+	cand.setNextTimeStep(1e11*sec);
+	brems.process(&cand);
+
+	EXPECT_NEAR(cand.current.getLorentzFactor(), 19367.4214, 0.002);
 }
 
 

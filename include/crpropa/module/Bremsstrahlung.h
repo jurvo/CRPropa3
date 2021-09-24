@@ -20,8 +20,8 @@ namespace crpropa {
 class Bremsstrahlung: public Module{
 private:
     ref_ptr<Density> density;
-    double alpha= 1/137.037; // fine structure constant
-    double sigmaT = 1/6 / M_PI * pow_integer<4>(eplus /c_light) * pow_integer<2>(1/epsilon0 /mass_electron);
+    double alpha; // fine structure constant
+    double sigmaT;
     std::vector<double> tabDelta;
     std::vector<double> tabPhi1;
     double limit;
@@ -31,7 +31,7 @@ private:
 public:
     Bremsstrahlung(ref_ptr<Density> density, double limit= 0.01);
 
-    void process(Candidate *cand);
+    void process(Candidate *candidate) const;
 
     void setDensity(ref_ptr<Density> density);
     void setLimit(double limit);
