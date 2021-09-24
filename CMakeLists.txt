@@ -382,6 +382,7 @@ add_library(crpropa SHARED
   src/module/Acceleration.cpp
   src/module/Boundary.cpp
   src/module/BreakCondition.cpp
+  src/module/Bremsstrahlung.cpp
   src/module/DiffusionSDE.cpp
   src/module/EMCascade.cpp
   src/module/EMDoublePairProduction.cpp

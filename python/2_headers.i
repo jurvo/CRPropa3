@@ -472,6 +472,7 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %include "crpropa/magneticField/turbulentField/PlaneWaveTurbulence.h"
 %include "crpropa/magneticField/RealisticJF12.h"
 %include "crpropa/module/BreakCondition.h"
+%include "crpropa/module/Bremsstrahlung.h"
 %include "crpropa/module/Boundary.h"
 
 %feature("director") crpropa::Observer;
