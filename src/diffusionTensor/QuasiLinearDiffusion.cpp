@@ -287,7 +287,7 @@ std::string QLTRigidity::getDescription() const{
     std::stringstream ss;
     ss << "Diffusiontensor QLTRigidity :\n"
         << "Rigidity scaling with aPar " << alphaPara << " and aPerp " << alphaPerp << "\n"
-        << "norm at position: " normPos/kpc << "\n"
+        << "norm at position: " << normPos/kpc << "\n"
         << "using k0 " << kappa0 << " m2/s \n"
         << "and norm turbulence at : \t"<< normEta << "\n"
         << "and norm red. rigidity at:\t"<< normRho << "\n";
