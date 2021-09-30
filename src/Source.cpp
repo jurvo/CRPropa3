@@ -367,6 +367,7 @@ SourceSNRDistribution::SourceSNRDistribution() :
 	set_fzMax(0.3*kpc);
 	set_RMax(20*kpc);
 	set_ZMax(5*kpc);
+	setDescription();
 }
 
 SourceSNRDistribution::SourceSNRDistribution(double R_earth, double alpha, double beta, double Zg) :
@@ -375,6 +376,7 @@ SourceSNRDistribution::SourceSNRDistribution(double R_earth, double alpha, doubl
 	set_fzMax(Zg);
 	set_RMax(20*kpc);
 	set_ZMax(5*kpc);
+	setDescription();
 }
 
 void SourceSNRDistribution::prepareParticle(ParticleState& particle) const {
