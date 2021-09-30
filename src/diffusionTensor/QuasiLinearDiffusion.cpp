@@ -207,14 +207,15 @@ void QLTRigidity::setAlpha(double a){
 
 void QLTRigidity::normToPosition(const Vector3d &pos){
     normPos = pos;
+    Vector3d B;
     if(useFullModel){
         normEta = field->getTurbulenceOverRegular(pos);
         correlationLength = 60 * parsec;
-        Vector3d B = field->getRegularField(pos);
+        B = field->getRegularField(pos);
     }
     else{
         Vector3d b = turbulentField -> getField(pos);
-        Vector3d B = backgroundField -> getField(pos);
+        B = backgroundField -> getField(pos);
         normEta = b.getR()/B.getR();
     }
     normRho = 4e9*volt/B.getR()/c_light/correlationLength;
