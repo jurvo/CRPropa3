@@ -476,7 +476,7 @@ void SourceSNRDistribution::setDescription() {
 	ss << "SourceSNRDistribution: Random position according to SNR distribution";
 	ss << "R_earth = " << R_earth / kpc << " kpc and ";
 	ss << "Zg = " << Zg / kpc << " kpc and";
-	ss << "alpha = " << alpha << " and "
+	ss << "alpha = " << alpha << " and ";
 	ss << "beta = " << beta << " \n";
 	description = ss.str();
 }
