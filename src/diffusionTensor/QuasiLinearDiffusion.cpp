@@ -15,6 +15,10 @@ inline double calculateLamorRadius(ParticleState &state, ref_ptr<MagneticField> 
     fieldStrength = backgroundField->getField(pos).getR();
     return state.getMomentum().getR()/std::abs(state.getCharge())/fieldStrength;
 }
+inline double calculateLamorRadius(ParticleState &state, double fieldStrength) {
+    return state.getMomentum().getR()/std::abs(state.getCharge())/fieldStrength;
+}
+
 
 // QLTDiffusion ------------------------------------------------------------------
 QLTDiffusion::QLTDiffusion(double epsilon , double kappa0, double alpha, double normRig ): 
@@ -165,18 +169,26 @@ std::string QLTTurbulent::getDescription() const{
 QLTRigidity::QLTRigidity(ref_ptr<MagneticField> magField, ref_ptr<TurbulentField> turbField, double kappa0, double alphaPara, double alphaPerp)
     : backgroundField(magField), kappa0(kappa0), alphaPara(alphaPara), alphaPerp(alphaPerp){
         setTurbulentField(turbField);
-    }
+        useFullModel = false;
+}
 
+QLTRigidity::QLTRigidity(ref_ptr<RealisticJF12Field> field, double kappa0, double alphaPara, double alphaPerp)
+    : field(field), kappa0(kappa0), alphaPara(alphaPara), alphaPerp(alphaPerp) {
+    useFullModel = true;
+    normToPosition(normPos);
+}
 
 void QLTRigidity::setMagneticField(ref_ptr<MagneticField> field){
     backgroundField = field;
     normToPosition(normPos);
+    useFullModel = false;
 }
 
 void QLTRigidity::setTurbulentField(ref_ptr<TurbulentField> field){
     turbulentField = field;
     correlationLength = field -> getCorrelationLength();
     normToPosition(normPos);
+    useFullModel = false;
 }
 
 void QLTRigidity::setKappa0(double kap){
@@ -195,9 +207,16 @@ void QLTRigidity::setAlpha(double a){
 
 void QLTRigidity::normToPosition(const Vector3d &pos){
     normPos = pos;
-    Vector3d b = turbulentField -> getField(pos);
-    Vector3d B = backgroundField -> getField(pos);
-    normEta = b.getR()/B.getR();
+    if(useFullModel){
+        normEta = field->getTurbulenceOverRegular(pos);
+        correlationLength = 60 * parsec;
+        Vector3d B = field->getRegularField(pos);
+    }
+    else{
+        Vector3d b = turbulentField -> getField(pos);
+        Vector3d B = backgroundField -> getField(pos);
+        normEta = b.getR()/B.getR();
+    }
     normRho = 4e9*volt/B.getR()/c_light/correlationLength;
 }
 
@@ -243,10 +262,16 @@ Vector3d QLTRigidity::getNormPos() const{
 
 Vector3d QLTRigidity::getDiffusionKoefficent(Candidate *cand) const {
     Vector3d pos = cand -> current.getPosition();
-    double rho = calculateLamorRadius(cand -> current, backgroundField)/correlationLength;
-    double b = turbulentField -> getField(pos).getR();
-    double B = backgroundField -> getField(pos).getR();
-    double eta = b/std::sqrt(b*b + B*B);
+    double rho, eta;
+    if(useFullModel){
+        rho = calculateLamorRadius(cand -> current, field->getRegularField(pos).getR());
+    }
+    else{
+        rho = calculateLamorRadius(cand -> current, backgroundField)/correlationLength;
+        double b = turbulentField -> getField(pos).getR();
+        double B = backgroundField -> getField(pos).getR();
+        eta = b/B;
+    }
     
     Vector3d tens(kappa0);
     tens.x *= pow_integer<2>(normEta/eta)*pow(rho/normRho, getAlphaPara());  // parallel component

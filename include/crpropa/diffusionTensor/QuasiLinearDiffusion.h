@@ -79,6 +79,7 @@ class QLTRigidity: public DiffusionTensor{
         ref_ptr<MagneticField> backgroundField;
         ref_ptr<TurbulentField> turbulentField;
 
+        ref_ptr<RealisticJF12Field> field;
         double kappa0;
         double normEta;
         double normRho; // reduced rigidity to norm
@@ -87,9 +88,11 @@ class QLTRigidity: public DiffusionTensor{
         double correlationLength;
         Vector3d normPos; // position where the diffusion coefficent is normed. default at earth Vector3d(-8.5*kpc, 0, 0)
         //double calculateLamorRadius(ParticleState &state) const;
+        bool useFullModel;
 
     public:
         QLTRigidity(ref_ptr<MagneticField> magField, ref_ptr<TurbulentField> turbField, double kappa0=6.1e24, double alphaPara=(1./3.), double alphaPerp=(1./3.));
+        QLTRigidity(ref_ptr<RealisticJF12Field> field, double kappa0=6.1e24, double alphaPara = (1./3.), double alphaPerp= (1./3.));
         
         Vector3d getDiffusionKoefficent(Candidate *cand) const;
 
