@@ -266,7 +266,7 @@ Vector3d QLTRigidity::getDiffusionKoefficent(Candidate *cand) const {
     double rho, eta;
     if(useFullModel){
         rho = calculateLamorRadius(cand -> current, field->getRegularField(pos).getR());
-        eta = field->getTurbulenceOverRegular();
+        eta = field->getTurbulenceOverRegular(pos);
     }
     else{
         rho = calculateLamorRadius(cand -> current, backgroundField)/correlationLength;
