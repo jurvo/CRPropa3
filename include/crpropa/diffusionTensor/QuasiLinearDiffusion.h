@@ -114,6 +114,7 @@ class QLTRigidity: public DiffusionTensor{
         double getNormEta() const;
         double getNormRho() const;
         Vector3d getNormPos() const;
+        std::string getDescription() const;
 };
 
 } // namespace
