@@ -283,7 +283,7 @@ Vector3d QLTRigidity::getDiffusionKoefficent(Candidate *cand) const {
     return tens;
 }
 
-std::string getDescription() const{
+std::string QLTRigidity::getDescription() const{
     std::stringstream ss;
     ss << "Diffusiontensor QLTRigidity :\n"
         << "Rigidity scaling with aPar " << alphaPara << " and aPerp " << alphaPerp << "\n"
