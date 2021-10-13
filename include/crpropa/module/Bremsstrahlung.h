@@ -34,7 +34,7 @@ private:
     double mc2 = mass_electron * c_squared;
 
 public:
-    Bremsstrahlung(ref_ptr<Density> density, double limit= 0.01);
+    Bremsstrahlung(ref_ptr<Density> density, double limit= 0.01, double secondaryThreshold = 10 * keV);
 
     void process(Candidate *candidate) const;
 

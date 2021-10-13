@@ -953,33 +953,82 @@ TEST(EMInverseComptonScattering, secondaries) {
 
 // Bremsstrahlung -------------------------------------------------------------
 TEST(Bremsstrahlung, getSetFunctions){
-	ref_ptr<Density> dens = new ConstantDensity(1,0,1);
-	Bremsstrahlung interaction(dens, 0.01);
+	ref_ptr<Density> dens = new ConstantDensity(1,0,2);
+	Bremsstrahlung interaction(dens);
 
 	// check default values
 	EXPECT_DOUBLE_EQ(interaction.getLimit(), 0.01);
+	EXPECT_DOUBLE_EQ(interaction.getSecondaryThreshold(), 10 * keV);
 	EXPECT_FALSE(interaction.getHavePhotons());
+	
+	ref_ptr<Density> saved = interaction.getDensity();
+	Vector3d pos(0.);
+	EXPECT_DOUBLE_EQ(saved -> getHIDensity(pos), 1.);
+	EXPECT_DOUBLE_EQ(saved -> getHIIDensity(pos), 0.);
+	EXPECT_DOUBLE_EQ(saved -> getH2Density(pos), 2.);
+
+	EXPECT_DOUBLE_EQ(interaction.getMaximumVariationFactor(), 0.1);
+	EXPECT_TRUE(interaction.getUseDoubleIntegration());
 
 	// check set functions
-	interaction.setHavePhotons(true);
-	EXPECT_TRUE(interaction.getHavePhotons());
+	ref_ptr<Density> dens2 = new ConstantDensity(2,1,3);
+	interaction.setDensity(dens2);
+	saved = interaction.getDensity();
+	EXPECT_DOUBLE_EQ(saved -> getHIDensity(pos), 2.);
+	EXPECT_DOUBLE_EQ(saved -> getHIIDensity(pos), 1.);
+	EXPECT_DOUBLE_EQ(saved -> getH2Density(pos), 3.);
 
 	interaction.setLimit(0.1);
 	EXPECT_DOUBLE_EQ(interaction.getLimit(), 0.1);
 
+	interaction.setHavePhotons(true);
+	EXPECT_TRUE(interaction.getHavePhotons());
+
 	interaction.setSecondaryThreshold(5*eV);
 	EXPECT_DOUBLE_EQ(interaction.getSecondaryThreshold(), 5*eV);
+
+	interaction.setUseDoubleIntegration(false); 
+	EXPECT_FALSE(interaction.getUseDoubleIntegration());
+
+	interaction.setMaximalVariationFactor(0.04);
+	EXPECT_DOUBLE_EQ(interaction.getMaximumVariationFactor(), 0.04);
 }
 
-TEST(Bremsstrahlung, energyLoss){
-	ref_ptr<Density> dens = new ConstantDensity(1e8, 0, 0);
+TEST(Bremsstrahlung, testInteraction){
+	// high density to be shure a interaction will take place. 
+	// note: this test may faliure by chance
+	ref_ptr<Density> dens = new ConstantDensity(1e99, 0, 0); 
 	Bremsstrahlung brems(dens);
-	double E0 = 10*GeV;
-	Candidate cand(11, E0);
-	cand.setNextTimeStep(1e11*sec);
-	brems.process(&cand);
 
-	EXPECT_NEAR(cand.current.getLorentzFactor(), 19367.4214, 0.002);
+	double E0 = 100*MeV;
+	ref_ptr<Candidate> c = new Candidate(11, E0);
+	c -> setCurrentStep(100*kpc); // also high to ensure a interaction
+
+	// check energy loss and limit next step
+	brems.process(c);
+	EXPECT_TRUE(c -> current.getEnergy() < E0); // energy should be less due to interaction
+	EXPECT_TRUE(c -> getNextStep() < 100*kpc);
+
+	// check average secondary energy (E/E0 = 0.5 \pm 0.1)
+	double secondaryEnergySum = 0.;
+	brems.setHavePhotons(true);
+	brems.setSecondaryThreshold(0.); // all secondaries should be produced
+	for (int i = 0; i < 100; i++)
+	{
+		c = new Candidate(11, E0);
+		c -> setCurrentStep(100*kpc); // also high to ensure a interaction
+
+		brems.process(c);
+		// EXPECT_TRUE(c -> current.getEnergy() < E0); 
+		for (int i = 0; i < c -> secondaries.size(); i++)
+		{
+			secondaryEnergySum += c -> secondaries[i] -> current.getEnergy();
+			if (i == 1)
+				throw std::runtime_error("more secondares produced than expected \n");
+		}
+	}
+	double eMean = secondaryEnergySum / 100;
+	EXPECT_NEAR(eMean / E0, 0.5, 0.1);
 }
 
 

@@ -13,8 +13,8 @@ namespace crpropa
 // static const double W[8] = {.1894506104, .1826034150, .1691565193, .1495959888, .1246289712, .0951585116, .0622535239, .0271524594};
 
 
-Bremsstrahlung::Bremsstrahlung(ref_ptr<Density> density, double limit) : 
-    density(density), limit(limit), havePhotons(false), secondaryThreshold(1*eV), useDoubleIntegration(true), maximalVariationFactor(0.1) {
+Bremsstrahlung::Bremsstrahlung(ref_ptr<Density> density, double limit, double threshold) : 
+    density(density), limit(limit), havePhotons(false), secondaryThreshold(threshold), useDoubleIntegration(true), maximalVariationFactor(0.1) {
     tabDelta = {0., 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10};
     tabPhi1 = {45.79, 45.43, 45.09, 44.11, 42.64, 40.16, 34.97, 29.97, 24.73, 18.09, 13.65};
     tabPhi2 = {44.46, 44.38, 44.24, 43.65, 42.49, 40.19, 34.93, 29.78, 24.34, 17.28, 12.41};
@@ -125,7 +125,7 @@ double Bremsstrahlung::samplePhotonEnergy(double Ein) const{
     {
         double eps = epsMin + random.rand() * (epsMax - epsMin);
         double pEps = sigmaH(Ein, eps);
-        if(random.rand() < sigmaT){
+        if(pEps > random.rand() * sigmaT){
             return eps;
         }
     }
