@@ -1013,22 +1013,26 @@ TEST(Bremsstrahlung, testInteraction){
 	double secondaryEnergySum = 0.;
 	brems.setHavePhotons(true);
 	brems.setSecondaryThreshold(0.); // all secondaries should be produced
-	for (int i = 0; i < 100; i++)
+	int nrSecondaries = 10000;
+	for (int i = 0; i < nrSecondaries; i++)
 	{
 		c = new Candidate(11, E0);
 		c -> setCurrentStep(100*kpc); // also high to ensure a interaction
 
 		brems.process(c);
+		double Esec = 0;
 		// EXPECT_TRUE(c -> current.getEnergy() < E0); 
 		for (int i = 0; i < c -> secondaries.size(); i++)
 		{
-			secondaryEnergySum += c -> secondaries[i] -> current.getEnergy();
+			Esec = c -> secondaries[i] -> current.getEnergy();
+			EXPECT_TRUE(Esec < E0);
+			secondaryEnergySum += Esec;
 			if (i == 1)
 				throw std::runtime_error("more secondares produced than expected \n");
 		}
 	}
-	double eMean = secondaryEnergySum / 100;
-	EXPECT_NEAR(eMean / E0, 0.5, 0.1);
+	double eMean = secondaryEnergySum / nrSecondaries;
+	EXPECT_NEAR(eMean / E0, 0.5, 0.05);
 }
 
 
