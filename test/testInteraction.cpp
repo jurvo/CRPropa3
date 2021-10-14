@@ -952,7 +952,7 @@ TEST(EMInverseComptonScattering, secondaries) {
 }
 
 // Bremsstrahlung -------------------------------------------------------------
-TEST(Bremsstrahlung, getSetFunctions){
+TEST(Bremsstrahlung, getSetFunctions) {
 	ref_ptr<Density> dens = new ConstantDensity(1,0,2);
 	Bremsstrahlung interaction(dens);
 
@@ -994,7 +994,43 @@ TEST(Bremsstrahlung, getSetFunctions){
 	EXPECT_DOUBLE_EQ(interaction.getMaximumVariationFactor(), 0.04);
 }
 
-TEST(Bremsstrahlung, testInteraction){
+TEST(Bremsstrahlung, noInteractionOnProtons) {
+	ref_ptr<Density> dens = new ConstantDensity(1e99, 0, 0);
+	Bremsstrahlung brems(dens);
+	brems.setHavePhotons(true);
+
+	double E0 = 1*PeV;
+	ref_ptr<Candidate> c = new Candidate(nucleusId(1,1), E0);
+	c -> setCurrentStep(100*kpc);
+
+	brems.process(c);
+	// no energy loss
+	EXPECT_DOUBLE_EQ(E0, c -> current.getEnergy());
+
+	// no secondaries produced
+	EXPECT_EQ(0, c -> secondaries.size()); 
+}
+
+TEST(Bremsstrahlung, noInteractionOnPhotons) {
+	ref_ptr<Density> dens = new ConstantDensity(1e99, 0, 0);
+	Bremsstrahlung brems(dens);
+	brems.setHavePhotons(true);
+
+	double E0 = 1*PeV;
+	ref_ptr<Candidate> c = new Candidate(22, E0);
+	c -> setCurrentStep(100*kpc);
+
+	brems.process(c);
+	// no energy loss
+	EXPECT_DOUBLE_EQ(E0, c -> current.getEnergy());
+
+	// no secondaries produced
+	EXPECT_EQ(0, c -> secondaries.size()); 
+}
+
+
+
+TEST(Bremsstrahlung, testInteraction) {
 	// high density to be shure a interaction will take place. 
 	// note: this test may faliure by chance
 	ref_ptr<Density> dens = new ConstantDensity(1e99, 0, 0); 
