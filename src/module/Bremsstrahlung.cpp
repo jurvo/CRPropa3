@@ -146,7 +146,7 @@ double Bremsstrahlung::sigmaH(double E, double Egamma) const {
     }
     double sigma = (1 + pow_integer<2>(1 - Egamma / E) ) * Phi1 - 2. / 3. * (1 - Egamma / E) * Phi2;
     sigma *= 3. / 8. / M_PI * alpha * sigmaT;
-    return sigma;
+    return sigma /eV;
 }
 
 double Bremsstrahlung::maximumEps(double E) const {
