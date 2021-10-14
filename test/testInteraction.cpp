@@ -1028,8 +1028,6 @@ TEST(Bremsstrahlung, noInteractionOnPhotons) {
 	EXPECT_EQ(0, c -> secondaries.size()); 
 }
 
-
-
 TEST(Bremsstrahlung, testInteraction) {
 	// high density to be shure a interaction will take place. 
 	// note: this test may faliure by chance
