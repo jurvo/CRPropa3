@@ -73,6 +73,7 @@ static const double k_boltzmann = 1.3806488e-23 * joule / kelvin;
 static const double mu0 = 4 * M_PI * 1e-7 * newton / ampere / ampere;
 static const double epsilon0 = 1.0 / mu0 / c_squared * ampere * second / volt / meter;
 static const double bohr_radius = epsilon0 * h_planck * h_planck / M_PI / mass_electron / eplus / eplus;
+static const double fine_structure = 1 / 137.035999;
 
 // gauss
 static const double gauss = 1e-4 * tesla;
