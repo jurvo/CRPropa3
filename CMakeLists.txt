@@ -391,6 +391,7 @@ add_library(crpropa SHARED
   src/module/ElasticScattering.cpp
   src/module/ElectronPairProduction.cpp
   src/module/HDF5Output.cpp
+  src/module/Ionization.cpp
   src/module/NuclearDecay.cpp
   src/module/Observer.cpp
   src/module/Output.cpp
