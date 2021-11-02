@@ -193,3 +193,8 @@ TEST(testQLTRigidity, testQLTRigidity){
     EXPECT_DOUBLE_EQ(tensNormPos.y, normPos.y);
     EXPECT_DOUBLE_EQ(tensNormPos.z, normPos.z);
 }
+
+int main(int argc, char **argv) {
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}
