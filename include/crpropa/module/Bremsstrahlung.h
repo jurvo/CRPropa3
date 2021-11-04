@@ -71,6 +71,8 @@ private:
     double maximumEps(double E) const;
     // photon energy of the break between tabulated scattering functions and unshielded approximation.
     double epsBreak(double E) const;
+
+    double getCrossection(double E) const;
 };
 
 } // namespace crpropa

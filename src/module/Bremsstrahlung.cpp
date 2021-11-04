@@ -36,16 +36,8 @@ void Bremsstrahlung::process(Candidate *cand) const{
         throw std::runtime_error("to big changes in density. Please take smaler step sizes. \n");
     }
 
-    double crossection = 0.;
-    double epsMax = maximumEps(Ein);
+    double crossection = getCrossection(Ein);
 
-    if(useDoubleIntegration) {
-        double eps0 = epsBreak(Ein);
-        crossection += gaussInt([this, Ein](double eps) {return this -> sigmaH(Ein, eps); }, 0, eps0);
-        crossection += gaussInt([this, Ein](double eps) {return this -> sigmaH(Ein, eps); }, eps0 + 1e-5 * Ein, epsMax);
-    }
-    else{
-        crossection += gaussInt([this, Ein](double eps) {return this -> sigmaH(Ein, eps); }, 0, epsMax);
     }
 
     // limit next step
@@ -62,6 +54,21 @@ void Bremsstrahlung::process(Candidate *cand) const{
     cand -> current.setEnergy(Ein - eps);
     if(havePhotons && (eps > secondaryThreshold))
         cand -> addSecondary(22, eps);
+}
+
+double Bremsstrahlung::getCrossection(double Ein) const{
+    double crossection = 0.;
+    double epsMax = maximumEps(Ein);
+
+    if(useDoubleIntegration) {
+        double eps0 = epsBreak(Ein);
+        crossection += gaussInt([this, Ein](double eps) {return this -> sigmaH(Ein, eps); }, 0, eps0);
+        crossection += gaussInt([this, Ein](double eps) {return this -> sigmaH(Ein, eps); }, eps0 + 1e-5 * Ein, epsMax);
+    }
+    else{
+        crossection += gaussInt([this, Ein](double eps) {return this -> sigmaH(Ein, eps); }, 0, epsMax);
+    }
+    return crossection;
 }
 
 void Bremsstrahlung::setDensity(ref_ptr<Density> density) {
