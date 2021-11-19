@@ -16,21 +16,22 @@ Bremsstrahlung::Bremsstrahlung(ref_ptr<Density> density, double limit, double th
     tabPhi2 = {44.46, 44.38, 44.24, 43.65, 42.49, 40.19, 34.93, 29.78, 24.34, 17.28, 12.41};
     sigmaT = 6.652458558e-29 * meter * meter;
     alpha = 1/137.037;
+    fMin = 1e-4;
 }
 
-void Bremsstrahlung::process(Candidate *cand) const{
+void Bremsstrahlung::process(Candidate *cand) const {
     if(fabs(cand -> current.getId()) != 11)
         return; // only for electrons
 
     Vector3d pos = cand -> current.getPosition();
     double step = cand -> getCurrentStep();
-    double n0 = density -> getHIDensity(pos) + 2 * density -> getH2Density(pos);
+    double n0 = getDensityAtPosition(pos);
     double Ein = cand -> current.getEnergy();
 
     // check for maximal variation of the density
     Vector3d dir = cand -> current.getDirection();
     Vector3d pos2 = pos + step*dir; 
-    double n1 = density -> getHIDensity(pos2) + 2 * density -> getH2Density(pos2);
+    double n1 = getDensityAtPosition(pos2);
     if(abs(n1 - n0) / n0 > maximalVariationFactor) {
         // ToDo:    limit step size and perform half step 
         throw std::runtime_error("to big changes in density. Please take smaler step sizes. \n");
@@ -38,6 +39,8 @@ void Bremsstrahlung::process(Candidate *cand) const{
 
     double crossection = getCrossection(Ein);
 
+    if (crossection <= 0){
+        throw std::runtime_error("no crossection left");
     }
 
     // limit next step
@@ -56,7 +59,7 @@ void Bremsstrahlung::process(Candidate *cand) const{
         cand -> addSecondary(22, eps);
 }
 
-double Bremsstrahlung::getCrossection(double Ein) const{
+double Bremsstrahlung::getCrossection(double Ein) const {
     double crossection = 0.;
     double epsMax = maximumEps(Ein);
 
@@ -119,7 +122,7 @@ double Bremsstrahlung::getMaximumVariationFactor() const {
     return this -> maximalVariationFactor;
 }
 
-double Bremsstrahlung::samplePhotonEnergy(double Ein) const{
+double Bremsstrahlung::samplePhotonEnergy(double Ein) const {
     double epsMin = 0;
     double epsMax = maximumEps(Ein); 
     Random &random = Random::instance();
@@ -128,7 +131,7 @@ double Bremsstrahlung::samplePhotonEnergy(double Ein) const{
     {
         double eps = epsMin + random.rand() * (epsMax - epsMin);
         double pEps = sigmaH(Ein, eps);
-        if(pEps > random.rand() * sigmaT){
+        if(pEps > random.rand() * sigmaT/eV){
             return eps;
         }
     }
@@ -149,7 +152,7 @@ double Bremsstrahlung::sigmaH(double E, double Egamma) const {
     }
     double sigma = (1 + pow_integer<2>(1 - Egamma / E) ) * Phi1 - 2. / 3. * (1 - Egamma / E) * Phi2;
     sigma *= 3. / 8. / M_PI * alpha * sigmaT;
-    return sigma /eV;
+    return sigma / Egamma / eV;
 }
 
 double Bremsstrahlung::maximumEps(double E) const {

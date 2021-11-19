@@ -22,13 +22,14 @@ namespace crpropa {
  */
 
 class Bremsstrahlung: public Module{
-private:
+protected:
     ref_ptr<Density> density; // density distribution to interact with
     double limit;   // limit next step length to limit the interaction probability to a given value
     bool havePhotons; // create secondary photons
     double secondaryThreshold; // threshold energy of the secondary photons
     bool useDoubleIntegration; // calculate total crossection with two integrals instead of one
     double maximalVariationFactor; // maximal variation of the density between this step and the next one
+    double fMin; // fraction of the minimum energy of the sampled photon
 
     double alpha; // fine structure constant
     double sigmaT; // thomson crossection
@@ -55,6 +56,9 @@ public:
     // allows a maximal variation of gas density for step length
     void setMaximalVariationFactor(double factor);
 
+    void setFMin(double fraction);
+    double getFMin() const;
+
     ref_ptr<Density> getDensity() const;
     double getLimit() const;
     bool getHavePhotons() const;
@@ -62,7 +66,6 @@ public:
     bool getUseDoubleIntegration() const;
     double getMaximumVariationFactor() const;
 
-private:
     // calculate the produced photon energy. This is also used for the energy loss.
     double samplePhotonEnergy(double Ein) const;
     // differential crossection. Parametrized after Schlickeiser 2002.
@@ -73,6 +76,7 @@ private:
     double epsBreak(double E) const;
 
     double getCrossection(double E) const;
+    double getDensityAtPosition(Vector3d &pos) const;
 };
 
 } // namespace crpropa
