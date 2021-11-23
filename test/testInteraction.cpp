@@ -2,6 +2,8 @@
 #include "crpropa/Units.h"
 #include "crpropa/ParticleID.h"
 #include "crpropa/PhotonBackground.h"
+#include "crpropa/massDistribution/ConstantDensity.h"
+#include "crpropa/module/Bremsstrahlung.h"
 #include "crpropa/module/ElectronPairProduction.h"
 #include "crpropa/module/NuclearDecay.h"
 #include "crpropa/module/PhotoDisintegration.h"
@@ -949,6 +951,99 @@ TEST(EMInverseComptonScattering, secondaries) {
 	}
 }
 
+// Bremsstrahlung -------------------------------------------------
+
+TEST(Bremsstrahlung, simpleTest) {
+	double dens = 10 / ccm;
+	ConstantDensity* cd = new ConstantDensity(dens, 0., 0.);
+	Bremsstrahlung brems(cd);
+
+	// check default values
+	EXPECT_DOUBLE_EQ(brems.getLimit(), 0.01);
+	EXPECT_DOUBLE_EQ(brems.getSecondaryThreshold(), 10 * keV);
+	EXPECT_FALSE(brems.getHavePhotons());
+
+	// check set functions
+	brems.setLimit(0.05);
+	EXPECT_DOUBLE_EQ(brems.getLimit(), 0.05);
+	
+	brems.setHavePhotons(true);
+	EXPECT_TRUE(brems.getHavePhotons());
+
+	brems.setSecondaryThreshold(1 * keV);
+	EXPECT_DOUBLE_EQ(brems.getSecondaryThreshold(), 1 * keV);
+
+	// check density function
+	ref_ptr<Density> density = brems.getDensity();
+	Vector3d pos(10, 1, 0);
+	double densReturn = density -> getHIDensity(pos) + 2 * density -> getH2Density(pos);
+	EXPECT_DOUBLE_EQ(densReturn, dens);
+	EXPECT_DOUBLE_EQ(brems.getDensityAtPosition(pos), dens);
+
+	// test full constructor
+	Bremsstrahlung brems2(cd, 0.03, 100 * keV, true);
+	EXPECT_DOUBLE_EQ(brems2.getLimit(), 0.03);
+	EXPECT_DOUBLE_EQ(brems2.getSecondaryThreshold(), 100 * keV);
+	EXPECT_TRUE(brems2.getHavePhotons());
+}
+
+TEST(Bremsstrahlung, noInteraction) {
+	double dens = 10 / ccm;
+	ConstantDensity* cd = new ConstantDensity(dens, 0., 0.);
+	Bremsstrahlung brems(cd);
+
+	// no interaction for photons
+	Candidate c(22, 10 * TeV);
+	c.setCurrentStep(1 * kpc);
+	brems.process(&c);
+	EXPECT_DOUBLE_EQ(c.current.getEnergy(), 10 * TeV);
+
+	// no interaction for protons
+	c.current.setId(nucleusId(1,1));
+	brems.process(&c);
+	EXPECT_DOUBLE_EQ(c.current.getEnergy(), 10 * TeV);
+}
+
+TEST(Bremsstrahlung, crossectionValues) {
+	double dens = 10 / ccm;
+	ConstantDensity* cd = new ConstantDensity(dens, 0., 0.);
+	Bremsstrahlung brems(cd);
+
+	// check expected values
+	double E0 = 100 * GeV;
+	double Egamma = 0.5 * E0;
+	double sigmaDiff = 2.60758e-30 * 11/12 / Egamma;
+	double sigmaTot = 2.132721e-29;
+	EXPECT_NEAR(sigmaDiff, brems.differentialCrossection(E0, Egamma), 1e-23);
+	EXPECT_NEAR(sigmaTot, brems.getCrossection(E0), 1e-32);
+
+	E0 = 10 * GeV;
+	Egamma = 0.1 * E0;
+	sigmaDiff = 2.60758e-30 * 1.21 / Egamma;
+	EXPECT_NEAR(sigmaDiff, brems.differentialCrossection(E0, Egamma), 1e-22);
+	EXPECT_NEAR(sigmaTot, brems.getCrossection(E0), 1e-32);
+}
+
+TEST(Bremsstrahlung, meanEnergyLoss) {
+	double dens = 10 / ccm;
+	ConstantDensity* cd = new ConstantDensity(dens, 0., 0.);
+	Bremsstrahlung brems(cd, 0.01, 0., true);
+
+	Candidate c(11, 100*GeV);
+	double energyLoss = 0.;
+	for (int i = 0; i < 1000; i++)
+	{
+		c.setCurrentStep(100 * Mpc); // large enough to be shure a interaction will take place
+		brems.process(&c);
+		EXPECT_TRUE(c.secondaries.size() > 0);
+		energyLoss += (100 * GeV - c.current.getEnergy());
+		
+		// reset candidate
+		c.current.setEnergy(100 * GeV);
+		c.clearSecondaries();
+	}
+	EXPECT_NEAR(energyLoss/1000, 50 * GeV, 1 * GeV);
+}
 
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
