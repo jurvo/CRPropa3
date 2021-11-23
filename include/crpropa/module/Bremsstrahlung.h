@@ -36,7 +36,8 @@ public:
     Bremsstrahlung(
         ref_ptr<Density> density, 
         double limit= 0.01, 
-        double secondaryThreshold = 10 * keV
+        double secondaryThreshold = 10 * keV, 
+        bool havePhotons = false
     );
 
     void process(Candidate *candidate) const;

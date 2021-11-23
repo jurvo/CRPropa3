@@ -8,8 +8,8 @@
 namespace crpropa
 {
 
-Bremsstrahlung::Bremsstrahlung(ref_ptr<Density> density, double limit, double threshold) : 
-    density(density), limit(limit), havePhotons(false), secondaryThreshold(threshold) {
+Bremsstrahlung::Bremsstrahlung(ref_ptr<Density> density, double limit, double threshold, bool havePhotons) : 
+    density(density), limit(limit), havePhotons(havePhotons), secondaryThreshold(threshold) {
     sigmaT = 6.652458558e-29 * meter * meter;
     alpha = 1/137.037;
 }
@@ -98,7 +98,7 @@ double Bremsstrahlung::samplePhotonEnergy(double Ein) const {
 
 // parametrisation of crossection after Schlickeiser 2002 in the strong shielding limit
 double Bremsstrahlung::differentialCrossection(double E, double eps) const {
-    return 3 / (8 * M_PI * eps) * alpha * sigmaT * 45 * (4./3. - 4/3 * eps / E + pow_integer<2>(eps / E));
+    return 3. / (8. * M_PI * eps) * alpha * sigmaT * 45 * (4./3. - 4./3 * eps / E + pow_integer<2>(eps / E));
 }
 
 double Bremsstrahlung::getDensityAtPosition(Vector3d &pos) const {
