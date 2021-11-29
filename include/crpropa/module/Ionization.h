@@ -4,12 +4,7 @@
 #include "crpropa/Module.h"
 #include "crpropa/massDistribution/Density.h"
 
-using namespace crpropa;
-/**
- * 
- * 
- * 
- */
+namespace crpropa {
 
 class Ionization: public Module {
 
@@ -30,30 +25,25 @@ public:
 
     void process(Candidate *cand) const;
 
-
-private: 
     /* crossections for the ionization after Padovani et al (A&A 501, 2, pp. 619-631, 2009)
         @param E: kinetic Energy of the incoming particle in [J]
         @return crossection for the process in [m^2]
     */
-    double sigma_p_ion(double E) const;
-    double sigma_p_ec(double E) const;
-    double sigma_p_diss(double E) const;
-    double sigma_p_doub(double E) const;
+    
+    double sigmaPion(double E) const;
+    double sigmaPec(double E) const;
+    double sigmaPdiss(double E) const;
+    double sigmaPdoub(double E) const;
 
-    double sigma_e_ion(double E) const;
-    double sigma_e_diss(double E) const;
-    double sigma_e_doub(double E) const;
+    double sigmaEion(double E) const;
+    double sigmaEdiss(double E) const;
+    double sigmaEdoub(double E) const;
 
     double energyLossRateElectron(double E, Vector3d &pos) const;
-    double energyLossRateProton(double E, Vector3d &pos) const;
+    double energyLossRateProton(double E, Vector3d &pos) const; 
     void countInteractionsOnStep(double E, double step, Candidate *cand) const;
-
 };
 
-
-
-
-
+} // namespace
 
 #endif // CRPROPA_IONIZATION_H
