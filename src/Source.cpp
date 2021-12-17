@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include <stdexcept>
+#include <fstream>
 
 namespace crpropa {
 
@@ -1016,6 +1017,111 @@ SourceTimePropagation::SourceTimePropagation(bool use){
 void SourceTimePropagation::prepareCandidate(Candidate &candidate) const {
 	candidate.setUseTimePropagation(use);
 }
+// ----------------------------------------------------------------------------
 
+SourceRadiusFromSFR::SourceRadiusFromSFR(std::string filename) {
+	loadData(filename);
+}
+
+void SourceRadiusFromSFR::loadData(std::string filename) {
+	std::ifstream infile(filename.c_str());
+
+	if(!infile.good())
+		throw std::runtime_error("SourceRadiusFromSFR could not read file: " + filename);
+	
+	std::istream *in;
+	std::string line;
+	in = &infile;
+	double r, rMax, s, sMax, _;
+
+	while (std::getline(*in, line))
+	{
+		std::stringstream stream(line);
+		if (stream.peek() == '#')
+			continue;
+		
+		stream >> r >> s >> _;
+		if (s > sMax) 
+			sMax = s;
+		
+		if ((r>rMax) && (s>0))
+			rMax = r;
+
+		radius.push_back(r * kpc);
+		sfr.push_back(s);
+	}
+	std::cout << "raduisList: länge " << radius.size() << " \tmax: " << rMax << "\n"
+		<< "sfr List:\t Länge: " << sfr.size() << "\tmax: " << sfrMax << "\n";
+	this -> sfrMax = sMax;
+	this -> rMax = rMax * kpc;
+	infile.close();
+}
+
+void SourceRadiusFromSFR::prepareParticle(ParticleState& state) const {
+	Random &random = Random::instance();
+	Vector3d pos = state.getPosition();
+	double Rpos;
+	int counter = 0;
+	while (true)
+	{	
+		Rpos = random.rand() * rMax;
+		double sPos = interpolate(Rpos, radius, sfr);
+		double sTest = random.rand() * sfrMax;
+		if(sTest <= sPos / 1.6){
+			std::cout << "finish sampling at R: " << Rpos / kpc << "kpc after " << counter << "loops \n";
+			break;
+		}
+		counter++;
+	}
+	double phi = random.rand() * 2 * M_PI;
+	pos.x = cos(phi) * Rpos;
+	pos.y = sin(phi) * Rpos;
+	state.setPosition(pos);
+}
+
+double SourceRadiusFromSFR::getSFRMax() {
+	return sfrMax;
+}
+
+double SourceRadiusFromSFR::getRMax() {
+	return rMax;
+}
+// ------------------------------------------------------------------------------
+
+SourceZpositionGauss::SourceZpositionGauss(double zMax, double h) : zMax(zMax), h(h) {}
+
+void SourceZpositionGauss::prepareParticle(ParticleState& state) const {
+	Vector3d pos = state.getPosition();
+	double zPos;
+	Random &random = Random::instance();
+	double fPos, fTest;
+	while (true)
+	{
+		zPos = (random.rand() - 0.5) * 2 * zMax;
+		fPos = exp(- zPos * zPos / h / h);
+		fTest = random.rand();
+		if (fTest <= fPos) {
+			break;
+		}
+	}
+	pos.z = zPos;
+	state.setPosition(pos);
+}
+
+double SourceZpositionGauss::getZMax() const {
+	return zMax;
+}
+
+double SourceZpositionGauss::getH() const {
+	return h;
+}
+
+void SourceZpositionGauss::setZMax(double z) {
+	this->zMax = z;
+}
+
+void SourceZpositionGauss::setH(double h) {
+	this->h = h;
+}
 
 } // namespace crpropa

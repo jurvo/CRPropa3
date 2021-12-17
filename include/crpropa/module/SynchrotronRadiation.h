@@ -56,6 +56,32 @@ public:
 	void process(Candidate *candidate) const;
 	std::string getDescription() const;
 };
+
+/**
+ * @class SynchrotronSelfCompton
+ * @brief Energy loss due to synchrotron radiation and IC scattering
+ * 
+ * This module calculates the energy loss of electrons due to synchrotron radiation and inverse compton scattering 
+ * as a continues energy loss process. All secondaries are neglected. This approach can be found e.g. Mulcahy et al. DOI: 10.1051/0004-6361/201628446
+ */
+class SynchrotronSelfCompton: public Module {
+private:
+	double uRad;
+	ref_ptr<MagneticField> field;
+public:
+	SynchrotronSelfCompton(ref_ptr<MagneticField> field, double Urad);
+
+	void process(Candidate *cand) const;
+
+	void setURad(double uRad);
+	void setMagneticField(ref_ptr<MagneticField> field);
+
+	double getURad() const;
+
+	double energyLoss(Vector3d pos, double E) const;
+	std::string getDescription() const;
+};
+
 /** @}*/
 
 } // namespace crpropa

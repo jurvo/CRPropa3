@@ -70,6 +70,7 @@
 #include "crpropa/magneticField/CMZField.h"
 #include "crpropa/magneticField/turbulentField/GridTurbulence.h"
 #include "crpropa/magneticField/turbulentField/HelicalGridTurbulence.h"
+#include "crpropa/magneticField/turbulentField/ModulatedTurbulentField.h"
 #include "crpropa/magneticField/turbulentField/PlaneWaveTurbulence.h"
 #include "crpropa/magneticField/turbulentField/SimpleGridTurbulence.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"

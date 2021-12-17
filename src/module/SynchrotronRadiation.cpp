@@ -2,6 +2,8 @@
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
 
+#include "kiss/logger.h"
+
 #include <fstream>
 #include <limits>
 #include <stdexcept>
@@ -130,6 +132,14 @@ void SynchrotronRadiation::process(Candidate *candidate) const {
 	double dEdx = 1. / 6 / M_PI / epsilon0 * pow(lf * lf - 1, 2) * pow(charge / Rg, 2); // Jackson p. 770 (14.31)
 	double step = candidate->getCurrentStep() / (1 + z); // step size in local frame
 	double dE = step * dEdx;
+	if(dE == 0) {
+		KISS_LOG_WARNING << "synchroton has a step with dE = 0 \n"
+			<< "B: \t"<<B << "\n"
+			<< "Rg: \t"<<Rg <<"\n"
+			<< "lf: \t" << lf << "\n"
+			<< "dEdx\t" << dEdx << "\n"
+			<< "s: \t" << step << "\n";
+	}
 
 	// apply energy loss and limit next step
 	double w0 = candidate->getWeight();
@@ -138,7 +148,7 @@ void SynchrotronRadiation::process(Candidate *candidate) const {
 	candidate->limitNextStep(limit * E / dEdx);
 
 	// optionally add secondary photons
-	if (not(havePhotons))
+	if (havePhotons == false)
 		return;
 
 	// check if photons with energies > 14 * Ecrit are possible
@@ -218,6 +228,51 @@ std::string SynchrotronRadiation::getDescription() const {
 	if (thinning > 0)
 		s << "thinning parameter: " << thinning; 
 	return s.str();
+}
+
+SynchrotronSelfCompton::SynchrotronSelfCompton(ref_ptr<MagneticField> field, double uRad) {
+	setMagneticField(field);
+	setURad(uRad);
+}
+
+void SynchrotronSelfCompton::process(Candidate *c) const {
+	int id = fabs(c -> current.getId());
+	
+	if (id != 11)
+		return; // only for electrons
+	
+	double E = c -> current.getEnergy();
+	Vector3d pos = c -> current.getPosition();
+	double dT = c -> getCurrentTimeStep(); 
+
+	double dEdT = energyLoss(pos, E);
+	double dE = dEdT * dT;
+	c -> current.setEnergy(E - dE);
+}
+
+double SynchrotronSelfCompton::energyLoss(Vector3d pos, double E) const {
+	double B = field -> getField(pos).getR() / gauss;
+	double beta = 8e-17 * (uRad + 6e11 * pow_integer<2>(B) / 8 / M_PI) / GeV * second;
+	return beta * E * E;
+}
+
+void SynchrotronSelfCompton::setMagneticField(ref_ptr<MagneticField> field) {
+	this -> field = field;
+}
+
+void SynchrotronSelfCompton::setURad(double u) {
+	uRad = u;
+}
+
+double SynchrotronSelfCompton::getURad() const {
+	return uRad;
+}
+
+std::string SynchrotronSelfCompton::getDescription() const {
+	std::stringstream ss;
+	ss << "continues energy loss due to Synchrotron and Inverse Compton \n";
+	ss << "using a photon field with energy density uRad = " << uRad / eV * ccm << "eV / ccm \n"; 
+	return ss.str();
 }
 
 } // namespace crpropa
