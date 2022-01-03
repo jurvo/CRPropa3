@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <string>
+#include <sstream>
 
 using namespace crpropa;
 
