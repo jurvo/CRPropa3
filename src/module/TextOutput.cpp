@@ -107,6 +107,8 @@ void TextOutput::printHeader() const {
 	if (fields.test(TrajectoryLengthColumn))
 		*out << "# D             Trajectory length [" << lengthScale / Mpc
 				<< " Mpc]\n";
+	if (fields.test(TimeColumn))
+		*out << "# T             Time [" << timeScale / yr << " yr]\n";
 	if (fields.test(RedshiftColumn))
 		*out << "# z             Redshift\n";
 	if (fields.test(SerialNumberColumn))
@@ -165,7 +167,7 @@ void TextOutput::process(Candidate *c) const {
 
 	if (fields.test(TimeColumn))
 		p += std::sprintf(buffer + p, "%8.5E\t",
-				c->getTime());
+				c->getTime() / timeScale);
 
 	if (fields.test(RedshiftColumn))
 		p += std::sprintf(buffer + p, "%1.5E\t", c->getRedshift());
