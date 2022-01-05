@@ -1050,8 +1050,6 @@ void SourceRadiusFromSFR::loadData(std::string filename) {
 		radius.push_back(r * kpc);
 		sfr.push_back(s);
 	}
-	std::cout << "raduisList: länge " << radius.size() << " \tmax: " << rMax << "\n"
-		<< "sfr List:\t Länge: " << sfr.size() << "\tmax: " << sfrMax << "\n";
 	this -> sfrMax = sMax;
 	this -> rMax = rMax * kpc;
 	infile.close();
@@ -1068,7 +1066,6 @@ void SourceRadiusFromSFR::prepareParticle(ParticleState& state) const {
 		double sPos = interpolate(Rpos, radius, sfr);
 		double sTest = random.rand() * sfrMax;
 		if(sTest <= sPos / 1.6){
-			std::cout << "finish sampling at R: " << Rpos / kpc << "kpc after " << counter << "loops \n";
 			break;
 		}
 		counter++;
