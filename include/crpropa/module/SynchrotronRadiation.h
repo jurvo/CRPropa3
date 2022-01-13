@@ -3,6 +3,7 @@
 
 #include "crpropa/Module.h"
 #include "crpropa/magneticField/MagneticField.h"
+#include "crpropa/magneticField/turbulentField/ModulatedTurbulentField.h"
 
 namespace crpropa {
 /**
@@ -67,14 +68,14 @@ public:
 class SynchrotronSelfCompton: public Module {
 private:
 	double uRad;
-	ref_ptr<MagneticField> field;
+	ref_ptr<ModulatedTurbulentField> field;
 public:
-	SynchrotronSelfCompton(ref_ptr<MagneticField> field, double Urad);
+	SynchrotronSelfCompton(ref_ptr<ModulatedTurbulentField> field, double Urad);
 
 	void process(Candidate *cand) const;
 
 	void setURad(double uRad);
-	void setMagneticField(ref_ptr<MagneticField> field);
+	void setMagneticField(ref_ptr<ModulatedTurbulentField> field);
 
 	double getURad() const;
 

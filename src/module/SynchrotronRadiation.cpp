@@ -229,8 +229,9 @@ std::string SynchrotronRadiation::getDescription() const {
 		s << "thinning parameter: " << thinning; 
 	return s.str();
 }
+// -----------------------------------------------------------------------------------------------------------------------
 
-SynchrotronSelfCompton::SynchrotronSelfCompton(ref_ptr<MagneticField> field, double uRad) {
+SynchrotronSelfCompton::SynchrotronSelfCompton(ref_ptr<ModulatedTurbulentField> field, double uRad) {
 	setMagneticField(field);
 	setURad(uRad);
 }
@@ -251,12 +252,12 @@ void SynchrotronSelfCompton::process(Candidate *c) const {
 }
 
 double SynchrotronSelfCompton::energyLoss(Vector3d pos, double E) const {
-	double B = field -> getField(pos).getR() / gauss;
+	double B = field -> getBrmsAtPosition(pos) / gauss;
 	double beta = 8e-17 * (uRad + 6e11 * pow_integer<2>(B) / 8 / M_PI) / GeV * second;
 	return beta * E * E;
 }
 
-void SynchrotronSelfCompton::setMagneticField(ref_ptr<MagneticField> field) {
+void SynchrotronSelfCompton::setMagneticField(ref_ptr<ModulatedTurbulentField> field) {
 	this -> field = field;
 }
 

@@ -1,4 +1,4 @@
-#ifndef CRPROPA_MODULATEDTURBULENTFIELD1
+#ifndef CRPROPA_MODULATEDTURBULENTFIELD
 #define CRPROPA_MODULATEDTURBULENTFIELD
 
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"

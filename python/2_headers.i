@@ -401,6 +401,10 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %template(RealisticJF12RefPtr) crpropa::ref_ptr<crpropa::RealisticJF12Field>;
 %include "crpropa/magneticField/RealisticJF12.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::ModulatedTurbulentField>;
+%template(ModulatedTurbulentFieldRefPtr) crpropa::ref_ptr<crpropa::ModulatedTurbulentField>;
+%include "crpropa/magneticField/turbulentField/ModulatedTurbulentField.h"
+
 %implicitconv crpropa::ref_ptr<crpropa::PhotonField>;
 %template(PhotonFieldRefPtr) crpropa::ref_ptr<crpropa::PhotonField>;
 
@@ -467,7 +471,6 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %include "crpropa/magneticField/CMZField.h"
 %include "crpropa/magneticField/turbulentField/TurbulentField.h"
 %include "crpropa/magneticField/turbulentField/GridTurbulence.h"
-%include "crpropa/magneticField/turbulentField/ModulatedTurbulentField.h"
 %include "crpropa/magneticField/turbulentField/SimpleGridTurbulence.h"
 %include "crpropa/magneticField/turbulentField/HelicalGridTurbulence.h"
 %include "crpropa/magneticField/turbulentField/PlaneWaveTurbulence.h"
