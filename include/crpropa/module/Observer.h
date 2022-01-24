@@ -278,6 +278,21 @@ public:
   DetectionState checkDetection(Candidate *candidate) const;
   std::string getDescription() const;
 };
+
+/**
+ * @class ObserverScaleHeight
+ * @brief Variable scale height for M51
+ * 
+ */
+class ObserverScaleHeight: public ObserverFeature {
+private:
+	std::vector<double> rBin, zBin;
+	double Rmax;
+public:
+	ObserverScaleHeight(double Rmax, std::string path);
+	void loadData(std::string path);
+	DetectionState checkDetection(Candidate *candidate) const;
+};
 /** @} */
 
 }
