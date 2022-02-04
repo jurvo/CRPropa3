@@ -11,6 +11,7 @@
 #include "crpropa/Vector3.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/Units.h"
+#include "crpropa/Common.h"
 
 namespace crpropa {
 
@@ -24,6 +25,7 @@ class AdvectionField: public Referenced {
 public:
 	virtual ~AdvectionField() {
 	}
+	AdvectionField() {}
 	virtual Vector3d getField(const Vector3d &position) const = 0;
 	virtual double getDivergence(const Vector3d &position) const = 0;
 };
@@ -177,6 +179,22 @@ public:
 
 	std::string getDescription() const;
 };
+
+class AdvectionFieldFromList: public AdvectionField {
+private:
+	std::vector<double> radius, velocity;
+	double scale;
+public:
+	/**
+	 * @brief Construct a new Advection Field From List object
+	 * @param filePath : path for Data with radius and velocity
+	 */
+	AdvectionFieldFromList(std::string filePath, double scale = 1);
+	void loadData(std::string filePath);
+	Vector3d getField(const Vector3d &position) const;
+	double getDivergence(const Vector3d &pos) const {return 0.;};
+};
+
 
 } // namespace crpropa
 
