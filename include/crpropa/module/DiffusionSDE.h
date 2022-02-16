@@ -94,6 +94,8 @@ public:
 	    double getAlpha() const; // outdated
 	    double getScale() const; // outdated
 
+		Vector3d getAdvectionFieldAtPosition(Vector3d &pos) const;
+
 	    std::string getDescription() const; // need to be updated
 
 };

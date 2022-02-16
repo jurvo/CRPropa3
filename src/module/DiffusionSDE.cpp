@@ -228,8 +228,8 @@ void DiffusionSDE::process(Candidate *candidate) const {
 
 	candidate->setNextStep(nextStep);
 
-    	// Debugging and Testing
-    	// Delete comments if additional information should be stored in candidate
+	// Debugging and Testing
+	// Delete comments if additional information should be stored in candidate
 	// This property "arcLength" can be interpreted as the effective arclength
 	// of the propagation along a magnetic field line.
 
@@ -341,6 +341,7 @@ void DiffusionSDE::setMagneticField(ref_ptr<MagneticField> f) {
 }
 
 void DiffusionSDE::setAdvectionField(ref_ptr<AdvectionField> f) {
+	// std::cout << "output from setAdvectionField with field "<< f->getField(Vector3d(0.)) << "\n";
 	advectionField = f;
 }
 
@@ -370,6 +371,10 @@ double DiffusionSDE::getAlpha() const {
 
 double DiffusionSDE::getScale() const {
 	return scale;
+}
+
+Vector3d DiffusionSDE::getAdvectionFieldAtPosition(Vector3d &pos) const{
+	return advectionField -> getField(pos);
 }
 
 std::string DiffusionSDE::getDescription() const {
