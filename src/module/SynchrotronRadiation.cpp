@@ -229,51 +229,5 @@ std::string SynchrotronRadiation::getDescription() const {
 		s << "thinning parameter: " << thinning; 
 	return s.str();
 }
-// -----------------------------------------------------------------------------------------------------------------------
-
-SynchrotronSelfCompton::SynchrotronSelfCompton(ref_ptr<ModulatedTurbulentField> field, double uRad) {
-	setMagneticField(field);
-	setURad(uRad);
-}
-
-void SynchrotronSelfCompton::process(Candidate *c) const {
-	int id = fabs(c -> current.getId());
-	
-	if (id != 11)
-		return; // only for electrons
-	
-	double E = c -> current.getEnergy();
-	Vector3d pos = c -> current.getPosition();
-	double dT = c -> getCurrentTimeStep(); 
-
-	double dEdT = energyLoss(pos, E);
-	double dE = dEdT * dT;
-	c -> current.setEnergy(E - dE);
-}
-
-double SynchrotronSelfCompton::energyLoss(Vector3d pos, double E) const {
-	double B = field -> getBrmsAtPosition(pos) / gauss;
-	double beta = 8e-17 * (uRad + 6e11 * pow_integer<2>(B) / 8 / M_PI) / GeV * second;
-	return beta * E * E;
-}
-
-void SynchrotronSelfCompton::setMagneticField(ref_ptr<ModulatedTurbulentField> field) {
-	this -> field = field;
-}
-
-void SynchrotronSelfCompton::setURad(double u) {
-	uRad = u;
-}
-
-double SynchrotronSelfCompton::getURad() const {
-	return uRad;
-}
-
-std::string SynchrotronSelfCompton::getDescription() const {
-	std::stringstream ss;
-	ss << "continues energy loss due to Synchrotron and Inverse Compton \n";
-	ss << "using a photon field with energy density uRad = " << uRad / eV * ccm << "eV / ccm \n"; 
-	return ss.str();
-}
 
 } // namespace crpropa

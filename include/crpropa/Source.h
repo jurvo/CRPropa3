@@ -547,34 +547,6 @@ public:
 	SourceTimePropagation(bool use);
 	void prepareCandidate(Candidate &candidate) const;
 };
-
-class SourceRadiusFromSFR: public SourceFeature{
-private:
-	std::vector<double> radius;
-	std::vector<double> sfr;
-	double sfrMax, rMax;  // maximal values for eficient sampling
-public:
-	SourceRadiusFromSFR(std::string filename);
-	void prepareParticle(ParticleState& state) const;
-	void loadData(std::string filename);
-	double getSFRMax();
-	double getRMax();
-};
-
-
-class SourceZpositionGauss: public SourceFeature {
-private:
-	double zMax;	// maximal range to sample
-	double h;		// scale-height
-public:
-	SourceZpositionGauss(double zMax, double h);
-	void prepareParticle(ParticleState& state) const;
-
-	double getZMax() const;
-	double getH() const;
-	void setZMax(double zMax);
-	void setH(double h);
-};
 /**  @} */ // end of group SourceFeature
 
 }// namespace crpropa

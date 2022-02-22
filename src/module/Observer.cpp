@@ -522,45 +522,6 @@ std::string ObserverDetectionLengthEvolution::getDescription() const {
 	return s.str();
 }
 
-ObserverScaleHeight::ObserverScaleHeight(double Rmax, std::string path){
-	this -> Rmax = Rmax;
-	loadData(path);
-}
 
-void ObserverScaleHeight::loadData(std::string path) {
-	std::ifstream infile(path.c_str());
-	if(!infile.good())
-		throw std::runtime_error("could not open file: " + path);
-
-	double r, z;
-	std::istream *in;
-	std::string line;
-	in = &infile;
-	while(std::getline(*in, line)){
-		std::stringstream stream(line);
-		if(stream.peek() == '#')
-			continue; // coments start with "#"
-
-		stream >> r >> z;
-		rBin.push_back(r);
-		zBin.push_back(z);
-	}
-	infile.close();
-}
-
-DetectionState ObserverScaleHeight::checkDetection(Candidate *candidate) const {
-	Vector3d pos = candidate -> current.getPosition();
-
-	double R = std::sqrt(pos.x * pos.x + pos.y * pos.y);
-	if (R > Rmax)
-		return DETECTED;
-
-	double zMax = interpolate(R, rBin, zBin);
-
-	if (fabs(pos.z) > zMax)
-		return DETECTED;
-
-	return NOTHING;
-}
 
 } // namespace crpropa
