@@ -460,7 +460,6 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %implicitconv crpropa::ref_ptr<crpropa::CylindricalProjectionMap>;
 %template(CylindricalProjectionMapRefPtr) crpropa::ref_ptr<crpropa::CylindricalProjectionMap>;
 
-%include "crpropa/advectionField/AdvectionFieldFromList.h";
 %include "crpropa/magneticField/MagneticFieldGrid.h"
 %feature("notabstract") QuimbyMagneticFieldAdapter;
 %include "crpropa/magneticField/QuimbyMagneticField.h"

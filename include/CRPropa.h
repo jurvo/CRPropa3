@@ -26,7 +26,6 @@
 #include "crpropa/Version.h"
 
 #include "crpropa/advectionField/AdvectionField.h"
-#include "crpropa/advectionField/AdvectionFieldFromList.h"
 
 #include "crpropa/module/AdiabaticCooling.h"
 #include "crpropa/module/Acceleration.h"
