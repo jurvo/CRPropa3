@@ -25,6 +25,9 @@
 #include "crpropa/Vector3.h"
 #include "crpropa/Version.h"
 
+#include "crpropa/advectionField/AdvectionField.h"
+#include "crpropa/advectionField/AdvectionFieldFromList.h"
+
 #include "crpropa/module/AdiabaticCooling.h"
 #include "crpropa/module/Acceleration.h"
 #include "crpropa/module/Boundary.h"
@@ -75,8 +78,6 @@
 #include "crpropa/magneticField/turbulentField/SimpleGridTurbulence.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
 #include "crpropa/magneticField/RealisticJF12.h"
-
-#include "crpropa/advectionField/AdvectionField.h"
 
 #include "crpropa/massDistribution/Density.h"
 #include "crpropa/massDistribution/Nakanishi.h"
