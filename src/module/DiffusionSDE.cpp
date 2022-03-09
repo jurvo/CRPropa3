@@ -41,11 +41,16 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double toleranc
   	setMaximumStep(maxStep);
   	setMinimumStep(minStep);
   	setTolerance(tolerance);
-  	setEpsilon(epsilon);
-  	setScale(1.);
-  	setAlpha(1./3.);
 	diffusionTensor = new QLTDiffusion(epsilon);
 	}
+
+DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<DiffusionTensor> diffusionTensor, double tolerance, double minStep, double maxStep) : 
+	magneticField(magneticField), diffusionTensor(diffusionTensor), minStep(0) 
+{
+	setMaximumStep(maxStep);
+	setMinimumStep(minStep);
+	setTolerance(tolerance);
+}
 
 DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
   	minStep(0)
@@ -55,11 +60,17 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<Advecti
 	setMaximumStep(maxStep);
 	setMinimumStep(minStep);
 	setTolerance(tolerance);
-	setEpsilon(epsilon);
-	setScale(1.);
-	setAlpha(1./3.);
 	diffusionTensor = new QLTDiffusion(epsilon);
-  	}
+}
+
+DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, ref_ptr<DiffusionTensor> diffusionTensor, double tolerance, double minStep, double maxStep) :
+	magneticField(magneticField), advectionField(advectionField), diffusionTensor(diffusionTensor), minStep(0) 
+{
+	setMaximumStep(maxStep);
+	setMinimumStep(minStep);
+	setTolerance(tolerance);
+}
+	
 
 void DiffusionSDE::process(Candidate *candidate) const {
 
@@ -314,28 +325,6 @@ void DiffusionSDE::setTolerance(double tol) {
 	tolerance = tol;
 }
 
-void DiffusionSDE::setEpsilon(double e) {
-	if ((e > 1) or (e < 0))
-		throw std::runtime_error(
-				"DiffusionSDE: epsilon not in range 0-1");
-	epsilon = e;
-}
-
-
-void DiffusionSDE::setAlpha(double a) {
-	if ((a > 2.) or (a < 0))
-		throw std::runtime_error(
-				"DiffusionSDE: alpha not in range 0-2");
-	alpha = a;
-}
-
-void DiffusionSDE::setScale(double s) {
-	if (s < 0)
-		throw std::runtime_error(
-				"DiffusionSDE: Scale error: Scale < 0");
-	scale = s;
-}
-
 void DiffusionSDE::setMagneticField(ref_ptr<MagneticField> f) {
 	magneticField = f;
 }
@@ -361,17 +350,6 @@ double DiffusionSDE::getTolerance() const {
 	return tolerance;
 }
 
-double DiffusionSDE::getEpsilon() const {
-	return epsilon;
-}
-
-double DiffusionSDE::getAlpha() const {
-	return alpha;
-}
-
-double DiffusionSDE::getScale() const {
-	return scale;
-}
 
 Vector3d DiffusionSDE::getAdvectionFieldAtPosition(Vector3d &pos) const{
 	return advectionField -> getField(pos);
@@ -384,17 +362,6 @@ std::string DiffusionSDE::getDescription() const {
 	s << "maxStep: " << maxStep / kpc  << " kpc, ";
 	s << "tolerance: " << tolerance << "\n";
 
-	if (epsilon != 0.1) {
-	  s << "epsilon: " << epsilon << ", ";
-	  }
-
-	if (alpha != 1./3.) {
-	  s << "alpha: " << alpha << "\n";
-	  }
-
-	if (scale != 1.) {
-	  s << "D_0: " << scale*6.1e24 << " m^2/s" << "\n";
-	  }
-
+	s << "using diffusion tensor: " << diffusionTensor -> getDescription() << "\n";
 	return s.str();
 }
