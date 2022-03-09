@@ -54,7 +54,7 @@ TEST(testQLTDiffusion, TestForEnergyScaling){
     EXPECT_NEAR(value3.y,  9.47706e25, 1e20);
     EXPECT_NEAR(value3.z,  9.47706e25, 1e20);
 }
-
+/*
 TEST(testQLTTurbulence, testQLTTurbulence){
     // background field
     double B = 10;  // field strenght
@@ -193,7 +193,7 @@ TEST(testQLTRigidity, testQLTRigidity){
     EXPECT_DOUBLE_EQ(tensNormPos.y, normPos.y);
     EXPECT_DOUBLE_EQ(tensNormPos.z, normPos.z);
 }
-
+*/
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

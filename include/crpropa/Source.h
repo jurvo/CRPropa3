@@ -259,6 +259,7 @@ See G. Case and D. Bhattacharya (1996) for the details of the distribution.
 */
 
 class SourceSNRDistribution: public SourceFeature {
+protected:
 	double R_earth; // parameter given by observation
 	double alpha; // parameter to shift the maximum in R direction
 	double beta; // parameter to shift the maximum in R direction

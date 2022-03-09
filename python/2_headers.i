@@ -475,7 +475,6 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %include "crpropa/magneticField/turbulentField/SimpleGridTurbulence.h"
 %include "crpropa/magneticField/turbulentField/HelicalGridTurbulence.h"
 %include "crpropa/magneticField/turbulentField/PlaneWaveTurbulence.h"
-%include "crpropa/magneticField/RealisticJF12.h"
 %include "crpropa/module/BreakCondition.h"
 %include "crpropa/module/Boundary.h"
 
@@ -712,12 +711,11 @@ class ParticleCollectorIterator {
 %include "crpropa/massDistribution/ConstantDensity.h"
 
 %include "crpropa/diffusionTensor/QuasiLinearDiffusion.h"
-%include "crpropa/diffusionTensor/TurbulentDiffusion.h"
-%include "crpropa/diffusionTensor/BohmDiffusion.h"
+// %include "crpropa/diffusionTensor/TurbulentDiffusion.h"
+// %include "crpropa/diffusionTensor/BohmDiffusion.h"
 
 %template(StepLengthModifierRefPtr) crpropa::ref_ptr<crpropa::StepLengthModifier>;
 %feature("director") crpropa::StepLengthModifier;
 %include "crpropa/module/Acceleration.h"
 
-
-
+%include "crpropa/Plugin.h"
