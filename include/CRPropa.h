@@ -87,8 +87,10 @@
 
 #include "crpropa/diffusionTensor/DiffusionTensor.h"
 #include "crpropa/diffusionTensor/QuasiLinearDiffusion.h"
-#include "crpropa/diffusionTensor/TurbulentDiffusion.h"
-#include "crpropa/diffusionTensor/BohmDiffusion.h"
+// #include "crpropa/diffusionTensor/TurbulentDiffusion.h"
+// #include "crpropa/diffusionTensor/BohmDiffusion.h"
+
+#include "crpropa/Plugin.h"
 
 /** \namespace crpropa
  *  @brief CRPropa is a public astrophysical simulation framework for propagating extraterrestrial ultra-high energy particles.

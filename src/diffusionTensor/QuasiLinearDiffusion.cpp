@@ -165,7 +165,7 @@ std::string QLTTurbulent::getDescription() const{
 }
 
 // QLTRigidity ------------------------------------------------------------------
-
+/*
 QLTRigidity::QLTRigidity(ref_ptr<MagneticField> magField, ref_ptr<TurbulentField> turbField, double kappa0, double alphaPara, double alphaPerp)
     : backgroundField(magField), kappa0(kappa0), alphaPara(alphaPara), alphaPerp(alphaPerp){
         setTurbulentField(turbField);
@@ -292,4 +292,30 @@ std::string QLTRigidity::getDescription() const{
         << "and norm turbulence at : \t"<< normEta << "\n"
         << "and norm red. rigidity at:\t"<< normRho << "\n";
     return ss.str();
+}
+*/
+
+
+DiffusionTensorQLTPowerlaw::DiffusionTensorQLTPowerlaw(double kappa, double normRig, double alpha) {
+        this->kappa0 = kappa;
+        this->normRig = normRig;
+        this->alpha = alpha;
+    }
+
+Vector3d DiffusionTensorQLTPowerlaw::getDiffusionKoefficent(Candidate *cand) const{
+    double rig = cand -> current.getEnergy() / cand -> current.getCharge();
+    double k = kappa0 * pow(fabs(rig) / normRig, alpha);
+    double beta = cand -> current.getBeta(); // v/c
+    // std::cout << "rig: " << rig << "\t" << "k: " << k << "\t" << "beta: "<< beta << "\n";
+    return Vector3d(beta * k);
+}
+
+std::string DiffusionTensorQLTPowerlaw::getDescription() const {
+    std::stringstream s;
+    s << "DiffusionTensorQLTPowerlaw: Powerlaw scaling of the diffusion coeficent in the QLT limit. The Diffusiontensor is scaled with the velocity. D = D0 * beta * (r /r0)^alpha. \n";
+    s << "Using values of: \n";
+    s << "D0 " << kappa0 << " m^2 / sec \n";
+    s << "r0 " << normRig / giga / volt << " GV \n";
+    s << "alpha " << alpha << "\n";
+    return s.str();
 }

@@ -74,7 +74,7 @@ class QLTTurbulent: public DiffusionTensor{
         std::string getDescription() const;
 };
 
-class QLTRigidity: public DiffusionTensor{
+/* class QLTRigidity: public DiffusionTensor{
     private:
         ref_ptr<MagneticField> backgroundField;
         ref_ptr<TurbulentField> turbulentField;
@@ -115,6 +115,15 @@ class QLTRigidity: public DiffusionTensor{
         double getNormRho() const;
         Vector3d getNormPos() const;
         std::string getDescription() const;
+};*/
+
+class DiffusionTensorQLTPowerlaw : public DiffusionTensor{
+private:
+    double kappa0, normRig, alpha;
+public:
+    DiffusionTensorQLTPowerlaw(double kappa0, double normRig, double alpha);
+    Vector3d getDiffusionKoefficent(Candidate *cand) const;
+    std::string getDescription() const;
 };
 
 } // namespace

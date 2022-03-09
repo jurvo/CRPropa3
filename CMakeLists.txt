@@ -423,6 +423,7 @@ add_library(crpropa SHARED
   src/magneticField/turbulentField/SimpleGridTurbulence.cpp
   src/magneticField/TF17Field.cpp
   src/magneticField/CMZField.cpp
+  src/magneticField/RealisticJF12.cpp
   src/advectionField/AdvectionField.cpp
   src/massDistribution/ConstantDensity.cpp
   src/massDistribution/Cordes.cpp
@@ -430,8 +431,11 @@ add_library(crpropa SHARED
   src/massDistribution/Massdistribution.cpp
   src/massDistribution/Nakanishi.cpp
   src/diffusionTensor/QuasiLinearDiffusion.cpp
-  src/diffusionTensor/TurbulentDiffusion.cpp
-  src/diffusionTensor/BohmDiffusion.cpp
+  src/diffusionTensor/DiffusionTensor.cpp
+  # src/diffusionTensor/TurbulentDiffusion.cpp
+  # src/diffusionTensor/BohmDiffusion.cpp
+
+  src/Plugin.cpp
 
   ${CRPROPA_EXTRA_SOURCES}
 
