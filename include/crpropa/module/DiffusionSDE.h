@@ -65,11 +65,11 @@ public:
 	@param scale 		Scaling factor for the diffusion coefficient D = scale*D_0
 */
 	    DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc), double epsilon=0.1);
-		//DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc), ref_ptr<DiffusionTensor> diffusionTensor);
+		DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<DiffusionTensor> diffusionTensor, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc));
 		
 
 	    DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc), double epsilon=0.1);
-		//DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc), ref_ptr<DiffusionTensor> diffusionTensor);
+		DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, ref_ptr<DiffusionTensor> diffusionTensor, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc));
 		
 
 	    void process(crpropa::Candidate *candidate) const;
@@ -80,9 +80,6 @@ public:
 	    void setMinimumStep(double minStep);
 	    void setMaximumStep(double maxStep);
 	    void setTolerance(double tolerance);
-	    void setEpsilon(double kappa); // outdated
-	    void setAlpha(double alpha); // outdated
-	    void setScale(double Scale); // outdated
 	    void setMagneticField(ref_ptr<crpropa::MagneticField> magneticField);
 	    void setAdvectionField(ref_ptr<crpropa::AdvectionField> advectionField);
 		void setDiffusionTensor(ref_ptr<crpropa::DiffusionTensor> diffusionTensor);
@@ -90,9 +87,6 @@ public:
 		double getMinimumStep() const;
 	    double getMaximumStep() const;
 	    double getTolerance() const;
-	    double getEpsilon() const; // outdated
-	    double getAlpha() const; // outdated
-	    double getScale() const; // outdated
 
 		Vector3d getAdvectionFieldAtPosition(Vector3d &pos) const;
 
