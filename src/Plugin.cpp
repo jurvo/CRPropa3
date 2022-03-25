@@ -6,7 +6,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-
+#include <iostream>
 
 
 using namespace crpropa;
@@ -272,4 +272,246 @@ void SourceSNRKissmann::prepareParticle(ParticleState& particle) const {
 	double phi = random.rand()*2*M_PI;
 	Vector3d pos(cos(phi)*RPos, sin(phi)*RPos, 0.);
 	particle.setPosition(pos);
+}
+
+// -----------------------------------------------------------------------------------------------------------------------
+/*
+SourceSpiralArm::SourceSpiralArm() : SourceFeature() {
+	alphaI = {0.242, 0.279, 0.249, 0.240};
+	aI = {0.246 * kpc, 0.608 * kpc, 0.449 * kpc, 0.378 * kpc};
+	sigmaRinner = 0.7 * kpc;
+	sigmaRouter = 3.1 * kpc;
+	sigmaPhi = 15 * deg;
+	sigmaZ = 70 * pc;
+	r3 = 2.9 * kpc;
+}
+
+
+double SourceSpiralArm::sourceDensity(double r, double phi, double z) {
+	double result = 0;
+	for(size_t i = 0; i < 4; i++){
+		double phiI = phiArm(r, i);
+		double arm = 1;
+		if(r < r3){
+			arm *= std::exp(- (r3 - r)/sigmaRinner);
+		}
+		else{
+			arm *= std::exp(- (r - r3)/sigmaRouter);
+		}
+		arm *= std::exp(- pow_integer<2>((phi - phiI)/sigmaPhi));
+		arm *= std::exp(- pow_integer<2>(z / sigmaZ) / 2);
+		result += arm;
+	}
+	return result;
+}
+
+double SourceSpiralArm::phiArm(double r, int i) {
+	return std::log(r / aI[i]) / alphaI[i];
+}
+*/
+
+// -----------------------------------------------------------------------------------------------------------------------
+
+Array4D::Array4D(int nX, int nY, int nZ, int nE){
+	this -> nX = nX;
+	this -> nY = nY;
+	this -> nZ = nZ;
+	this -> nE = nE;
+	fillGrid(); 
+	// std::cout << "created a new Array4D \n";
+}
+
+void Array4D::printHistSize() {
+	std::cout << "level 0:\t size: nX = " << nX << " vector size: " << data.size() << "\n";
+	std::cout << "level 1:\t size: nY = " << nY << " vector size: " << data[0].size() << "\n";
+	std::cout << "level 2:\t size: nZ = " << nZ << " vector size: " << data[0][0].size() << "\n";
+	std::cout << "level 3:\t size: nE = " << nE << " vector size: " << data[0][0][0].size() << "\n";
+} 
+
+void Array4D::fillGrid(){
+	data.clear();
+	std::vector<double> eVec;
+	// loop over inverse order
+	// innermost loop over energy
+	for(int iE = 0; iE < nE; iE ++){
+		eVec.push_back(0.);
+	}
+
+	// second inner loop for z-axis
+	std::vector< std::vector<double>> zVec;
+	for(int iZ = 0; iZ < nZ; iZ++) {
+		zVec.push_back(eVec);
+	}
+
+	// third inner loop for y-axis
+	std::vector< std::vector< std::vector<double>>> yVec;
+	for(int iY = 0; iY < nY; iY ++){
+		yVec.push_back(zVec);
+	}
+
+	// outer loop for x-axis
+	std::vector< std::vector< std::vector< std::vector<double>>>> xVec;
+	for(int iX = 0; iX < nX; iX++) {
+		xVec.push_back(yVec);
+	}
+	this-> data = xVec;
+}
+
+void Array4D::fillGrid(int nX, int nY, int nZ, int nE){
+	this -> nX = nX;
+	this -> nY = nY;
+	this -> nZ = nZ;
+	this -> nE = nE;
+	fillGrid();
+}
+
+void Array4D::setValue(double v, int iX, int iY, int iZ, int iE){
+	data[iX][iY][iZ][iE] = v;
+}
+
+ObserverHistogram4D::ObserverHistogram4D() {
+	hist = new Array4D(1, 1, 1, 1);
+	// std::cout << "observerHistogram4D started \n";
+}
+
+void ObserverHistogram4D::getIndexFromValue(double value, std::vector<double> grid, int &I) const {
+	// std::cout << "start finding position in Grid:\n";
+	for(int i = 0; i < grid.size() - 1; i++) {
+		if ((value <= grid[i+1]) & (value > grid[i])) {
+			I = i;
+			// std::cout << "\t" << "go to return statement at i = " << i << " for value: " << value 
+			// 	<< " and grid value: " << grid[i] << "," << grid[i+1] << "\n";
+			return;
+		}
+	}
+	std::cout << "\t" << "go to return after for loop and use: i = " << grid.size() - 1 <<"\n";
+	I =  grid.size() - 1;
+}
+
+void ObserverHistogram4D::saveHistogram(std::string path) {
+	std::ofstream outputFile;
+	outputFile.open(path);
+
+	// write header information
+	outputFile << "# Output of a 4D array. Axes contains X, Y, Z, E column\n";
+	outputFile << "# The fastes changing index is for the energy column (last column).";
+	outputFile << "# The slowest changing column has a row for each bin \n";
+	outputFile << "# column length are: \n";
+	outputFile << "# nX: " << hist -> nX << "\t xmin: " << xGrid[0] << "\t xmax: " << xGrid[xGrid.size() - 1] << "\n";
+	outputFile << "# nY: " << hist -> nY << "\t ymin: " << yGrid[0] << "\t ymax: " << yGrid[yGrid.size() - 1] << "\n";
+	outputFile << "# nZ: " << hist -> nZ << "\t zmin: " << zGrid[0] << "\t zmax: " << zGrid[zGrid.size() - 1] << "\n";
+	outputFile << "# nE: " << hist -> nE << "\n";
+	outputFile << "# Egrid:";
+	for (int i = 0; i < eGrid.size(); i++) {
+		outputFile << "\t" << eGrid[i];
+	}
+	outputFile << "\n";
+
+	// write all data
+	for (int iX = 0; iX <( hist -> nX); iX++) {
+		for (int iY = 0; iY < (hist -> nY); iY++){
+			for (int iZ = 0; iZ < (hist -> nZ); iZ++){
+				for (int iE = 0; iE < (hist -> nE); iE++){
+					outputFile << hist -> data[iX][iY][iZ][iE] << " ";
+				}
+			}
+		}
+		outputFile << "\n";
+	}
+
+	outputFile.close();
+}
+
+
+void ObserverHistogram4D::fillCandidateInHistogram(const double x, const double y, const double z, const double e, const double w, Array4D &data) const {
+	int iX, iY, iZ, iE;
+	getIndexFromValue(x, xGrid, iX);
+	getIndexFromValue(y, yGrid, iY);
+	getIndexFromValue(z, zGrid, iZ);
+	getIndexFromValue(e, eGrid, iE);
+
+	hist->data[iX][iY][iZ][iE] += w;
+}
+
+void ObserverHistogram4D::setXGrid(double min, double max, int n){
+	hist -> fillGrid(n, hist -> nY, hist -> nZ, hist -> nE);
+	xGrid.clear();
+	for(int i = 0; i <= n; i++){ 
+		xGrid.push_back(min + (max - min) / n * i);
+	}
+}
+
+void ObserverHistogram4D::setYGrid(double min, double max, int n){
+	hist -> fillGrid(hist -> nX, n, hist -> nZ, hist -> nE);
+	yGrid.clear();
+	for(int i = 0; i <= n; i++){
+		yGrid.push_back(min + (max - min) / n * i);
+	}
+}
+void ObserverHistogram4D::setZGrid(double min, double max, int n){
+	hist -> fillGrid(hist -> nX, hist -> nY, n, hist -> nE);
+	zGrid.clear();
+	for(int i = 0; i <= n; i++){
+		zGrid.push_back(min + (max - min) / n * i);
+	}
+}
+void ObserverHistogram4D::setEGrid(double min, double max, int n, bool scaleLog){
+	// std::cout << "create eGrid: \n";
+	hist -> fillGrid(hist -> nX, hist -> nY, hist -> nZ, n);
+	eGrid.clear();
+	if (scaleLog) { // log scaling
+		double lgMin = log10(min);
+		double lgMax = log10(max);
+		// std::cout << "log scaling in range: " << lgMin << " " << lgMax << "\n";
+		for(int i = 0; i <= n; i++) {
+			double lg = lgMin + (lgMax - lgMin) / n * i;
+			// std::cout << lg << "\t";
+			eGrid.push_back(pow(10, lg));
+		}
+	}
+	else { // linear scaling
+		for(int i = 0; i <= n; i++){
+			xGrid.push_back(min + (max - min) / n * i);
+		}
+	}
+}
+
+void ObserverHistogram4D::process(Candidate *cand) const {
+	// std::cout << "start process in hist module \n";
+	const double E = cand -> current.getEnergy();
+	Vector3d pos = cand -> current.getPosition();
+	// check for min and max of grid: 
+	if( (E < eGrid[0]) || (E > eGrid[eGrid.size() -1])) {return;}
+	if( (pos.x < xGrid[0]) || (pos.x > xGrid[xGrid.size() -1])) {return;}
+	if( (pos.y < yGrid[0]) || (pos.y > yGrid[yGrid.size() -1])) {return;}
+	if( (pos.z < zGrid[0]) || (pos.z > xGrid[zGrid.size() -1])) {return;}
+	
+
+
+	const double w = cand -> getWeight();
+	// std::cout << "get properties from candidate: -- done \n";
+	int iX, iY, iZ, iE;
+	getIndexFromValue(pos.x, xGrid, iX);
+	getIndexFromValue(pos.y, yGrid, iY);
+	getIndexFromValue(pos.z, zGrid, iZ);
+	getIndexFromValue(E, eGrid, iE);
+
+	// std::cout << "get index done: (" << iX << "," << iY << "," << iZ << "," << iE << ")\n";
+	// hist -> printHistSize();
+	
+	// if((iX > (hist->nX)) || (iY > (hist -> nY)) || (iZ > (hist -> nZ)) || (iE >(hist -> nE))) {
+	// 	std::stringstream ss;
+	// 	ss << "index not okay. Index is (" << iX << "," << iY << "," << iZ << "," << iE<< ")\n";
+	// 	ss << "maximal array size is (" << hist-> nX << "," << hist -> nY << "," << (hist -> nZ) << "," << (hist-> nE) << ")\n";
+	// 	ss << "candidate: " << cand -> getDescription()<<"\n";
+	// 	ss << "\t zGrid: ";
+	// 	for(int i = 0; i < zGrid.size(); i++){
+	// 		ss << "  " << zGrid[i];
+	// 	}
+	// 	ss << "\n";
+	// 	throw std::runtime_error(ss.str());
+	// }
+
+	double w0 = hist -> data[iX][iY][iZ][iE];
+	hist -> setValue(w0 + w, iX, iY, iZ, iE);
 }

@@ -117,5 +117,51 @@ public:
 	void prepareParticle(ParticleState& particle) const;
 };
 
+/*class SourceSpiralArm: public SourceFeature {
+private:
+	double r3; // parameter that allow a cusp in the inner Galaxy
+	double sigmaRinner, sigmaRouter, sigmaPhi, sigmaZ; // parameter for scalelength of the spiral arm
+	std::vector<double> aI, alphaI; // parameter for each spiral arm;
+
+public:
+	SourceSpiralArm();
+	void prepareParticle(ParticleState &particle) const;
+	double phiArm(double r, int i);
+	double sourceDensity(double r, double phi, double z);
+};*/
+
+// -----------------------------------------------------------------------------------------------------------------------
+
+class Array4D: public Referenced {
+public:
+	Array4D(int nX, int nY, int nZ, int nE);
+	int nX, nY, nZ, nE;
+	std::vector< std::vector< std::vector< std::vector<double>>>> data;
+	void fillGrid();
+	void fillGrid(int nX, int nY, int nZ, int nE);
+	void setValue(double value, int iX, int iY, int iZ, int iE);
+	std::vector<double> xGrid, yGrid, zGrid, eGrid;
+	void printHistSize();
+};
+
+class ObserverHistogram4D: public Module {
+public:
+	
+	std::vector<double> xGrid, yGrid, zGrid, eGrid;
+	ref_ptr<Array4D> hist;
+	double weightSum = 0;
+	void getIndexFromValue(double value, std::vector<double> grid, int &i) const;
+
+	ObserverHistogram4D();
+	void saveHistogram(std::string path);
+	void fillCandidateInHistogram(const double x, const double y, const double z, const double energy, const double w, Array4D &data) const;
+	void process(Candidate *cand) const;
+	
+	void setXGrid(double min, double max, int nX);
+	void setYGrid(double min, double max, int nY);
+	void setZGrid(double min, double max, int nZ);
+	void setEGrid(double min, double max, int nE, bool scaleLog = true);
+};
+
 
 #endif // CRPROPA_PLUGIN_H
