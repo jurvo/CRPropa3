@@ -47,13 +47,6 @@ private:
 	    double minStep; // minStep/c_light is the minimum integration timestep
 	    double maxStep; // maxStep/c_light is the maximum integration timestep
 	    double tolerance; // tolerance is criterion for step adjustment. Step adjustment takes place when the tangential vector of the magnetic field line is calculated.
-	    double epsilon; // ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
-	    double alpha; // power law index of the energy dependent diffusion coefficient: D\propto E^alpha
-	    double scale; // scaling factor for the diffusion coefficient D = scale*D_0
-		double eta0; // reference tubulencelevel at earth
-		double rho0; // reduced rigility for R = 4*GV
-		double lc = 60*pc; // coheration length for the Milky Way
-
 
 public:
 /** Constructor
@@ -67,7 +60,6 @@ public:
 	    DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc), double epsilon=0.1);
 		DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<DiffusionTensor> diffusionTensor, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc));
 		
-
 	    DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc), double epsilon=0.1);
 		DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, ref_ptr<DiffusionTensor> diffusionTensor, double tolerance = 1e-4, double minStep=(10*pc), double maxStep=(1*kpc));
 		

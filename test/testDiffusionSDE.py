@@ -158,10 +158,7 @@ class DiffusionOneDirection(unittest.TestCase):
         self.assertEqual(self.Dif.getTolerance(), self.precision)
         self.assertEqual(self.Dif.getMinimumStep(), self.minStep)
         self.assertEqual(self.Dif.getMaximumStep(), self.maxStep)
-        self.assertEqual(self.Dif.getEpsilon(), self.epsilon)
-        self.assertEqual(self.Dif.getAlpha(), 1./3.) # default Kolmogorov diffusion
-        self.assertEqual(self.Dif.getScale(), 1.) # default D(4GeV) = 6.1e28 cm^2/s
-
+        
     def test_NeutralPropagation(self):
         c = crpropa.Candidate()
         c.current.setId(crpropa.nucleusId(1,0))
@@ -239,7 +236,7 @@ class DiffusionOneDirection(unittest.TestCase):
     def test_DiffusionEnergy10TeV(self):
         x, y, z = [], [], []
         E = 10 * TeV
-        D = self.Dif.getScale()*6.1e24*(E/(4*GeV))**self.Dif.getAlpha()
+        D = 6.1e24*(E/(4*GeV))**(1./3)
         L_max = 50 * kpc
         std_exp = np.sqrt(2*D*L_max/c_light)
         mean_exp = 0.
@@ -280,7 +277,7 @@ class DiffusionOneDirection(unittest.TestCase):
     def test_DiffusionEnergy1PeV(self):
         x, y, z = [], [], []
         E = 1 * TeV
-        D = self.Dif.getScale()*6.1e24*(E/(4*GeV))**self.Dif.getAlpha()
+        D = 6.1e24*(E/(4*GeV))**(1./3)
         L_max = 50 * kpc
         std_exp = np.sqrt(2*D*L_max/c_light)
         mean_exp = 0.
@@ -320,7 +317,7 @@ class DiffusionOneDirection(unittest.TestCase):
     def test_DiffusionEnergy100PeV(self):
         x, y, z = [], [], []
         E = 10 * PeV
-        D = self.Dif.getScale()*6.1e24*(E/(4*GeV))**self.Dif.getAlpha()
+        D = 6.1e24*(E/(4*GeV))**(1./3)
         L_max = 50 * kpc
         std_exp = np.sqrt(2*D*L_max/c_light)
         mean_exp = 0.
@@ -361,7 +358,7 @@ class DiffusionOneDirection(unittest.TestCase):
     def test_FullTransport(self):
         x, y, z = [], [], []
         E = 10 * TeV
-        D = self.DifAdv.getScale()*6.1e24*(E/(4*GeV))**self.DifAdv.getAlpha()
+        D = 6.1e24*(E/(4*GeV))**(1./3)
         L_max = 50 * kpc
         epsilon = 0.1
         advSpeed = 1e6
