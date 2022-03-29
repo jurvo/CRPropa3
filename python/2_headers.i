@@ -719,3 +719,4 @@ class ParticleCollectorIterator {
 %include "crpropa/module/Acceleration.h"
 
 %include "crpropa/Plugin.h"
+%include "crpropa/Plugin_Kissmann.h"

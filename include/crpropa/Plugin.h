@@ -104,18 +104,7 @@ public:
 //     void loadData(std::string path);    
 // };
 
-class SourceSNRKissmann: public SourceFeature {
-private:
-	double R_earth = 8.5 * kpc;
-	double R_max = 20 * kpc;
-	double alpha = 0.475063;
-    double beta = 2.16570;
-	double frMax = pow(alpha/beta, alpha)*exp(beta - alpha);
-public:
-	SourceSNRKissmann();
-	double f_r(double r) const;
-	void prepareParticle(ParticleState& particle) const;
-};
+
 
 /*class SourceSpiralArm: public SourceFeature {
 private:

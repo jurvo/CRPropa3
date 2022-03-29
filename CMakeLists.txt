@@ -436,6 +436,7 @@ add_library(crpropa SHARED
   # src/diffusionTensor/BohmDiffusion.cpp
 
   src/Plugin.cpp
+  src/Plugin_Kissmann.cpp
 
   ${CRPROPA_EXTRA_SOURCES}
 

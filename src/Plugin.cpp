@@ -8,7 +8,6 @@
 #include <sstream>
 #include <iostream>
 
-
 using namespace crpropa;
 
 // ----------------------------------------------------------------------------
@@ -244,35 +243,7 @@ Vector3d AdvectionFieldFromList::getField(Vector3d &pos) const {
     return Vector3d(0., 0., v);
 }*/
 
-// -----------------------------------------------------------------------------------------------------------------------
 
-SourceSNRKissmann::SourceSNRKissmann() : SourceFeature(){
-}
-
-double SourceSNRKissmann::f_r(double r) const{
-	if(r>15*kpc)
-		return 0;
-	if (r > 10 * kpc)
-		r = 10 * kpc;
-		
-	return pow(r / R_earth, alpha) * std::exp(- beta * (r - R_earth) / R_earth); 
-}
-
-void SourceSNRKissmann::prepareParticle(ParticleState& particle) const {
-  	Random &random = Random::instance();
-	double RPos;
-	while (true){
-		RPos = random.rand()*R_max;
-		double fTest = random.rand()*frMax;
-		double fR=f_r(RPos);
-		if (fTest<=fR) {
-			break;
-		}
-	}
-	double phi = random.rand()*2*M_PI;
-	Vector3d pos(cos(phi)*RPos, sin(phi)*RPos, 0.);
-	particle.setPosition(pos);
-}
 
 // -----------------------------------------------------------------------------------------------------------------------
 /*
