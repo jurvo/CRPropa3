@@ -65,6 +65,9 @@ void MaximumTrajectoryLength::process(Candidate *c) const {
 
 //*****************************************************************************
 MaximumTime::MaximumTime(double time): Tmax(time) {
+	std::stringstream ss; 
+	ss << "Breakcondition: Maximum Time = " << time / kyr << "kyr \n";
+	description = ss.str();
 }
 
 void MaximumTime::setMaximumTime(double time) {

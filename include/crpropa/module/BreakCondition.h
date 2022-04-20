@@ -32,6 +32,7 @@ public:
 
 class MaximumTime: public AbstractCondition {
 	double Tmax;
+	std::string description;
 public:
 	MaximumTime(double time = 0);
 	void setMaximumTime(double time);
