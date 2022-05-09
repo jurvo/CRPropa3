@@ -1,6 +1,7 @@
 #include <crpropa/Plugin_Kissmann.h>
 #include <crpropa/Common.h>
 
+#include <kiss/logger.h>
 #include <cmath>
  
 using namespace crpropa;
@@ -72,7 +73,9 @@ double SourceSpiralArm::sourceDensity(Vector3d pos) const {
 void SourceSpiralArm::prepareParticle(ParticleState &particle) const {
     Random &random = Random::instance();
     Vector3d pos;
-    while(true) {
+    int nMax = 1000000; // maximal 1 million trys
+    bool finish = false;
+    for(int i = 0; i < nMax; i++) {
         double r = random.rand(rMax);
         double phi = random.rand() * 2 * M_PI;
         pos.x = r * std::cos(phi);
@@ -82,11 +85,17 @@ void SourceSpiralArm::prepareParticle(ParticleState &particle) const {
         double test = random.rand();
         double crit = sourceDensity(pos);
         if(test <= crit) {
+            finish = true;
             break;
         }
     }
-
-    particle.setPosition(pos);
+    KISS_LOG_WARNING << "not possible to find a position";
+    if(finish){
+        particle.setPosition(pos);
+    }
+    else{
+        prepareParticle(particle); // repeat 
+    }
 }
 
 void SourceSpiralArm::setRMax(double r) {
