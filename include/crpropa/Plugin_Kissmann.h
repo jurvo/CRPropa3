@@ -7,6 +7,8 @@
 #include <crpropa/Units.h>
 #include <crpropa/Vector3.h>
 
+#include <cmath>
+
 using namespace crpropa;
 
 class SourceSNRKissmann: public SourceFeature {
@@ -44,6 +46,18 @@ public:
 
     double getRMax();
     double getZMax();
+};
+
+class CheckNaNModule: public Module {
+    public:
+    void process(Candidate *cand) const;
+};
+
+class SourceEnergyNaN: public SourceFeature{
+    public:
+    void prepareParticle(ParticleState &particle) const {
+        particle.setEnergy(NAN);
+    }
 };
 
 #endif // CRPROPA_KISSMANN_H
