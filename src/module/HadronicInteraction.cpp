@@ -14,10 +14,12 @@
 namespace crpropa {
 
 
-HadronicInteraction::HadronicInteraction(ref_ptr<Density> massDensity, double limit, int flag) {
+HadronicInteraction::HadronicInteraction(ref_ptr<Density> massDensity, double limit, int flag, bool photons, bool pions) {
 	this->massDensity = massDensity;
 	this->limit = limit;
 	this->flag_Function = flag;
+	this->createPhotons = photons;
+	this->createPions = pions;
 	setDescription("HadronicInteraction");
 }
 
@@ -720,7 +722,12 @@ double HadronicInteraction::xSection(double ePrimary) const {
 }
 
 double HadronicInteraction::spectrumPion(double x, double ePrimary) const {
-	return 0;
+	if (flag_Function == 0) {
+		return KellnerSpectrumPion(x, ePrimary);
+	}
+	else {
+		return 0; // not implementet for other models
+	}
 }
 
 double HadronicInteraction::spectrumPhoton(double x, double ePrimary) const {
@@ -815,8 +822,10 @@ void HadronicInteraction::performInteraction(Candidate *candidate) const {
 			for (int i = 0; i < nPhoton; ++i) {
 				const double ePhoton = sampleParticleEnergy([this, eAvailable](double x) { return this->spectrumPhoton(x, eAvailable); }, eAvailable);
 				if (eAvailable >= ePhoton) {
-					outPartID.push_back(22);
-					outPartE.push_back(ePhoton);
+					if(createPhotons){
+						outPartID.push_back(22);
+						outPartE.push_back(ePhoton);
+					}
 					eAvailable -= ePhoton;
 				} else {
 					break;
@@ -834,13 +843,14 @@ void HadronicInteraction::performInteraction(Candidate *candidate) const {
 				const double ePiPlus = sampleParticleEnergy([this, eAvailable](double x) { return this->spectrumPion(x, eAvailable); }, eAvailable);
 				const double ePiMinus = sampleParticleEnergy([this, eAvailable](double x) { return this->spectrumPion(x, eAvailable); }, eAvailable);
 				if (eAvailable >= ePiPlus + ePiMinus) {
-					outPartID.push_back(211);
-					outPartE.push_back(ePiPlus);
-					eAvailable -= ePiPlus;
-
-					outPartID.push_back(-211);
-					outPartE.push_back(ePiMinus);
+					if(createPions){
+						outPartID.push_back(211);
+						outPartE.push_back(ePiPlus);
+						outPartID.push_back(-211);
+						outPartE.push_back(ePiMinus);
+					}
 					eAvailable -= ePiMinus;
+					eAvailable -= ePiPlus;
 				} else {
 					break;
 				}

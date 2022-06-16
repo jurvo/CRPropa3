@@ -36,10 +36,13 @@ protected:
 
 	int flag_Function=0; // 0: Kellner, 1: Kamae, 2: Dermer, 3: Kamae+Kellner, 4: Dermer+Kellner, 5: Dermer+Kamae+Kellner
 	double EnergySplit = 100*GeV;
+
+	bool createPhotons;
+	bool createPions;
 public:
 	HadronicInteraction(
 		ref_ptr<Density> density,
-		double limit = 0.1, int flag = 0);
+		double limit = 0.1, int flag = 0, bool photons = true, bool pions = false);
 	void setMassDensity(ref_ptr<Density> density);
 	void setLimit(double limit);
 	void process(Candidate *candidate) const;
