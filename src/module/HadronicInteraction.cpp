@@ -66,7 +66,9 @@ double HadronicInteraction::KellnerSpectrumPhoton(double x, double ePrimary) con
 }
 
 double HadronicInteraction::KellnerXSection(double ePrimary) const {
-	// Kellner+ 2006, eqn. 73
+  if (ePrimary < 0.1 * TeV)
+    return 0.;
+  // Kellner+ 2006, eqn. 79
 	const double L = std::log(ePrimary / TeV);
 	const double A = 1 - std::pow(1.22 * 1e-3 * TeV / ePrimary, 4);
 	return (34.3 + 1.88 * L + 0.25 * L * L) * A * A * 1e-31;
