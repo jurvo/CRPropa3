@@ -47,6 +47,7 @@
 #include "crpropa/module/PhotoPionProduction.h"
 #include "crpropa/module/PhotonEleCa.h"
 #include "crpropa/module/PhotonOutput1D.h"
+#include "crpropa/module/PionDecay.h"
 #include "crpropa/module/PropagationBP.h"
 #include "crpropa/module/PropagationCK.h"
 #include "crpropa/module/Redshift.h"
