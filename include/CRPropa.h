@@ -43,6 +43,7 @@
 #include "crpropa/module/Observer.h"
 #include "crpropa/module/OutputShell.h"
 #include "crpropa/module/ParticleCollector.h"
+#include "crpropa/module/ParticleDecay.h"
 #include "crpropa/module/PhotoDisintegration.h"
 #include "crpropa/module/PhotoPionProduction.h"
 #include "crpropa/module/PhotonEleCa.h"
