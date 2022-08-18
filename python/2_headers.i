@@ -701,6 +701,7 @@ class ParticleCollectorIterator {
 %template(StepLengthModifierRefPtr) crpropa::ref_ptr<crpropa::StepLengthModifier>;
 %feature("director") crpropa::StepLengthModifier;
 %include "crpropa/module/Acceleration.h"
+%include "crpropa/module/PionDecay.h"
 
 
 
