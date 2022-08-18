@@ -405,7 +405,7 @@ add_library(crpropa SHARED
   src/module/Output.cpp
   src/module/OutputShell.cpp
   src/module/ParticleCollector.cpp
-  src/module/ParticleDecay.cpp
+  src/module/PionDecay.cpp
   src/module/PhotoDisintegration.cpp
   src/module/PhotoPionProduction.cpp
   src/module/PhotonEleCa.cpp

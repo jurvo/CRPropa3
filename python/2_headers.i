@@ -564,7 +564,7 @@ using namespace crpropa;   // for usage of namespace in header files, necessary
 %include "crpropa/module/EMInverseComptonScattering.h"
 %include "crpropa/module/SynchrotronRadiation.h"
 %include "crpropa/module/AdiabaticCooling.h"
-%include "crpropa/module/ParticleDecay.h"
+%include "crpropa/module/PionDecay.h"
 
 %template(IntSet) std::set<int>;
 %include "crpropa/module/Tools.h"
@@ -701,7 +701,7 @@ class ParticleCollectorIterator {
 %template(StepLengthModifierRefPtr) crpropa::ref_ptr<crpropa::StepLengthModifier>;
 %feature("director") crpropa::StepLengthModifier;
 %include "crpropa/module/Acceleration.h"
-%include "crpropa/module/ParticleDecay.h"
+%include "crpropa/module/PionDecay.h"
 
 
 
