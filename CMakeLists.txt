@@ -410,6 +410,7 @@ add_library(crpropa SHARED
   src/module/PhotoPionProduction.cpp
   src/module/PhotonEleCa.cpp
   src/module/PhotonOutput1D.cpp
+  src/module/PionDecay.cpp
   src/module/PropagationBP.cpp
   src/module/PropagationCK.cpp
   src/module/Redshift.cpp
