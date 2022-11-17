@@ -20,7 +20,7 @@ const double bs[] = { 2825. / 27648., 0., 18575. / 48384., 13525.
 
 DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double tolerance,
 				 double minStep, double maxStep, double epsilon) :
-	minStep(0)
+	minStep(0) // C++ Synatx: Why is the minStep(0) needed?
 {
   	setMagneticField(magneticField);
   	setMaximumStep(maxStep);
@@ -51,7 +51,8 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	ParticleState &current = candidate->current;
 	candidate->previous = current;
 
-	double h = clip(candidate->getNextStep(), minStep, maxStep) / c_light;
+	double h = clip(candidate->getNextStep(), minStep, maxStep) / c_light; // clip is limiting the value into the bounds of min and maxstep?
+	// h is the step size?
 	Vector3d PosIn = current.getPosition();
 	Vector3d DirIn = current.getDirection();
 
@@ -113,7 +114,8 @@ void DiffusionSDE::process(Candidate *candidate) const {
 
     // Check for better break condition
 	} while (r > 1 && fabs(propTime) >= minStep/c_light);
-
+	// minimize PosErr for the next step (non-diffusive?) and count the steps?
+	// not saving the result?
 
 	size_t stepNumber = pow(2, counter-1);
 	double allowedTime = TStep * sqrt(h) / c_light / stepNumber;
@@ -124,6 +126,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 		tryStep(Start, PosOut, PosErr, z, allowedTime);
 		Start = PosOut;
 	}
+	// repeat the same procedure like before but safe the result? so "actully" doing the propagation?
 
     // Normalize the tangent vector
 	TVec = (PosOut-PosIn).getUnitVector();
@@ -169,7 +172,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	}
 
     // Integration of the SDE with a Mayorama-Euler-method
-	Vector3d PO = PosOut + LinProp + (NVec * NStep + BVec * BStep) * sqrt(h) ;
+	Vector3d PO = PosOut + LinProp + (NVec * NStep + BVec * BStep) * sqrt(h) ; // Diffusive step?
 
     // Throw error message if something went wrong with propagation.
     // Deactivate candidate.
