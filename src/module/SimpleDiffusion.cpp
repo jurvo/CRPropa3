@@ -55,12 +55,11 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 void SimpleDiffusion::process(Candidate *candidate) const {
 
     // save the new previous particle state
-
 	ParticleState &current = candidate->current;
 	candidate->previous = current;
 
-	double h = clip(candidate->getNextStep(), minStep, maxStep) / c_light; // clip is limiting the value into the bounds of min and maxstep
 	// h is the time step
+	double h = clip(candidate->getNextStep(), minStep, maxStep) / c_light;
 	Vector3d PosIn = current.getPosition();
 	Vector3d DirIn = current.getDirection();
 
@@ -104,11 +103,11 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	Vector3d NVec(0.);
 	Vector3d BVec(0.);
 
+	Vector3d PosOut = Vector3d(0.);
 	Vector3d DirOut = Vector3d(0.);
 
-
     // Normalize the tangent vector
-	TVec = magneticField.getField(PosIn).getUnitVector();
+	TVec = magneticField.getField(PosIn).getUnitVector(); // need to calculate with redshift?
 
     // Choose a random perpendicular vector as the Normal-vector.
     // Prevent 'nan's in the NVec-vector in the case of <TVec, NVec> = 0.
@@ -132,20 +131,20 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	double tTest = TVec.getR();
 	if (tTest != tTest) {
 		if (advectionField){
-			current.setPosition(Pos + LinProp);
+			current.setPosition(PosIn + LinProp);
 		}
 		else {
-			current.setPosition(Pos + DirIn*h*c_light);
+			current.setPosition(PosIn + DirIn*h*c_light);
 		}
 	 	candidate->setCurrentStep(h*c_light);
-		double newStep = 5*h*c_light; // why 5?
+		double newStep = 5 * h * c_light; // why 5?
 		newStep = clip(newStep, minStep, maxStep);
 	  	candidate->setNextStep(newStep);
 	  	return;
 	}
 
     // Integration of the SDE with a Mayorama-Euler-method aka the total step
-	Vector3d PO = PosOut + LinProp + (NVec * NStep + BVec * BStep) * sqrt(h);
+	Vector3d PO = PosIn + LinProp + (TVec * TStep + NVec * NStep + BVec * BStep) * sqrt(h);
 
     // Throw error message if something went wrong with propagation.
     // Deactivate candidate.
@@ -173,14 +172,8 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	current.setDirection(DirOut);
 	candidate->setCurrentStep(h * c_light);
 
-	double nextStep;
-	if (stepNumber>1){
-		nextStep = h*pow(stepNumber, -2.)*c_light;
-	}
-	else {
-		nextStep = 4 * h*c_light;
-	}
-
+	double nextStep = 4 * h * c_light; // why 4?
+	nextStep = clip(nextStep, minStep, maxStep);
 	candidate->setNextStep(nextStep);
 
     	// Debugging and Testing
