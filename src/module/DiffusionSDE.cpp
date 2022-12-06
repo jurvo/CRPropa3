@@ -52,7 +52,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	candidate->previous = current;
 
 	double h = clip(candidate->getNextStep(), minStep, maxStep) / c_light; // clip is limiting the value into the bounds of min and maxstep?
-	// h is the step size?
+	// h is the time step
 	Vector3d PosIn = current.getPosition();
 	Vector3d DirIn = current.getDirection();
 
@@ -114,19 +114,18 @@ void DiffusionSDE::process(Candidate *candidate) const {
 
     // Check for better break condition
 	} while (r > 1 && fabs(propTime) >= minStep/c_light);
-	// minimize PosErr for the next step (non-diffusive?) and count the steps?
-	// not saving the result?
+	// "timestep size control"
 
 	size_t stepNumber = pow(2, counter-1);
 	double allowedTime = TStep * sqrt(h) / c_light / stepNumber;
 	Vector3d Start = PosIn;
 	Vector3d PosOut = Vector3d(0.);
 	Vector3d PosErr = Vector3d(0.);
+	// magnetic field line integration
 	for (size_t j=0; j<stepNumber; j++) {
 		tryStep(Start, PosOut, PosErr, z, allowedTime);
 		Start = PosOut;
 	}
-	// repeat the same procedure like before but safe the result? so "actully" doing the propagation?
 
     // Normalize the tangent vector
 	TVec = (PosOut-PosIn).getUnitVector();
@@ -171,8 +170,8 @@ void DiffusionSDE::process(Candidate *candidate) const {
 		driftStep(PosIn, LinProp, h);
 	}
 
-    // Integration of the SDE with a Mayorama-Euler-method
-	Vector3d PO = PosOut + LinProp + (NVec * NStep + BVec * BStep) * sqrt(h) ; // Diffusive step?
+    // Integration of the SDE with a Mayorama-Euler-method aka total step
+	Vector3d PO = PosOut + LinProp + (NVec * NStep + BVec * BStep) * sqrt(h) ;
 
     // Throw error message if something went wrong with propagation.
     // Deactivate candidate.
