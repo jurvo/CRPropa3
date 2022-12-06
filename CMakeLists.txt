@@ -412,6 +412,7 @@ add_library(crpropa SHARED
   src/module/PropagationCK.cpp
   src/module/Redshift.cpp
   src/module/RestrictToRegion.cpp
+  src/module/SimpleDiffusion.cpp
   src/module/SimplePropagation.cpp
   src/module/SynchrotronRadiation.cpp
   src/module/TextOutput.cpp
