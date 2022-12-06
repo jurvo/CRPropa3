@@ -107,7 +107,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	Vector3d DirOut = Vector3d(0.);
 
     // Normalize the tangent vector
-	TVec = magneticField.getField(PosIn).getUnitVector(); // need to calculate with redshift?
+	TVec = magneticField->getField(PosIn).getUnitVector(); // need to calculate with redshift?
 
     // Choose a random perpendicular vector as the Normal-vector.
     // Prevent 'nan's in the NVec-vector in the case of <TVec, NVec> = 0.
