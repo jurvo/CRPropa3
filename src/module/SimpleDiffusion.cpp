@@ -107,7 +107,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	Vector3d DirOut = Vector3d(0.);
 
     // Normalize the tangent vector
-	TVec = magneticField->getField(PosIn).getUnitVector(); // need to calculate with redshift?
+	TVec = magneticField->getField(PosIn, z).getUnitVector(); // Attention: Redshift is not used except for the magnitude of the field
 
     // Choose a random perpendicular vector as the Normal-vector.
     // Prevent 'nan's in the NVec-vector in the case of <TVec, NVec> = 0.
@@ -137,7 +137,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 			current.setPosition(PosIn + DirIn*h*c_light);
 		}
 	 	candidate->setCurrentStep(h*c_light);
-		double newStep = 5 * h * c_light; // why 5?
+		double newStep = 5 * h * c_light; // max new step from CK 
 		newStep = clip(newStep, minStep, maxStep);
 	  	candidate->setNextStep(newStep);
 	  	return;
@@ -172,8 +172,8 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	current.setDirection(DirOut);
 	candidate->setCurrentStep(h * c_light);
 
-	double nextStep = 4 * h * c_light; // why 4?
-	nextStep = clip(nextStep, minStep, maxStep);
+	double nextStep = 4 * h * c_light; // why 4? max new step from CK, but reduced to a power of two
+	nextStep = clip(nextStep, minStep, maxStep); // added this line, need more research
 	candidate->setNextStep(nextStep);
 
     	// Debugging and Testing
