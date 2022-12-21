@@ -435,6 +435,7 @@ add_library(crpropa SHARED
   src/massDistribution/Ferriere.cpp
   src/massDistribution/Massdistribution.cpp
   src/massDistribution/Nakanishi.cpp
+  src/massDistribution/RadialDensity.cpp
 
   ${CRPROPA_EXTRA_SOURCES}
 )
