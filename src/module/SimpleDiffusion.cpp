@@ -1,21 +1,5 @@
 #include "crpropa/module/SimpleDiffusion.h"
-
-
 using namespace crpropa;
-
-// Defining Cash-Karp coefficients
-const double a[] = { 0., 0., 0., 0., 0., 0., 1. / 5., 0., 0., 0., 0.,
-		0., 3. / 40., 9. / 40., 0., 0., 0., 0., 3. / 10., -9. / 10., 6. / 5.,
-		0., 0., 0., -11. / 54., 5. / 2., -70. / 27., 35. / 27., 0., 0., 1631.
-				/ 55296., 175. / 512., 575. / 13824., 44275. / 110592., 253.
-				/ 4096., 0. };
-
-const double b[] = { 37. / 378., 0, 250. / 621., 125. / 594., 0., 512.
-		/ 1771. };
-
-const double bs[] = { 2825. / 27648., 0., 18575. / 48384., 13525.
-		/ 55296., 277. / 14336., 1. / 4. };
-
 
 // Diffusion with a magnetic field that does not have curvature
 SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, double tolerance,
@@ -49,8 +33,12 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	// 1. magnetfeldlinien ohne Krümmung
 	// 1.1 Integrationen fallen weg
 	// 1.2 reduzierung des Diffusionstensor auf 2 Komponenten (senkrecht, parallele)
-	// 
-	// 2. Diffusiontensor auslagern (ähnlich zu Advektionsfeld)
+	// 		BTensor vereinfachen auf 2D
+	//		Tests sollten weiterhin durchlaufen
+
+	// 2. Diffusiontensor auslagern (ähnlich zu Advektionsfeld), Kopp, 2012, Gl. 18/19
+	//  	getBTensor, getDerivatveOfBTensor
+	//
 
 void SimpleDiffusion::process(Candidate *candidate) const {
 
@@ -107,7 +95,8 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	Vector3d DirOut = Vector3d(0.);
 
     // Normalize the tangent vector
-	TVec = magneticField->getField(PosIn, z).getUnitVector(); // Attention: Redshift is not used except for the magnitude of the field
+	TVec = magneticField->getField(PosIn, z).getUnitVector(); // Attention: Redshift is not used except for the magnitude of the field.
+	// What happens if magnetfic field is 0?
 
     // Choose a random perpendicular vector as the Normal-vector.
     // Prevent 'nan's in the NVec-vector in the case of <TVec, NVec> = 0.
@@ -200,6 +189,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 
 
 void SimpleDiffusion::driftStep(const Vector3d &pos, Vector3d &linProp, double h) const {
+	// add here: Drift step of diff coeff
 	Vector3d advField = getAdvectionFieldAtPosition(pos);
 	linProp += advField * h;
 	return;
