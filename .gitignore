@@ -13,6 +13,9 @@ lib/
 share/
 doc/api/
 
+include/healpix_base
+include/kiss
+
 cmake/CMakeCache.txt
 cmake/CMakeFiles/
 
@@ -24,3 +27,4 @@ cmake/CMakeFiles/
 *.dat
 *.ipynb_checkpoints
 *.idea
+.vscode/

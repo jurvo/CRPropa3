@@ -398,16 +398,19 @@ add_library(crpropa SHARED
   src/module/EMTripletPairProduction.cpp
   src/module/ElasticScattering.cpp
   src/module/ElectronPairProduction.cpp
+  src/module/HadronicInteraction.cpp
   src/module/HDF5Output.cpp
   src/module/NuclearDecay.cpp
   src/module/Observer.cpp
   src/module/Output.cpp
   src/module/OutputShell.cpp
   src/module/ParticleCollector.cpp
+  src/module/PionDecay.cpp
   src/module/PhotoDisintegration.cpp
   src/module/PhotoPionProduction.cpp
   src/module/PhotonEleCa.cpp
   src/module/PhotonOutput1D.cpp
+  src/module/PionDecay.cpp
   src/module/PropagationBP.cpp
   src/module/PropagationCK.cpp
   src/module/Redshift.cpp
