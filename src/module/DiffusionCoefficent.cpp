@@ -15,24 +15,23 @@ Vector3d DiffusionCoefficentList::getCoefficent(const Vector3d &position) const 
 	return b;
 }
 
-double DiffusionCoefficentList::getGradient(const Vector3d &position) const {
+double DiffusionCoefficentList::getDivergence(const Vector3d &position) const {
 	double D=0.;
 	// Work on default values for divergence or an error handling
 	for (int i = 0; i < coefficents.size(); i++)
-		D += coefficents[i]->getGradient(position);
+		D += coefficents[i]->getDivergence(position);
 	return D;
 }
 
 // ---- UniformDiffusionCoefficent ----
-UniformDiffusionCoefficent::UniformDiffusionCoefficent(const double value) :
-			value(value) {
+UniformDiffusionCoefficent::DiffusionCoefficent(double value) : value(value) {
 	}
 
 Vector3d UniformDiffusionCoefficent::getCoefficent(const Vector3d &position) const {
 	return value;
 	}
 
-double UniformDiffusionCoefficent::getGradient(const Vector3d &position) const {
+double UniformDiffusionCoefficent::getDivergence(const Vector3d &position) const {
 	return 0.;
 	}
 

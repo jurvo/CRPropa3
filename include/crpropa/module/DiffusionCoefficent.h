@@ -23,7 +23,7 @@ public:
 	virtual ~DiffusionCoefficent() {
 	}
 	virtual Vector3d getCoefficent(const Vector3d &position) const = 0;
-	virtual double getGradient(const Vector3d &position) const = 0;
+	virtual double getDivergence(const Vector3d &position) const = 0;
 };
 
 
@@ -36,7 +36,7 @@ class DiffusionCoefficentList: public DiffusionCoefficent {
 public:
 	void addCoefficent(ref_ptr<DiffusionCoefficent> coefficent);
 	Vector3d getCoefficent(const Vector3d &position) const;
-	double getGradient(const Vector3d &position) const;
+	double getDivergence(const Vector3d &position) const;
 };
 
 
@@ -45,11 +45,11 @@ public:
  @brief Spatial independent diffusion coefficent 
  */
 class UniformDiffusionCoefficent: public DiffusionCoefficent {
-	Vector3d value;
+	double value;
 public:
 	UniformDiffusionCoefficent(const Vector3d &value);
 	Vector3d getCoefficent(const Vector3d &position) const;
-	double getGradient(const Vector3d &position) const;
+	double getDivergence(const Vector3d &position) const;
 
 	std::string getDescription() const;
 };
