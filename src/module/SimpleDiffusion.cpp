@@ -84,12 +84,11 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	}
 
 	double TStep = BTensor[0] * eta[0];
-	double NStep = BTensor[4] * eta[1];
-	double BStep = BTensor[8] * eta[2];
+	double PStep = BTensor[4] * eta[1];
+	//double BStep = BTensor[8] * eta[2];
 
 	Vector3d TVec(0.);
-	Vector3d NVec(0.);
-	Vector3d BVec(0.);
+	Vector3d PVec(0.);
 
 	Vector3d PosOut = Vector3d(0.);
 	Vector3d DirOut = Vector3d(0.);
@@ -100,14 +99,14 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 
     // Choose a random perpendicular vector as the Normal-vector.
     // Prevent 'nan's in the NVec-vector in the case of <TVec, NVec> = 0.
-	while (NVec.getR()==0.){
+	while (PVec.getR()==0.){
 	  	Vector3d RandomVector = Random::instance().randVector();
-	  	NVec = TVec.cross( RandomVector );
+	  	PVec = TVec.cross( RandomVector );
 	}
-	NVec = NVec.getUnitVector();
+	PVec = PVec.getUnitVector();
 
     // Calculate the Binormal-vector
-	BVec = (TVec.cross(NVec)).getUnitVector();
+	// BVec = (TVec.cross(NVec)).getUnitVector();
 
 	// Calculate the advection step
 	Vector3d LinProp(0.);
@@ -133,7 +132,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	}
 
     // Integration of the SDE with a Mayorama-Euler-method aka the total step
-	Vector3d PO = PosIn + LinProp + (TVec * TStep + NVec * NStep + BVec * BStep) * sqrt(h);
+	Vector3d PO = PosIn + LinProp + (TVec * TStep + PVec * sqrt(2) * PStep) * sqrt(h);
 
     // Throw error message if something went wrong with propagation.
     // Deactivate candidate.
@@ -146,10 +145,10 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 		  	<< "PosIn = " << PosIn << "\n"
 		  	<< "TVec = " << TVec << "\n"
 		  	<< "TStep = " << std::abs(TStep) << "\n"
-		  	<< "NVec = " << NVec << "\n"
-		  	<< "NStep = " << NStep << "\n"
-		  	<< "BVec = " << BVec << "\n"
-		  	<< "BStep = " << BStep << "\n"
+		  	<< "NVec = " << PVec << "\n"
+		  	<< "NStep = " << PStep << "\n"
+//		  	<< "BVec = " << BVec << "\n"
+//		  	<< "BStep = " << BStep << "\n"
 			<< "Candidate is deactivated!\n";
 		  return;
 	}
