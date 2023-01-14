@@ -84,7 +84,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	}
 
 	double TStep = BTensor[0] * eta[0];
-	double PStep = BTensor[4] * eta[1];
+	double PStep = BTensor[4] * (eta[1] + eta[2]);
 	//double BStep = BTensor[8] * eta[2];
 
 	Vector3d TVec(0.);
@@ -132,7 +132,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	}
 
     // Integration of the SDE with a Mayorama-Euler-method aka the total step
-	Vector3d PO = PosIn + LinProp + (TVec * TStep + PVec * sqrt(2) * PStep) * sqrt(h);
+	Vector3d PO = PosIn + LinProp + (TVec * TStep + PVec * PStep) * sqrt(h);
 
     // Throw error message if something went wrong with propagation.
     // Deactivate candidate.
