@@ -84,7 +84,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	}
 
 	double TStep = BTensor[0] * eta[0];
-	double PStep = BTensor[4] * (eta[1] + eta[2]);
+	double PStep = BTensor[4] * (std::sqrt(eta[1] * eta[1] + eta[2] * eta[2]));
 	//double BStep = BTensor[8] * eta[2];
 
 	Vector3d TVec(0.);
