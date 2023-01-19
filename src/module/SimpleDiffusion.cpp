@@ -1,6 +1,8 @@
 #include "crpropa/module/SimpleDiffusion.h"
 using namespace crpropa;
 
+#pragma region Constructors
+
 // Diffusion with a magnetic field that does not have curvature
 SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, double tolerance,
 				 double minStep, double maxStep, double epsilon) :
@@ -29,6 +31,8 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	setAlpha(1./3.);
   	}
 
+#pragma endregion
+	
 	// TODO:
 	// 1. magnetfeldlinien ohne Krümmung
 	// 1.1 Integrationen fallen weg
@@ -85,7 +89,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 
 	double TStep = BTensor[0] * eta[0];
 	double PStep = BTensor[4] * (std::sqrt(eta[1] * eta[1] + eta[2] * eta[2]));
-	//double BStep = BTensor[8] * eta[2];
+	//double BStep = BTensor[8] * eta[2]; To reduce the run time, just one perpendicular vector is drawn
 
 	Vector3d TVec(0.);
 	Vector3d PVec(0.);
@@ -105,7 +109,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	}
 	PVec = PVec.getUnitVector();
 
-    // Calculate the Binormal-vector
+    // Calculate the Binormal-vector - Not necessary any more
 	// BVec = (TVec.cross(NVec)).getUnitVector();
 
 	// Calculate the advection step
