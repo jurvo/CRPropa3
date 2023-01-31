@@ -6,20 +6,21 @@ using namespace crpropa;
 // Diffusion with a magnetic field that does not have curvature
 SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, double tolerance,
 				 double minStep, double maxStep, double epsilon) :
-	minStep(0)
+	minStep(0), epsilon(epsilon), scale(1), alpha(1./3.), DiffCoef(UniformDiffusionCoefficent(epsilon, scale, alpha))
 {
   	setMagneticField(magneticField);
   	setMaximumStep(maxStep);
   	setMinimumStep(minStep);
   	setTolerance(tolerance);
-  	setEpsilon(epsilon);
-  	setScale(1.);
-  	setAlpha(1./3.);
-	}
+// 	setEpsilon(epsilon);
+// 	setScale(1.);
+// 	setAlpha(1./3.);
+//	DiffCoef = UniformDiffusionCoefficent(epsilon, scale, alpha);
+}
 
 // Diffusion with a magnetic field that does not have curvature
 SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
-  	minStep(0)
+  	minStep(0), DiffCoef(UniformDiffusionCoefficent(epsilon, 1., 1./3.))
 {
 	setMagneticField(magneticField);
 	setAdvectionField(advectionField);
@@ -29,6 +30,7 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	setEpsilon(epsilon);
 	setScale(1.);
 	setAlpha(1./3.);
+	//UniformDiffusionCoefficent DiffCoef(epsilon, 1, 1./3.);
   	}
 
 #pragma endregion
@@ -75,11 +77,8 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	double z = candidate->getRedshift();
 	double rig = current.getEnergy() / current.getCharge();
 
-
-    // Calculate the Diffusion tensor
-	double BTensor[] = {0., 0., 0., 0., 0., 0., 0., 0., 0.};
-	calculateBTensor(rig, BTensor, PosIn, DirIn, z);
-
+    // Calculate the Diffusion tensor, Vector3d pos, Vector3d dir, double z
+	BTensor b = DiffCoef.getBTensor(rig);
 
     // Generate random numbers
 	double eta[] = {0., 0., 0.};
@@ -87,8 +86,9 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	  	eta[i] =  Random::instance().randNorm();
 	}
 
-	double TStep = BTensor[0] * eta[0];
-	double PStep = BTensor[4] * (std::sqrt(eta[1] * eta[1] + eta[2] * eta[2]));
+	double TStep = b.parallel * eta[0]; // parallel step
+	double PStep = b.perpendicular * (std::sqrt(eta[1] * eta[1] + eta[2] * eta[2])); // perpendicular step
+	// sqrt(x**2 + y**2) -> rayleigh distribution -> weibull dist with shape k = 2
 	//double BStep = BTensor[8] * eta[2]; To reduce the run time, just one perpendicular vector is drawn
 
 	Vector3d TVec(0.);
@@ -198,8 +198,8 @@ void SimpleDiffusion::driftStep(const Vector3d &pos, Vector3d &linProp, double h
 	return;
 }
 
-void SimpleDiffusion::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const {
-
+void SimpleDiffusion::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const 
+{
     double DifCoeff = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
     BTen[0] = pow( 2  * DifCoeff, 0.5);
     BTen[4] = pow(2 * epsilon * DifCoeff, 0.5);

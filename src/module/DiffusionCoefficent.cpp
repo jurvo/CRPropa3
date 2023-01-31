@@ -1,15 +1,16 @@
 #include "crpropa/module/DiffusionCoefficent.h"
 
-
 namespace crpropa {
 
 // ---- DiffusionCoefficent ----
 #pragma region Static members
 
 const double DiffusionCoefficent::D0 = 6.1e24;
+const double DiffusionCoefficent::E0 = 4.0e9;
 
 #pragma endregion
 
+BTensor::BTensor(double par, double perp) : parallel(par), perpendicular(perp) { }
 
 #pragma region DiffusionCoefficentList
 /*
@@ -51,13 +52,8 @@ double UniformDiffusionCoefficent::getCoefficent(const Vector3d &position) const
 
 BTensor UniformDiffusionCoefficent::getBTensor(double r) const
 {
-	BTensor b;
-	double d = scale * D0 * pow((std::abs(r) / 4.0e9), alpha);
-
-	b.parallel = pow(2  * d, 0.5);
-	b.perpendicular = pow(2 * epsilon * d, 0.5);
-
-	return b;
+	double d = scale * D0 * pow((std::abs(r) / E0), alpha);
+	return BTensor(pow(2  * d, 0.5), pow(2 * epsilon * d, 0.5));
 }
 
 void UniformDiffusionCoefficent::setEpsilon(double e)
@@ -103,7 +99,10 @@ std::string UniformDiffusionCoefficent::getDescription() const
 {
 	std::stringstream s;
 	s << "UniformDiffusionCoefficent\n";
-	s << "D: " << getCoefficent()  << " m^2/s";
+	s << "D: " << getCoefficent()  << " m^2/s\n";
+	s << "scale: " << getScale() << "\n";
+	s << "epsilon: " << getEpsilon() << "\n";
+	s << "alpha: " << getAlpha();
 	return s.str();
 }
 
@@ -129,5 +128,4 @@ void UniformDiffusionCoefficent::getBTensor(double r, double BTen[], Vector3d po
 
 
 // ---- tbc ----
-
 } // namespace crpropa

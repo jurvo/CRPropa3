@@ -18,6 +18,8 @@ struct BTensor
 {
 	double parallel;
 	double perpendicular;
+
+	BTensor(double par, double perp);
 };
 
 
@@ -30,8 +32,10 @@ class DiffusionCoefficent: public Referenced {
 public:
 	virtual ~DiffusionCoefficent() {}
 	virtual double getCoefficent(const Vector3d &position) const { return 0; }
+	virtual BTensor getBTensor(double r) const { return BTensor(1.,1.);}
 	//virtual double getDivergence(const Vector3d &position) const = 0;
 	static const double D0; // Normalization diffusion coefficent, unit: m^2/s
+	static const double E0; // Energy normalization for the diffusion coefficent, unit: eV
 };
 
 
@@ -58,6 +62,10 @@ class UniformDiffusionCoefficent: public DiffusionCoefficent {
 	double scale;
 	double alpha;
 public:
+	/// @brief 
+	/// @param epsilon 
+	/// @param scale 
+	/// @param alpha 
 	UniformDiffusionCoefficent(double epsilon, double scale, double alpha);
 	double getCoefficent() const;
 	double getCoefficent(const Vector3d &position) const;
@@ -65,7 +73,7 @@ public:
 	/// @brief Calculates the Diffusion Tensor for a particle
 	/// @param r Ridgidity of the particle
 	/// @return Diffuison Tensor parallel and perpendicular component
-	BTensor getBTensor(double r) const;
+	BTensor getBTensor(double r) const override;
 	//BTensor getBTensor(double r, Vector3d pos = , Vector3d dir = 0., double z = 0.) const;
 	//Vector3d getGradient(const Vector3d &position) const;
 

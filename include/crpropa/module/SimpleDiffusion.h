@@ -11,6 +11,7 @@
 #include "crpropa/Module.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/advectionField/AdvectionField.h"
+#include "crpropa/module/DiffusionCoefficent.h"
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
 
@@ -43,6 +44,8 @@ private:
 	    double epsilon; // ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
 	    double alpha; // power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	    double scale; // scaling factor for the diffusion coefficient D = scale*D_0
+		// ToDo: Modify in respect to inheritance!
+		UniformDiffusionCoefficent DiffCoef;
 
 public:
 	/** Constructor
