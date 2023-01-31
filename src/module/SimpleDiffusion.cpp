@@ -5,33 +5,26 @@ using namespace crpropa;
 
 // Diffusion with a magnetic field that does not have curvature
 SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, double tolerance,
-				 double minStep, double maxStep, double epsilon) :
-	minStep(0), epsilon(epsilon), scale(1), alpha(1./3.), DiffCoef(UniformDiffusionCoefficent(epsilon, scale, alpha))
+								 double minStep, double maxStep, double epsilon, double scale, double alpha) :
+	minStep(0), DiffCoef(UniformDiffusionCoefficent(epsilon, scale, alpha))
 {
   	setMagneticField(magneticField);
   	setMaximumStep(maxStep);
   	setMinimumStep(minStep);
   	setTolerance(tolerance);
-// 	setEpsilon(epsilon);
-// 	setScale(1.);
-// 	setAlpha(1./3.);
-//	DiffCoef = UniformDiffusionCoefficent(epsilon, scale, alpha);
 }
 
 // Diffusion with a magnetic field that does not have curvature
-SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
-  	minStep(0), DiffCoef(UniformDiffusionCoefficent(epsilon, 1., 1./3.))
+SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField,
+								 double tolerance, double minStep, double maxStep, double epsilon, double scale, double alpha) :
+  	minStep(0), DiffCoef(UniformDiffusionCoefficent(epsilon, scale, alpha))
 {
 	setMagneticField(magneticField);
 	setAdvectionField(advectionField);
 	setMaximumStep(maxStep);
 	setMinimumStep(minStep);
 	setTolerance(tolerance);
-	setEpsilon(epsilon);
-	setScale(1.);
-	setAlpha(1./3.);
-	//UniformDiffusionCoefficent DiffCoef(epsilon, 1, 1./3.);
-  	}
+}
 
 #pragma endregion
 	
@@ -200,11 +193,12 @@ void SimpleDiffusion::driftStep(const Vector3d &pos, Vector3d &linProp, double h
 
 void SimpleDiffusion::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const 
 {
-    double DifCoeff = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
+	
+/*  double DifCoeff = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
     BTen[0] = pow( 2  * DifCoeff, 0.5);
     BTen[4] = pow(2 * epsilon * DifCoeff, 0.5);
-    BTen[8] = pow(2 * epsilon * DifCoeff, 0.5);
-    return;
+    BTen[8] = pow(2 * epsilon * DifCoeff, 0.5);*/	
+	throw std::runtime_error("SimpleDiffusion: Deprecated.");
 }
 
 void SimpleDiffusion::setMinimumStep(double min) {
@@ -230,25 +224,16 @@ void SimpleDiffusion::setTolerance(double tol) {
 }
 
 void SimpleDiffusion::setEpsilon(double e) {
-	if ((e > 1) or (e < 0))
-		throw std::runtime_error(
-				"SimpleDiffusion: epsilon not in range 0-1");
-	epsilon = e;
+	DiffCoef.setEpsilon(e);
 }
 
 
 void SimpleDiffusion::setAlpha(double a) {
-	if ((a > 2.) or (a < 0))
-		throw std::runtime_error(
-				"SimpleDiffusion: alpha not in range 0-2");
-	alpha = a;
+	DiffCoef.setAlpha(a);
 }
 
 void SimpleDiffusion::setScale(double s) {
-	if (s < 0)
-		throw std::runtime_error(
-				"SimpleDiffusion: Scale error: Scale < 0");
-	scale = s;
+	DiffCoef.setScale(s);
 }
 
 void SimpleDiffusion::setMagneticField(ref_ptr<MagneticField> f) {
@@ -272,15 +257,15 @@ double SimpleDiffusion::getTolerance() const {
 }
 
 double SimpleDiffusion::getEpsilon() const {
-	return epsilon;
+	return DiffCoef.getEpsilon();
 }
 
 double SimpleDiffusion::getAlpha() const {
-	return alpha;
+	return DiffCoef.getAlpha();
 }
 
 double SimpleDiffusion::getScale() const {
-	return scale;
+	return DiffCoef.getScale();
 }
 
 ref_ptr<MagneticField> SimpleDiffusion::getMagneticField() const {
@@ -326,18 +311,6 @@ std::string SimpleDiffusion::getDescription() const {
 	s << "minStep: " << minStep / kpc  << " kpc, ";
 	s << "maxStep: " << maxStep / kpc  << " kpc, ";
 	s << "tolerance: " << tolerance << "\n";
-
-	if (epsilon != 0.1) {
-	  s << "epsilon: " << epsilon << ", ";
-	  }
-
-	if (alpha != 1./3.) {
-	  s << "alpha: " << alpha << "\n";
-	  }
-
-	if (scale != 1.) {
-	  s << "D_0: " << scale*6.1e24 << " m^2/s" << "\n";
-	  }
-
+	s << DiffCoef.getDescription();
 	return s.str();
 }
