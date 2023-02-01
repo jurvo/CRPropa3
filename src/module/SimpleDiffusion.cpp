@@ -47,6 +47,37 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	//		-> v_advektion**2 / kappa_0 = const über Shock
 	//		- AdiabaticCooling in Modulliste (mit Advektionsfeld)
 
+
+
+/* Code example
+	
+	void DiffusionSDE::driftStep(const Vector3d &pos, Vector3d &linProp, double h) const {
+	Vector3d advField = getAdvectionFieldAtPosition(pos);
+	double DivadvField = advectionField->getDivergence(pos);
+	// Sophie: calculate divkappa depending on the advection Field and use x coordinate only:
+	// Future: provide diffusionCoefficient module that specifies kappa and its derivatives
+	Vector3d D_DifCoeff = 0 * scale * 2 * advField * DivadvField; 
+	linProp += (D_DifCoeff + advField) * h;
+	return;
+}
+
+void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const {
+
+    double DifCoeff = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha); // * 6.1e24
+	// Sophie: Diffusion coefficient changes with advection Field, scale now says how advection Field and Diffusion Coefficient 
+	// are related (for now in 1D) + not energy dependent in Toptyghin solution:
+	//Vector3d advField = getAdvectionFieldAtPosition(pos);
+	DifCoeff = scale; //* advField.x * advField.x;
+
+	BTen[0] = pow( 2  * DifCoeff, 0.5);
+    BTen[4] = pow(2 * epsilon * DifCoeff, 0.5);
+    BTen[8] = pow(2 * epsilon * DifCoeff, 0.5);
+
+    return; 
+
+}	
+	*/
+
 void SimpleDiffusion::process(Candidate *candidate) const {
 
     // save the new previous particle state
