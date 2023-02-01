@@ -46,7 +46,7 @@ private:
 	    //double scale; // scaling factor for the diffusion coefficient D = scale*D_0
 
 		// ToDo: Modify in respect to inheritance!
-		UniformDiffusionCoefficent DiffCoef;
+		UniformDiffusionCoefficent DiffCoef; // DiffusionCoefficent for the propagation
 
 public:
 	/** Constructor
@@ -55,6 +55,8 @@ public:
 	 @param minStep			minStep/c_light is the minimum integration time step
 	 @param maxStep			maxStep/c_light is the maximum integration time step
 	 @param epsilon			Ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
+	 @param scale			Scaling factor for the diffusion coefficient D = scale*D_0
+	 @param alpha 			Power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	 */
 	SimpleDiffusion(ref_ptr<crpropa::MagneticField> magneticField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1, double scale = 1., double alpha = 1./3.);
 	/** Constructor
@@ -64,6 +66,8 @@ public:
 	 @param minStep			minStep/c_light is the minimum integration time step
 	 @param maxStep			maxStep/c_light is the maximum integration time step
 	 @param epsilon			Ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
+	 @param scale			Scaling factor for the diffusion coefficient D = scale*D_0
+	 @param alpha 			Power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	 */
 	SimpleDiffusion(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1, double scale = 1., double alpha = 1./3.);
 

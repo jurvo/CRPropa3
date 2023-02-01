@@ -38,6 +38,14 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	// 2. Diffusiontensor auslagern (ähnlich zu Advektionsfeld), Kopp, 2012, Gl. 18/19
 	//  	getBTensor, getDerivatveOfBTensor
 	//
+	// 1-D Fall:
+	// 		- Magnetfeld in x-Richtung
+	//		- AdvectionField mit tanh - Sophie's Git
+	//		-> Diffusionskoeffizient auch mit tanh in x
+	//		-> getDerivativeBTensor für DiffCoef
+	//		-> Advektionsschritt + (dKappa / dx, 0, 0)
+	//		-> v_advektion**2 / kappa_0 = const über Shock
+	//		- AdiabaticCooling in Modulliste (mit Advektionsfeld)
 
 void SimpleDiffusion::process(Candidate *candidate) const {
 
