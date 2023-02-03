@@ -65,11 +65,11 @@ class OneDimensionalAdvectionShock: public AdvectionField {
 	double r_comp; //compression ratio of shock
 	double v_up; //upstream velocity 
 	double x_sh; //shock width
-public:/** Constructor
-	@param r_comp //compression ratio of shock
-	@param v_up //upstream velocity 
-	@param x_sh //shock width
-*/
+public:
+	/** Constructor
+	@param r_comp	compression ratio of shock
+	@param v_up		upstream velocity 
+	@param x_sh 	shock width */
 	OneDimensionalAdvectionShock(double r_comp, double v_up, double x_sh);
 	Vector3d getField(const Vector3d &position) const;
 	double getDivergence(const Vector3d &position) const;
@@ -108,8 +108,6 @@ public:
 	double getVWind() const;
 
 	std::string getDescription() const;
-
-	
 };
 	
 /**

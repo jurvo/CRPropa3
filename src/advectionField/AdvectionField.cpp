@@ -46,12 +46,11 @@ std::string UniformAdvectionField::getDescription() const {
 
 //----------------------------------------------------------------
 
-OneDimensionalAdvectionShock::OneDimensionalAdvectionShock(double r_comp, double v_up, double x_sh){
-
+OneDimensionalAdvectionShock::OneDimensionalAdvectionShock(double r_comp, double v_up, double x_sh) {
 	setComp(r_comp);
 	setVup(v_up);
 	setShockwidth(x_sh);
-	}
+}
 
 Vector3d OneDimensionalAdvectionShock::getField(const Vector3d &position) const {
 
@@ -65,7 +64,7 @@ Vector3d OneDimensionalAdvectionShock::getField(const Vector3d &position) const 
     v.x = a - b*tanh(x/x_sh);
 
 	return v;
-	}
+}
 
 double OneDimensionalAdvectionShock::getDivergence(const Vector3d &position) const {
 
@@ -76,7 +75,7 @@ double OneDimensionalAdvectionShock::getDivergence(const Vector3d &position) con
 	double b = (v_up - v_down)*0.5;
 
 	return -b/x_sh*(1 - tanh(x/x_sh)*tanh(x/x_sh));
-	}
+}
 
 void OneDimensionalAdvectionShock::setComp(double r) {
 	r_comp = r;
