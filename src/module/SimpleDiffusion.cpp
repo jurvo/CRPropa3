@@ -6,25 +6,40 @@ using namespace crpropa;
 // Diffusion with a magnetic field that does not have curvature
 SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, double tolerance,
 								 double minStep, double maxStep, double epsilon, double scale, double alpha) :
-	minStep(0), DiffCoef(UniformDiffusionCoefficent(epsilon, scale, alpha))
+	minStep(0)
 {
   	setMagneticField(magneticField);
   	setMaximumStep(maxStep);
   	setMinimumStep(minStep);
   	setTolerance(tolerance);
+	setDiffusionCoefficent(new UniformDiffusionCoefficent(epsilon, scale, alpha));
 }
 
 // Diffusion with a magnetic field that does not have curvature
 SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField,
 								 double tolerance, double minStep, double maxStep, double epsilon, double scale, double alpha) :
-  	minStep(0), DiffCoef(UniformDiffusionCoefficent(epsilon, scale, alpha))
+  	minStep(0)
 {
 	setMagneticField(magneticField);
 	setAdvectionField(advectionField);
 	setMaximumStep(maxStep);
 	setMinimumStep(minStep);
 	setTolerance(tolerance);
+	setDiffusionCoefficent(new UniformDiffusionCoefficent(epsilon, scale, alpha));
 }
+
+SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField,
+								 double tolerance, double minStep, double maxStep, ref_ptr<DiffusionCoefficent> D) :
+  	minStep(0)
+{
+	setMagneticField(magneticField);
+	setAdvectionField(advectionField);
+	setMaximumStep(maxStep);
+	setMinimumStep(minStep);
+	setTolerance(tolerance);
+	setDiffusionCoefficent(D);
+}
+
 
 #pragma endregion
 	
@@ -43,8 +58,9 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	//		- AdvectionField mit tanh - Sophie's Git
 	//		-> Diffusionskoeffizient auch mit tanh in x
 	//		-> getDerivativeBTensor für DiffCoef
-	//		-> Advektionsschritt + (dKappa / dx, 0, 0)
 	//		-> v_advektion**2 / kappa_0 = const über Shock
+	//		------ done so far -------------
+	//		-> Advektionsschritt + (dKappa / dx, 0, 0)
 	//		- AdiabaticCooling in Modulliste (mit Advektionsfeld)
 
 
@@ -110,7 +126,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	double rig = current.getEnergy() / current.getCharge();
 
     // Calculate the Diffusion tensor, Vector3d pos, Vector3d dir, double z
-	BTensor b = DiffCoef.getBTensor(rig);
+	Vector3d b = DiffCoef->getBTensor(rig, PosIn);
 
     // Generate random numbers
 	double eta[] = {0., 0., 0.};
@@ -118,8 +134,8 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	  	eta[i] =  Random::instance().randNorm();
 	}
 
-	double TStep = b.parallel * eta[0]; // parallel step
-	double PStep = b.perpendicular * (std::sqrt(eta[1] * eta[1] + eta[2] * eta[2])); // perpendicular step
+	double TStep = b.x * eta[0]; // parallel step
+	double PStep = b.y * (std::sqrt(eta[1] * eta[1] + eta[2] * eta[2])); // perpendicular step
 	// sqrt(x**2 + y**2) -> rayleigh distribution -> weibull dist with shape k = 2
 	//double BStep = BTensor[8] * eta[2]; To reduce the run time, just one perpendicular vector is drawn
 
@@ -221,8 +237,6 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 
 }
 
-
-
 void SimpleDiffusion::driftStep(const Vector3d &pos, Vector3d &linProp, double h) const {
 	// add here: Drift step of diff coeff
 	Vector3d advField = getAdvectionFieldAtPosition(pos);
@@ -262,17 +276,22 @@ void SimpleDiffusion::setTolerance(double tol) {
 	tolerance = tol;
 }
 
+void SimpleDiffusion::setDiffusionCoefficent(ref_ptr<DiffusionCoefficent> D)
+{
+	DiffCoef = D;
+}
+
 void SimpleDiffusion::setEpsilon(double e) {
-	DiffCoef.setEpsilon(e);
+	DiffCoef->setEpsilon(e);
 }
 
 
 void SimpleDiffusion::setAlpha(double a) {
-	DiffCoef.setAlpha(a);
+	DiffCoef->setAlpha(a);
 }
 
 void SimpleDiffusion::setScale(double s) {
-	DiffCoef.setScale(s);
+	DiffCoef->setScale(s);
 }
 
 void SimpleDiffusion::setMagneticField(ref_ptr<MagneticField> f) {
@@ -296,15 +315,15 @@ double SimpleDiffusion::getTolerance() const {
 }
 
 double SimpleDiffusion::getEpsilon() const {
-	return DiffCoef.getEpsilon();
+	return DiffCoef->getEpsilon();
 }
 
 double SimpleDiffusion::getAlpha() const {
-	return DiffCoef.getAlpha();
+	return DiffCoef->getAlpha();
 }
 
 double SimpleDiffusion::getScale() const {
-	return DiffCoef.getScale();
+	return DiffCoef->getScale();
 }
 
 ref_ptr<MagneticField> SimpleDiffusion::getMagneticField() const {
@@ -350,6 +369,6 @@ std::string SimpleDiffusion::getDescription() const {
 	s << "minStep: " << minStep / kpc  << " kpc, ";
 	s << "maxStep: " << maxStep / kpc  << " kpc, ";
 	s << "tolerance: " << tolerance << "\n";
-	s << DiffCoef.getDescription();
+	s << DiffCoef->getDescription();
 	return s.str();
 }

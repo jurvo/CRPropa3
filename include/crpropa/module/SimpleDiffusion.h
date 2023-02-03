@@ -46,7 +46,7 @@ private:
 	    //double scale; // scaling factor for the diffusion coefficient D = scale*D_0
 
 		// ToDo: Modify in respect to inheritance!
-		UniformDiffusionCoefficent DiffCoef; // DiffusionCoefficent for the propagation
+		ref_ptr<DiffusionCoefficent> DiffCoef; // DiffusionCoefficent for the propagation
 
 public:
 	/** Constructor
@@ -71,6 +71,16 @@ public:
 	 */
 	SimpleDiffusion(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1, double scale = 1., double alpha = 1./3.);
 
+	/**
+	 @param magneticField	the magnetic field to be used (but without any curvature)
+	 @param advectionField	object containing advection field
+	 @param tolerance		Tolerance is criterion for step adjustment. Step adjustment takes place when the  tangential vector of the magnetic field line is calculated.
+	 @param minStep			minStep/c_light is the minimum integration time step
+	 @param maxStep			maxStep/c_light is the maximum integration time step
+	 @param D				DiffusionCoefficent
+	 */
+	SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, ref_ptr<DiffusionCoefficent> D);
+
 	void process(crpropa::Candidate *candidate) const;
 
 	void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) const;
@@ -84,6 +94,7 @@ public:
 	void setScale(double Scale);
 	void setMagneticField(ref_ptr<crpropa::MagneticField> magneticField);
 	void setAdvectionField(ref_ptr<crpropa::AdvectionField> advectionField);
+	void setDiffusionCoefficent(ref_ptr<DiffusionCoefficent> diffusionCoefficent);
 
 	double getMinimumStep() const;
 	double getMaximumStep() const;
