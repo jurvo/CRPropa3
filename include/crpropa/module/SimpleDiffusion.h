@@ -69,7 +69,7 @@ public:
 	 @param scale			Scaling factor for the diffusion coefficient D = scale*D_0
 	 @param alpha 			Power law index of the energy dependent diffusion coefficient: D\propto E^alpha
 	 */
-	SimpleDiffusion(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1, double scale = 1., double alpha = 1./3.);
+	SimpleDiffusion(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1, double scale = 1., double alpha = 1./3., double comp = 0., double x_sh = 0.);
 
 	/**
 	 @param magneticField	the magnetic field to be used (but without any curvature)

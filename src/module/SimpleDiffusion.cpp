@@ -17,7 +17,7 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, double to
 
 // Diffusion with a magnetic field that does not have curvature
 SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField,
-								 double tolerance, double minStep, double maxStep, double epsilon, double scale, double alpha) :
+								 double tolerance, double minStep, double maxStep, double epsilon, double scale, double alpha, double comp, double x_sh) :
   	minStep(0)
 {
 	setMagneticField(magneticField);
@@ -25,13 +25,17 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	setMaximumStep(maxStep);
 	setMinimumStep(minStep);
 	setTolerance(tolerance);
-	setDiffusionCoefficent(new UniformDiffusionCoefficent(epsilon, scale, alpha));
+	if (comp == 0.)
+		setDiffusionCoefficent(new UniformDiffusionCoefficent(epsilon, scale, alpha));
+	else
+		setDiffusionCoefficent(new OneDimensionalDiffusionCoefficent(epsilon, scale, alpha, comp, x_sh));
 }
 
 SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, ref_ptr<DiffusionCoefficent> D, 
 								 double tolerance, double minStep, double maxStep) :
   	minStep(0)
 {
+	// this ctor does not work with python, why?
 	setMagneticField(magneticField);
 	setAdvectionField(advectionField);
 	setMaximumStep(maxStep);
