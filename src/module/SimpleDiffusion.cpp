@@ -28,8 +28,8 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	setDiffusionCoefficent(new UniformDiffusionCoefficent(epsilon, scale, alpha));
 }
 
-SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField,
-								 double tolerance, double minStep, double maxStep, ref_ptr<DiffusionCoefficent> D) :
+SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, ref_ptr<DiffusionCoefficent> D, 
+								 double tolerance, double minStep, double maxStep) :
   	minStep(0)
 {
 	setMagneticField(magneticField);
@@ -163,7 +163,7 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 	// Calculate the advection step
 	Vector3d LinProp(0.);
 	if (advectionField){
-		driftStep(PosIn, LinProp, h);
+		driftStep(PosIn, LinProp, h, rig);
 	}
 	
     // Exception: If the magnetic field vanishes: Use only advection.
@@ -239,8 +239,18 @@ void SimpleDiffusion::process(Candidate *candidate) const {
 
 void SimpleDiffusion::driftStep(const Vector3d &pos, Vector3d &linProp, double h) const {
 	// add here: Drift step of diff coeff
-	Vector3d advField = getAdvectionFieldAtPosition(pos);
-	linProp += advField * h;
+	driftStep(pos, linProp, h, 0.);
+	return;
+}
+
+void SimpleDiffusion::driftStep(const Vector3d &pos, Vector3d &linProp, double h, double r) const {
+	// add here: Drift step of diff coeff
+	Vector3d drift = getAdvectionFieldAtPosition(pos);
+	if (r != 0)
+	{
+		drift += DiffCoef->getDerivativeOfDiffusionCoefficent(r, pos);
+	}
+	linProp += drift * h;
 	return;
 }
 

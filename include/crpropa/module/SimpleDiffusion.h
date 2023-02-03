@@ -79,11 +79,12 @@ public:
 	 @param maxStep			maxStep/c_light is the maximum integration time step
 	 @param D				DiffusionCoefficent
 	 */
-	SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, ref_ptr<DiffusionCoefficent> D);
+	SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, ref_ptr<DiffusionCoefficent> D, double tolerance, double minStep, double maxStep);
 
 	void process(crpropa::Candidate *candidate) const;
 
-	void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) const;
+	void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h) const; // uncharged
+	void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h, double r) const; // charged
 	void calculateBTensor(double rig, double BTen[], Vector3d pos, Vector3d dir, double z) const;
 
 	void setMinimumStep(double minStep);
