@@ -390,6 +390,7 @@ add_library(crpropa SHARED
   src/module/Acceleration.cpp
   src/module/Boundary.cpp
   src/module/BreakCondition.cpp
+  src/module/CandidateSplitting.cpp
   src/module/DiffusionCoefficent.cpp
   src/module/DiffusionSDE.cpp
   src/module/EMCascade.cpp
