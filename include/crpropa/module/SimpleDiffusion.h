@@ -29,7 +29,8 @@ namespace crpropa {
  The time integration of SDEs is used to solve the transport equation.
  * Here an Euler-Mayurama integration scheme is used. The diffusion tensor
  * can be anisotropic with respect to the magnetic field line coordinates.
- * The magnetic field must not curved.
+ * The magnetic field must not be curved.
+ * The tests look like it is by a factor of 2 faster.
  */
 
 
