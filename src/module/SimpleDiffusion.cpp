@@ -378,6 +378,10 @@ Vector3d SimpleDiffusion::getAdvectionFieldAtPosition(Vector3d pos) const {
 	return AdvField;
 }
 
+ref_ptr<DiffusionCoefficent> SimpleDiffusion::getDiffusionCoefficent() const {
+	return DiffCoef;
+}
+
 std::string SimpleDiffusion::getDescription() const {
 	std::stringstream s;
 	s << "minStep: " << minStep / kpc  << " kpc, ";

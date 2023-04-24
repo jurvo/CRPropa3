@@ -106,7 +106,8 @@ public:
 	double getScale() const;
 	std::string getDescription() const;
   
-  ref_ptr<MagneticField> getMagneticField() const;
+	ref_ptr<DiffusionCoefficent> SimpleDiffusion::getDiffusionCoefficent() const;
+  	ref_ptr<MagneticField> getMagneticField() const;
 	/** get magnetic field vector at current candidate position
 	 @param pos   current position of the candidate
 	 @param z	 current redshift is needed to calculate the magnetic field
@@ -117,6 +118,8 @@ public:
 	 @param pos   current position of the candidate
 	 @return	  magnetic field vector at the position pos */
 	Vector3d getAdvectionFieldAtPosition(Vector3d pos) const;
+
+	
 
 };
 /** @}*/
