@@ -106,7 +106,7 @@ public:
 	double getScale() const;
 	std::string getDescription() const;
   
-	ref_ptr<DiffusionCoefficent> SimpleDiffusion::getDiffusionCoefficent() const;
+	ref_ptr<DiffusionCoefficent> getDiffusionCoefficent() const;
   	ref_ptr<MagneticField> getMagneticField() const;
 	/** get magnetic field vector at current candidate position
 	 @param pos   current position of the candidate
