@@ -11,7 +11,7 @@
 #include "crpropa/Module.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/advectionField/AdvectionField.h"
-#include "crpropa/module/DiffusionCoefficent.h"
+#include "crpropa/module/DiffusionCoefficient.h"
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
 
@@ -47,7 +47,7 @@ private:
 	    //double scale; // scaling factor for the diffusion coefficient D = scale*D_0
 
 		// ToDo: Modify in respect to inheritance!
-		ref_ptr<DiffusionCoefficent> DiffCoef; // DiffusionCoefficent for the propagation
+		ref_ptr<DiffusionCoefficient> DiffCoef; // DiffusionCoefficient for the propagation
 
 public:
 	/** Constructor
@@ -78,9 +78,9 @@ public:
 	 @param tolerance		Tolerance is criterion for step adjustment. Step adjustment takes place when the  tangential vector of the magnetic field line is calculated.
 	 @param minStep			minStep/c_light is the minimum integration time step
 	 @param maxStep			maxStep/c_light is the maximum integration time step
-	 @param D				DiffusionCoefficent
+	 @param D				DiffusionCoefficient
 	 */
-	SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, ref_ptr<DiffusionCoefficent> D, double tolerance, double minStep, double maxStep);
+	SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, ref_ptr<DiffusionCoefficient> D, double tolerance, double minStep, double maxStep);
 
 	void process(crpropa::Candidate *candidate) const;
 
@@ -96,7 +96,7 @@ public:
 	void setScale(double Scale);
 	void setMagneticField(ref_ptr<crpropa::MagneticField> magneticField);
 	void setAdvectionField(ref_ptr<crpropa::AdvectionField> advectionField);
-	void setDiffusionCoefficent(ref_ptr<DiffusionCoefficent> diffusionCoefficent);
+	void setDiffusionCoefficient(ref_ptr<DiffusionCoefficient> diffusionCoefficient);
 
 	double getMinimumStep() const;
 	double getMaximumStep() const;
@@ -106,7 +106,7 @@ public:
 	double getScale() const;
 	std::string getDescription() const;
   
-	ref_ptr<DiffusionCoefficent> getDiffusionCoefficent() const;
+	ref_ptr<DiffusionCoefficient> getDiffusionCoefficient() const;
   	ref_ptr<MagneticField> getMagneticField() const;
 	/** get magnetic field vector at current candidate position
 	 @param pos   current position of the candidate

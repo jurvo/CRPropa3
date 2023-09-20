@@ -12,7 +12,7 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, double to
   	setMaximumStep(maxStep);
   	setMinimumStep(minStep);
   	setTolerance(tolerance);
-	setDiffusionCoefficent(new UniformDiffusionCoefficent(epsilon, scale, alpha));
+	setDiffusionCoefficient(new UniformDiffusionCoefficient(epsilon, scale, alpha));
 }
 
 // Diffusion with a magnetic field that does not have curvature
@@ -26,12 +26,12 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	setMinimumStep(minStep);
 	setTolerance(tolerance);
 	if (comp == 0.)
-		setDiffusionCoefficent(new UniformDiffusionCoefficent(epsilon, scale, alpha));
+		setDiffusionCoefficient(new UniformDiffusionCoefficient(epsilon, scale, alpha));
 	else
-		setDiffusionCoefficent(new OneDimensionalDiffusionCoefficent(epsilon, scale, alpha, comp, x_sh));
+		setDiffusionCoefficient(new OneDimensionalDiffusionCoefficient(epsilon, scale, alpha, comp, x_sh));
 }
 
-SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, ref_ptr<DiffusionCoefficent> D, 
+SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, ref_ptr<DiffusionCoefficient> D, 
 								 double tolerance, double minStep, double maxStep) :
   	minStep(0)
 {
@@ -41,7 +41,7 @@ SimpleDiffusion::SimpleDiffusion(ref_ptr<MagneticField> magneticField, ref_ptr<A
 	setMaximumStep(maxStep);
 	setMinimumStep(minStep);
 	setTolerance(tolerance);
-	setDiffusionCoefficent(D);
+	setDiffusionCoefficient(D);
 }
 
 
@@ -252,7 +252,7 @@ void SimpleDiffusion::driftStep(const Vector3d &pos, Vector3d &linProp, double h
 	Vector3d drift = getAdvectionFieldAtPosition(pos);
 	if (r != 0)
 	{
-		drift += DiffCoef->getDerivativeOfDiffusionCoefficent(r, pos);
+		drift += DiffCoef->getDerivativeOfDiffusionCoefficient(r, pos);
 	}
 	linProp += drift * h;
 	return;
@@ -290,7 +290,7 @@ void SimpleDiffusion::setTolerance(double tol) {
 	tolerance = tol;
 }
 
-void SimpleDiffusion::setDiffusionCoefficent(ref_ptr<DiffusionCoefficent> D)
+void SimpleDiffusion::setDiffusionCoefficient(ref_ptr<DiffusionCoefficient> D)
 {
 	DiffCoef = D;
 }
@@ -378,7 +378,7 @@ Vector3d SimpleDiffusion::getAdvectionFieldAtPosition(Vector3d pos) const {
 	return AdvField;
 }
 
-ref_ptr<DiffusionCoefficent> SimpleDiffusion::getDiffusionCoefficent() const {
+ref_ptr<DiffusionCoefficient> SimpleDiffusion::getDiffusionCoefficient() const {
 	return DiffCoef;
 }
 
